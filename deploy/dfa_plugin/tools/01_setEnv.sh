@@ -23,9 +23,9 @@
 
 EnvVersion=1
 if [ $EnvVersion = 1 ]; then
-    export ENV_TensorRT_LIB=~/.cache/bazel/_bazel_wxc/fe1d1d62952da7ed96f34d290e1a4680/external/tensorrt_amd64/usr/lib/x86_64-linux-gnu
-    export ENV_TensorRT_INC=~/.cache/bazel/_bazel_wxc/fe1d1d62952da7ed96f34d290e1a4680/external/tensorrt_amd64/usr/include/x86_64-linux-gnu
-    export ENV_TensorRT_BIN=~/.cache/bazel/_bazel_wxc/fe1d1d62952da7ed96f34d290e1a4680/external/tensorrt_amd64/usr/src/tensorrt/bin
+    export ENV_TensorRT_LIB=path
+    export ENV_TensorRT_INC=path
+    export ENV_TensorRT_BIN=path
     export ENV_CUDA_LIB=/usr/local/cuda-11.3/lib64
     export ENV_CUDA_INC=/usr/local/cuda-11.3/include
     export ENV_CUDA_BIN=/usr/local/cuda-11.3/bin

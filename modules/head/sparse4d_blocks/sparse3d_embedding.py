@@ -60,9 +60,9 @@ class SparseBox3DEncoder(BaseModule):
             self.output_fc = None
 
     def forward(self, box_3d: torch.Tensor):
-        pos_feat = self.pos_fc(box_3d[..., [X, Y, Z]])
-        size_feat = self.size_fc(box_3d[..., [W, L, H]])
-        yaw_feat = self.yaw_fc(box_3d[..., [SIN_YAW, COS_YAW]])
+        pos_feat = self.pos_fc(box_3d[..., X:W])
+        size_feat = self.size_fc(box_3d[..., W:SIN_YAW])
+        yaw_feat = self.yaw_fc(box_3d[..., SIN_YAW:VX])
         if self.mode == "add":
             output = pos_feat + size_feat + yaw_feat
         elif self.mode == "cat":
@@ -97,10 +97,6 @@ class SparseBox3DRefinementModule(BaseModule):
         self.normalize_yaw = normalize_yaw
         self.refine_yaw = refine_yaw
 
-        self.refine_state = [X, Y, Z, W, L, H]
-        if self.refine_yaw:
-            self.refine_state += [SIN_YAW, COS_YAW]
-
         self.layers = nn.Sequential(
             *linear_relu_ln(embed_dims, 2, 2),
             nn.Linear(self.embed_dims, self.output_dim),
@@ -134,12 +130,14 @@ class SparseBox3DRefinementModule(BaseModule):
     ):
         feature = instance_feature + anchor_embed
         output = self.layers(feature)  # (bs ,1220, 256) => (bs ,1220, 11)
-        output[..., self.refine_state] = (
-            output[..., self.refine_state] + anchor[..., self.refine_state]
-        )
+        if self.refine_yaw:
+            output[..., :SIN_YAW] = output[..., :SIN_YAW] + anchor[..., :SIN_YAW]
+        else:
+            output[..., :VX] = output[..., :VX] + anchor[..., :VX]
+
         if self.normalize_yaw:  # default=false
-            output[..., [SIN_YAW, COS_YAW]] = torch.nn.functional.normalize(
-                output[..., [SIN_YAW, COS_YAW]], dim=-1
+            output[..., SIN_YAW:VX] = torch.nn.functional.normalize(
+                output[..., SIN_YAW:VX], dim=-1
             )
         if self.output_dim > 8:  # default=11
             if not isinstance(time_interval, torch.Tensor):

@@ -21,7 +21,7 @@ from tool.utils.logger import set_logger
 
 
 def parse_args():
-    parser = argparse.ArgumentParser(description="Deploy E2E Head!")
+    parser = argparse.ArgumentParser(description="Deploy PerceptionE2E Head!")
     parser.add_argument(
         "--cfg",
         type=str,
@@ -54,9 +54,9 @@ def parse_args():
     return args
 
 
-class FisrtFrame_Sparse4DHead(nn.Module):
+class Sparse4DHeadFisrtFrame(nn.Module):
     def __init__(self, model):
-        super(FisrtFrame_Sparse4DHead, self).__init__()
+        super(Sparse4DHeadFisrtFrame, self).__init__()
         self.model = model
 
     @staticmethod
@@ -87,7 +87,7 @@ class FisrtFrame_Sparse4DHead(nn.Module):
         feature_maps = [feature, spatial_shapes, level_start_index]
         prediction = []
         for i, op in enumerate(self.operation_order):
-            print("op:  ", op)
+            print("i: ", i, "\top: ", op)
             if self.layers[i] is None:
                 continue
             elif op == "temp_gnn":
@@ -360,7 +360,7 @@ def dummpy_input(
     dummy_level_start_index = scale_start_index.reshape(nums_cam, 4)
 
     dummy_lidar2img = torch.randn(bs, nums_cam, 4, 4).to(dummy_feature)
-    image_wh = (
+    dummy_image_wh = (
         torch.tensor([input_w, input_h])
         .unsqueeze(0)
         .unsqueeze(0)
@@ -368,50 +368,36 @@ def dummpy_input(
         .to(dummy_feature)
     )
 
-    logger.debug(f"Frame DummyInput Shape and Type...")
-    logger.debug(
-        f"dummy_instance_feature      : shape={dummy_instance_feature.shape},\tdtype={dummy_instance_feature.dtype},\tdevice={dummy_instance_feature.device}"
-    )
-    logger.debug(
-        f"dummy_anchor                : shape={dummy_anchor.shape},\tdtype={dummy_anchor.dtype},\tdevice={dummy_anchor.device}"
-    )
-    logger.debug(
-        f"dummy_time_interval         : shape={dummy_time_interval.shape},\tdtype={dummy_time_interval.dtype},\tdevice={dummy_time_interval.device}"
-    )
-    logger.debug(
-        f"dummy_feature               : shape={dummy_feature.shape},\tdtype={dummy_feature.dtype},\tdevice={dummy_feature.device}"
-    )
-    logger.debug(
-        f"dummy_spatial_shapes        : shape={dummy_spatial_shapes.shape},\tdtype={dummy_spatial_shapes.dtype},\tdevice={dummy_spatial_shapes.device}"
-    )
-    logger.debug(
-        f"dummy_level_start_index     : shape={dummy_level_start_index.shape},\tdtype={dummy_level_start_index.dtype},\tdevice={dummy_level_start_index.device}"
-    )
-    logger.debug(
-        f"dummy_lidar2img             : shape={dummy_lidar2img.shape},\tdtype={dummy_lidar2img.dtype},\tdevice={dummy_lidar2img.device}"
-    )
-    logger.debug(
-        f"image_wh                    : shape={image_wh.shape},\tdtype={image_wh.dtype},\tdevice={image_wh.device}"
-    )
+    logger.debug(f"Dummy input : hape&Type&Device Msg >>>>>>")
+    roi_x = [
+        "dummy_instance_feature",
+        "dummy_anchor",
+        "dummy_time_interval",
+        "dummy_feature",
+        "dummy_spatial_shapes",
+        "dummy_level_start_index",
+        "dummy_image_wh",
+        "dummy_lidar2img",
+    ]
+    for x in roi_x:
+        logger.debug(
+            f"{x}\t:\tshape={eval(x).shape},\tdtype={eval(x).dtype},\tdevice={eval(x).device}"
+        )
+
     if first_frame:
-        logger.debug(f"Frame > 1 Extra DummyInput is below...")
-        logger.debug(
-            f"dummy_temp_instance_feature : shape={dummy_temp_instance_feature.shape},\tdtype={dummy_temp_instance_feature.dtype},\tdevice={dummy_temp_instance_feature.device}"
-        )
-        logger.debug(
-            f"dummy_temp_anchor           : shape={dummy_temp_anchor.shape},\tdtype={dummy_temp_anchor.dtype},\tdevice={dummy_temp_anchor.device}"
-        )
-        logger.debug(
-            f"dummy_mask                  : shape={dummy_mask.shape},\tdtype={dummy_mask.dtype},\tdevice={dummy_mask.device}"
-        )
-        logger.debug(
-            f"dummy_track_id              : shape={dummy_track_id.shape},\tdtype={dummy_track_id.dtype},\tdevice={dummy_track_id.device}"
-        )
+        logger.debug(f"Frame > 1: Extra dummy input is needed >>>>>>>")
+        roi_y = [
+            "dummy_temp_instance_feature",
+            "dummy_temp_anchor",
+            "dummy_mask",
+            "dummy_track_id",
+        ]
+        for y in roi_y:
+            logger.debug(
+                f"{y}\t:\tshape={eval(y).shape},\tdtype={eval(y).dtype},\tdevice={eval(y).device}"
+            )
+
     return (
-        dummy_temp_instance_feature,
-        dummy_temp_anchor,
-        dummy_mask,
-        dummy_track_id,
         dummy_instance_feature,
         dummy_anchor,
         dummy_time_interval,
@@ -419,7 +405,11 @@ def dummpy_input(
         dummy_spatial_shapes,
         dummy_level_start_index,
         dummy_lidar2img,
-        image_wh,
+        dummy_image_wh,
+        dummy_temp_instance_feature,
+        dummy_temp_anchor,
+        dummy_mask,
+        dummy_track_id,
     )
 
 
@@ -434,7 +424,7 @@ def build_module(cfg, default_args: Optional[Dict] = None) -> Any:
 
 if __name__ == "__main__":
     args = parse_args()
-    os.makedirs(os.path.dirname(args.save_onnx), exist_ok=True)
+    os.makedirs(os.path.dirname(args.save_onnx1), exist_ok=True)
     logger, console_handler, file_handler = set_logger(args.log)
     logger.setLevel(logging.DEBUG)
     console_handler.setLevel(logging.DEBUG)
@@ -452,10 +442,6 @@ if __name__ == "__main__":
     INPUT_W = 704
     first_frame = True
     (
-        dummy_temp_instance_feature,
-        dummy_temp_anchor,
-        dummy_mask,
-        dummy_track_id,
         dummy_instance_feature,
         dummy_anchor,
         dummy_time_interval,
@@ -464,12 +450,16 @@ if __name__ == "__main__":
         dummy_level_start_index,
         dummy_lidar2img,
         image_wh,
+        dummy_temp_instance_feature,
+        dummy_temp_anchor,
+        dummy_mask,
+        dummy_track_id,
     ) = dummpy_input(
         model, BS, NUMS_CAM, INPUT_H, INPUT_W, first_frame=first_frame, logger=logger
     )
 
     if not args.osec:
-        first_frame_head = FisrtFrame_Sparse4DHead(copy.deepcopy(model)).cuda()
+        first_frame_head = Sparse4DHeadFisrtFrame(copy.deepcopy(model)).cuda()
         logger.info("Export Sparse4d Head_1 Onnx >>>>>>>>>>>>>>>>")
         time.sleep(2)
         with torch.no_grad():
@@ -515,55 +505,55 @@ if __name__ == "__main__":
                 f'🚀 Export onnx completed. ONNX saved in "{args.save_onnx1}" 🤗.'
             )
 
-    head = Sparse4DHead(copy.deepcopy(model)).cuda()
-    logger.info("Export Sparse4d Head_2 Onnx >>>>>>>>>>>>>>>>")
-    time.sleep(2)
-    with torch.no_grad():
-        torch.onnx.export(
-            head,
-            (
-                dummy_temp_instance_feature,
-                dummy_temp_anchor,
-                dummy_mask,
-                dummy_track_id,
-                dummy_instance_feature,
-                dummy_anchor,
-                dummy_time_interval,
-                dummy_feature,
-                dummy_spatial_shapes,
-                dummy_level_start_index,
-                dummy_lidar2img,
-                image_wh,
-            ),
-            args.save_onnx,
-            input_names=[
-                "temp_instance_feature",
-                "temp_anchor",
-                "mask",
-                "track_id",
-                "instance_feature",
-                "anchor",
-                "time_interval",
-                "feature",
-                "spatial_shapes",
-                "level_start_index",
-                "lidar2img",
-                "image_wh",
-            ],
-            output_names=[
-                "instance_feature",
-                "anchor",
-                "classification",
-                "quality",
-                "track_id",
-            ],
-            opset_version=15,
-            do_constant_folding=True,
-            verbose=False,
-        )
+    # head = Sparse4DHead(copy.deepcopy(model)).cuda()
+    # logger.info("Export Sparse4d Head_2 Onnx >>>>>>>>>>>>>>>>")
+    # time.sleep(2)
+    # with torch.no_grad():
+    #     torch.onnx.export(
+    #         head,
+    #         (
+    #             dummy_temp_instance_feature,
+    #             dummy_temp_anchor,
+    #             dummy_mask,
+    #             dummy_track_id,
+    #             dummy_instance_feature,
+    #             dummy_anchor,
+    #             dummy_time_interval,
+    #             dummy_feature,
+    #             dummy_spatial_shapes,
+    #             dummy_level_start_index,
+    #             dummy_lidar2img,
+    #             image_wh,
+    #         ),
+    #         args.save_onnx,
+    #         input_names=[
+    #             "temp_instance_feature",
+    #             "temp_anchor",
+    #             "mask",
+    #             "track_id",
+    #             "instance_feature",
+    #             "anchor",
+    #             "time_interval",
+    #             "feature",
+    #             "spatial_shapes",
+    #             "level_start_index",
+    #             "lidar2img",
+    #             "image_wh",
+    #         ],
+    #         output_names=[
+    #             "instance_feature",
+    #             "anchor",
+    #             "classification",
+    #             "quality",
+    #             "track_id",
+    #         ],
+    #         opset_version=15,
+    #         do_constant_folding=True,
+    #         verbose=False,
+    #     )
 
-        onnx_orig = onnx.load(args.save_onnx)
-        onnx_simp, check = simplify(onnx_orig)
-        assert check, "Simplified ONNX model could not be validated"
-        onnx.save(onnx_simp, args.save_onnx)
-        logger.info(f'🚀 Export onnx completed. ONNX saved in "{args.save_onnx}" 🤗.')
+    #     onnx_orig = onnx.load(args.save_onnx)
+    #     onnx_simp, check = simplify(onnx_orig)
+    #     assert check, "Simplified ONNX model could not be validated"
+    #     onnx.save(onnx_simp, args.save_onnx)
+    #     logger.info(f'🚀 Export onnx completed. ONNX saved in "{args.save_onnx}" 🤗.')

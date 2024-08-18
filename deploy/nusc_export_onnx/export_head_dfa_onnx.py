@@ -21,7 +21,7 @@ from tool.utils.logger import set_logger
 
 
 def parse_args():
-    parser = argparse.ArgumentParser(description="Deploy E2E Head!")
+    parser = argparse.ArgumentParser(description="Deploy PerceptionE2E Head!")
     parser.add_argument(
         "--cfg",
         type=str,

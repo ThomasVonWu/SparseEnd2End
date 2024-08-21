@@ -3,8 +3,6 @@ import torch
 import torch.onnx
 import torch.nn as nn
 
-import numpy as np
-
 import os
 import onnx
 import onnxsim
@@ -41,8 +39,9 @@ def setup_seed(seed):
 
 
 def export_onnx(model, save_path):
+    os.makedirs(os.path.dirname(save_path), exist_ok=True)
     num_cams = 6
-    dummy_value = torch.rand(
+    dummy_feature = torch.rand(
         [1, num_cams * (64 * 176 + 32 * 88 + 16 * 44 + 8 * 22), 256]
     ).cuda()
     dummy_spatial_shapes = (
@@ -73,7 +72,7 @@ def export_onnx(model, save_path):
         torch.onnx.export(
             model=model,
             args=(
-                dummy_value,
+                dummy_feature,
                 dummy_spatial_shapes,
                 dummy_level_start_index,
                 dummy_sampling_loc,
@@ -81,7 +80,7 @@ def export_onnx(model, save_path):
             ),
             f=save_path,
             input_names=[
-                "value",
+                "feature",
                 "spatial_shapes",
                 "level_start_index",
                 "sampling_loc",
@@ -107,38 +106,28 @@ def export_onnx(model, save_path):
 
     # inference results
     output = model(
-        dummy_value,
+        dummy_feature,
         dummy_spatial_shapes,
         dummy_level_start_index,
         dummy_sampling_loc,
         dummy_weights,
     )
 
-    print("dummy_value.dtype=", dummy_value.dtype)
-    print("dummy_spatial_shapes.dtype=", dummy_spatial_shapes.dtype)
-    print("dummy_level_start_index.dtype=", dummy_level_start_index.dtype)
-    print("dummy_sampling_loc.dtype=", dummy_sampling_loc.dtype)
-    print("dummy_weights.dtype=", dummy_weights.dtype)
-
     save_bin(
-        dummy_value.cpu().numpy(),
+        dummy_feature.cpu().numpy(),
         dummy_spatial_shapes.cpu().numpy(),
         dummy_level_start_index.cpu().numpy(),
         dummy_sampling_loc.cpu().numpy(),
         dummy_weights.cpu().numpy(),
         output.cpu().numpy(),
     )
-    print("[output]:\n", output)
-    print("[output_shape]=", output.shape)
-    print("[output_sum]  =", output.cpu().numpy().sum())
-    print("[output_max]  =", torch.max(output), "\n[output_min]=", torch.min(output))
 
 
 def save_bin(*data, prefix="deploy/dfa_plugin/asset/"):
     os.makedirs(prefix, exist_ok=True)
 
     (
-        dummy_value,
+        dummy_feature,
         dummy_spatial_shapes,
         dummy_level_start_index,
         dummy_sampling_loc,
@@ -146,17 +135,12 @@ def save_bin(*data, prefix="deploy/dfa_plugin/asset/"):
         output,
     ) = data
 
-    dummy_value.tofile(prefix + "value.bin")
-    dummy_spatial_shapes.tofile(prefix + "spatial_shapes.bin")
-    dummy_level_start_index.tofile(prefix + "level_start_index.bin")
-    dummy_sampling_loc.tofile(prefix + "sampling_loc.bin")
-    dummy_weights.tofile(prefix + "attn_weight.bin")
+    dummy_feature.tofile(prefix + "rand_fetaure.bin")
+    dummy_spatial_shapes.tofile(prefix + "rand_spatial_shapes.bin")
+    dummy_level_start_index.tofile(prefix + "rand_level_start_index.bin")
+    dummy_sampling_loc.tofile(prefix + "rand_sampling_loc.bin")
+    dummy_weights.tofile(prefix + "rand_attn_weight.bin")
     output.tofile(prefix + "output.bin")
-    dummy_spatial_shapes.astype(np.float32).tofile(prefix + "spatial_shapes_f.bin")
-    dummy_level_start_index.astype(np.float32).tofile(
-        prefix + "level_start_index_f.bin"
-    )
-    print("[Success] Save InputandOutput BinFile!")
 
 
 if __name__ == "__main__":

@@ -7,6 +7,8 @@ import os
 import onnx
 import onnxsim
 
+from tool.utils.save_bin import save_bins
+from tool.utils.logger import logger_wrapper
 from modules.ops.deformable_aggregation import DeformableAggregationFunction
 
 
@@ -38,7 +40,7 @@ def setup_seed(seed):
     torch.backends.cudnn.deterministic = True
 
 
-def export_onnx(model, save_path):
+def export_onnx(model, save_path, save_file=True):
     os.makedirs(os.path.dirname(save_path), exist_ok=True)
     num_cams = 6
     dummy_feature = torch.rand(
@@ -101,7 +103,7 @@ def export_onnx(model, save_path):
     assert check, "assert check failed"
     onnx.save(model_onnx, save_path)
     print(
-        f"[Succed] Simplifying with onnx-simplifier {onnxsim.__version__}, file is saved in {save_path}."
+        f"[Succed] Simplifying with onnx-simplifier {onnxsim.__version__}, file is saved in {save_path}.🤗"
     )
 
     # inference results
@@ -113,34 +115,29 @@ def export_onnx(model, save_path):
         dummy_weights,
     )
 
-    save_bin(
-        dummy_feature.cpu().numpy(),
-        dummy_spatial_shapes.cpu().numpy(),
-        dummy_level_start_index.cpu().numpy(),
-        dummy_sampling_loc.cpu().numpy(),
-        dummy_weights.cpu().numpy(),
-        output.cpu().numpy(),
-    )
-
-
-def save_bin(*data, prefix="deploy/dfa_plugin/asset/"):
-    os.makedirs(prefix, exist_ok=True)
-
-    (
-        dummy_feature,
-        dummy_spatial_shapes,
-        dummy_level_start_index,
-        dummy_sampling_loc,
-        dummy_weights,
-        output,
-    ) = data
-
-    dummy_feature.tofile(prefix + "rand_fetaure.bin")
-    dummy_spatial_shapes.tofile(prefix + "rand_spatial_shapes.bin")
-    dummy_level_start_index.tofile(prefix + "rand_level_start_index.bin")
-    dummy_sampling_loc.tofile(prefix + "rand_sampling_loc.bin")
-    dummy_weights.tofile(prefix + "rand_attn_weight.bin")
-    output.tofile(prefix + "output.bin")
+    if save_file:
+        logger, _, _ = logger_wrapper("", False)
+        save_bins(
+            inputs=[
+                dummy_feature.detach().cpu().numpy(),
+                dummy_spatial_shapes.detach().cpu().numpy(),
+                dummy_level_start_index.detach().cpu().numpy(),
+                dummy_sampling_loc.detach().cpu().numpy(),
+                dummy_weights.detach().cpu().numpy(),
+            ],
+            outputs=[output.detach().cpu().numpy()],
+            names=[
+                "rand_fetaure",
+                "rand_spatial_shapes",
+                "rand_level_start_index",
+                "rand_sampling_loc",
+                "rand_weights",
+                "outputs",
+            ],
+            sample_index=0,
+            logger=logger,
+            save_prefix="deploy/dfa_plugin/asset",
+        )
 
 
 if __name__ == "__main__":

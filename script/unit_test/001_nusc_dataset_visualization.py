@@ -131,8 +131,8 @@ def train_pipeline_vis(
                 show_lidarpts=True,
             )
         img_show = img_show[..., ::-1]  # rgb to bgr
-        # cv2.imshow("train_pipeline", img_show)
-        # cv2.waitKey(0)
+        cv2.imshow("pipeline", img_show)
+        cv2.waitKey(0)
         if offline:
             sample_idx = data["img_metas"][0]["sample_idx"]
             sample_scene = data["img_metas"][0]["sample_scene"]

@@ -6,17 +6,17 @@ if [ ! -d "${ENVTRTLOGSDIR}" ]; then
 fi
 
 ${ENV_TensorRT_BIN}/trtexec --onnx=${ENVONNX} \
-                            --plugins=$ENVTARGETPLUGIN \
-                            --memPoolSize=workspace:2048 \
-                            --saveEngine=${ENVEINGINENAME} \
-                            --verbose \
-                            --warmUp=200 \
-                            --iterations=50 \
-                            --dumpOutput \
-                            --dumpProfile \
-                            --dumpLayerInfo \
-                            --exportOutput=${ENVTRTLOGSDIR}/buildOutput.json\
-                            --exportProfile=${ENVTRTLOGSDIR}/buildProfile.json \
-                            --exportLayerInfo=${ENVTRTLOGSDIR}/buildLayerInfo.json \
-                            --profilingVerbosity=detailed \
-                            > ${ENVTRTLOGSDIR}/build.log 2>&1
+    --plugins=deploy/dfa_plugin/$ENVTARGETPLUGIN \
+    --memPoolSize=workspace:2048 \
+    --saveEngine=${ENVEINGINENAME} \
+    --verbose \
+    --warmUp=200 \
+    --iterations=50 \
+    --dumpOutput \
+    --dumpProfile \
+    --dumpLayerInfo \
+    --exportOutput=${ENVTRTLOGSDIR}/buildOutput.json \
+    --exportProfile=${ENVTRTLOGSDIR}/buildProfile.json \
+    --exportLayerInfo=${ENVTRTLOGSDIR}/buildLayerInfo.json \
+    --profilingVerbosity=detailed \
+    >${ENVTRTLOGSDIR}/build.log 2>&1

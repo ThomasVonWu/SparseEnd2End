@@ -47,7 +47,7 @@ fi
 # Part1
 export CUDASM=$cudasm
 export PATH=$ENV_TensorRT_BIN:$CUDA_BIN:$PATH
-export LD_LIBRARY_PATH=$ENV_TensorRT_LIB:$ENV_CUDA_LIB:$ENVcuDNN_LIB:$LD_LIBRARY_PATH
+export LD_LIBRARY_PATH=$ENV_TensorRT_LIB:$ENV_CUDA_LIB:$ENVcuDNN_LIB:$ENV_cuDNN_LIB:$LD_LIBRARY_PATH
 
 echo "===================================================================================================================="
 
@@ -59,9 +59,9 @@ export ENVBUILDDIR=build                              # relative path for saving
 export ENVTARGETPLUGIN=lib/deformableAttentionAggr.so # relative path for saving dfa shared library
 
 # Part3 Testing Consistency: op_deformableAttentionAggr pytorch->onnx->engine.
-export ENVONNX=onnx/deformableAttentionAggr.onnx           # relative path for saving dfa onnx
-export ENVEINGINENAME=trtlogdeformableAttentionAggr.engine # relative path for saving dfa engine
-export ENVTRTLOGSDIR=trtlog                                # relative path for saving dfa engine convertion logs
+export ENVONNX=deploy/dfa_plugin/onnx/deformableAttentionAggr.onnx  # relative path for saving dfa onnx
+export ENVTRTLOGSDIR=deploy/dfa_plugin/engine                       # relative path for saving dfa engine convertion logs
+export ENVEINGINENAME=$ENVTRTLOGSDIR/deformableAttentionAggr.engine # relative path for saving dfa engine
 
 echo "===================================================================================================================="
 echo "||  Config Environment Below:"

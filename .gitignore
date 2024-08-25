@@ -23,6 +23,7 @@ build/
 *.bin
 *.onnx
 *.engine
+*.json
 
 # Sphinx documentation
 docs/_build/

@@ -1,4 +1,4 @@
-// Copyright(c) 2024 thomas ADSE.All rights reserved @author : Xiaocuo WU.
+// Copyright (c) 2024 SparseEnd2End. All rights reserved @author: Thomas Von Wu.
 #include "deformableAttentionAggrPlugin.h"
 
 #include <cstring>

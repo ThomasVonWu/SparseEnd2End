@@ -42,21 +42,23 @@ def parse_args():
     parser.add_argument(
         "--save_onnx1",
         type=str,
-        default="deploy/onnxlog/1st_frame_sparse4dhead.onnx",
+        default="deploy/onnxlog/sparse4dhead1st_frame.onnx",
     )
     parser.add_argument(
-        "--save_onnx",
+        "--save_onnx2",
         type=str,
-        default="deploy/onnxlog/sparse4dhead.onnx",
+        default="deploy/onnxlog/sparse4dhead2rd.onnx",
     )
-    parser.add_argument("-osec", action="store_true", help="only export second_onnx.")
+    parser.add_argument(
+        "--osec", action="store_true", help="only export sparse4dhead2rd onnx."
+    )
     args = parser.parse_args()
     return args
 
 
-class Sparse4DHeadFisrtFrame(nn.Module):
+class Sparse4DHead1st(nn.Module):
     def __init__(self, model):
-        super(Sparse4DHeadFisrtFrame, self).__init__()
+        super(Sparse4DHead1st, self).__init__()
         self.model = model
 
     @staticmethod
@@ -158,9 +160,9 @@ class Sparse4DHeadFisrtFrame(nn.Module):
         return instance_feature, anchor, cls, qt
 
 
-class Sparse4DHead(nn.Module):
+class Sparse4DHead2rd(nn.Module):
     def __init__(self, model):
-        super(Sparse4DHead, self).__init__()
+        super(Sparse4DHead2rd, self).__init__()
         self.model = model
 
     @staticmethod
@@ -425,7 +427,7 @@ def build_module(cfg, default_args: Optional[Dict] = None) -> Any:
 if __name__ == "__main__":
     args = parse_args()
     os.makedirs(os.path.dirname(args.save_onnx1), exist_ok=True)
-    logger, console_handler, file_handler = set_logger(args.log)
+    logger, console_handler, file_handler = set_logger(args.log, True)
     logger.setLevel(logging.DEBUG)
     console_handler.setLevel(logging.DEBUG)
     file_handler.setLevel(logging.DEBUG)
@@ -449,7 +451,7 @@ if __name__ == "__main__":
         dummy_spatial_shapes,
         dummy_level_start_index,
         dummy_lidar2img,
-        image_wh,
+        dummy_image_wh,
         dummy_temp_instance_feature,
         dummy_temp_anchor,
         dummy_mask,
@@ -459,8 +461,8 @@ if __name__ == "__main__":
     )
 
     if not args.osec:
-        first_frame_head = Sparse4DHeadFisrtFrame(copy.deepcopy(model)).cuda()
-        logger.info("Export Sparse4d Head_1 Onnx >>>>>>>>>>>>>>>>")
+        first_frame_head = Sparse4DHead1st(copy.deepcopy(model)).cuda()
+        logger.info("Export Sparse4DHead1st Onnx >>>>>>>>>>>>>>>>")
         time.sleep(2)
         with torch.no_grad():
             torch.onnx.export(
@@ -473,7 +475,7 @@ if __name__ == "__main__":
                     dummy_spatial_shapes,
                     dummy_level_start_index,
                     dummy_lidar2img,
-                    image_wh,
+                    dummy_image_wh,
                 ),
                 args.save_onnx1,
                 input_names=[
@@ -489,8 +491,8 @@ if __name__ == "__main__":
                 output_names=[
                     "instance_feature",
                     "anchor",
-                    "classification",
-                    "quality",
+                    "class_score",
+                    "quality_score",
                 ],
                 opset_version=15,
                 do_constant_folding=True,
@@ -505,55 +507,55 @@ if __name__ == "__main__":
                 f'🚀 Export onnx completed. ONNX saved in "{args.save_onnx1}" 🤗.'
             )
 
-    # head = Sparse4DHead(copy.deepcopy(model)).cuda()
-    # logger.info("Export Sparse4d Head_2 Onnx >>>>>>>>>>>>>>>>")
-    # time.sleep(2)
-    # with torch.no_grad():
-    #     torch.onnx.export(
-    #         head,
-    #         (
-    #             dummy_temp_instance_feature,
-    #             dummy_temp_anchor,
-    #             dummy_mask,
-    #             dummy_track_id,
-    #             dummy_instance_feature,
-    #             dummy_anchor,
-    #             dummy_time_interval,
-    #             dummy_feature,
-    #             dummy_spatial_shapes,
-    #             dummy_level_start_index,
-    #             dummy_lidar2img,
-    #             image_wh,
-    #         ),
-    #         args.save_onnx,
-    #         input_names=[
-    #             "temp_instance_feature",
-    #             "temp_anchor",
-    #             "mask",
-    #             "track_id",
-    #             "instance_feature",
-    #             "anchor",
-    #             "time_interval",
-    #             "feature",
-    #             "spatial_shapes",
-    #             "level_start_index",
-    #             "lidar2img",
-    #             "image_wh",
-    #         ],
-    #         output_names=[
-    #             "instance_feature",
-    #             "anchor",
-    #             "classification",
-    #             "quality",
-    #             "track_id",
-    #         ],
-    #         opset_version=15,
-    #         do_constant_folding=True,
-    #         verbose=False,
-    #     )
+    head = Sparse4DHead2rd(copy.deepcopy(model)).cuda()
+    logger.info("Export Sparse4DHead2rd Onnx >>>>>>>>>>>>>>>>")
+    time.sleep(2)
+    with torch.no_grad():
+        torch.onnx.export(
+            head,
+            (
+                dummy_temp_instance_feature,
+                dummy_temp_anchor,
+                dummy_mask,
+                dummy_track_id,
+                dummy_instance_feature,
+                dummy_anchor,
+                dummy_time_interval,
+                dummy_feature,
+                dummy_spatial_shapes,
+                dummy_level_start_index,
+                dummy_lidar2img,
+                dummy_image_wh,
+            ),
+            args.save_onnx2,
+            input_names=[
+                "temp_instance_feature",
+                "temp_anchor",
+                "mask",
+                "track_id",
+                "instance_feature",
+                "anchor",
+                "time_interval",
+                "feature",
+                "spatial_shapes",
+                "level_start_index",
+                "lidar2img",
+                "image_wh",
+            ],
+            output_names=[
+                "instance_feature",
+                "anchor",
+                "class_score",
+                "quality_score",
+                "track_id",
+            ],
+            opset_version=15,
+            do_constant_folding=True,
+            verbose=False,
+        )
 
-    #     onnx_orig = onnx.load(args.save_onnx)
-    #     onnx_simp, check = simplify(onnx_orig)
-    #     assert check, "Simplified ONNX model could not be validated"
-    #     onnx.save(onnx_simp, args.save_onnx)
-    #     logger.info(f'🚀 Export onnx completed. ONNX saved in "{args.save_onnx}" 🤗.')
+        onnx_orig = onnx.load(args.save_onnx2)
+        onnx_simp, check = simplify(onnx_orig)
+        assert check, "Simplified ONNX model could not be validated!"
+        onnx.save(onnx_simp, args.save_onnx2)
+        logger.info(f'🚀 Export onnx completed. ONNX saved in "{args.save_onnx2}" 🤗.')

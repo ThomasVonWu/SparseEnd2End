@@ -10,7 +10,7 @@ log_colors_config = {
 }
 
 
-def set_logger(log_path, save_file):
+def set_logger(log_path, save_file=False):
     logger = logging.getLogger("logger_name")
     console_handler = logging.StreamHandler()
 

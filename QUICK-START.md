@@ -62,18 +62,14 @@ python script/tutorial_task_nusc/001_nusc_dataset_visualization.py
 ```
 
 
-### Train&Val Pipeline by DP
+### Train&Val Pipeline in DP Mode
 Set PythonEnvironment
 ```bash
 export PYTHONPATH=$PYTHONPATH:./
 ```
 
-Train Dp launcher.
+Train&Test in dp mode.
 ```bash
 clear && python script/train.py dataset/config/[your_config.py]
-```
-
-Test Dp launcher.
-```bash
 clear && python script/test.py  dataset/config/[your_config.py] --checkpoint path/to/checkpoint
 ```

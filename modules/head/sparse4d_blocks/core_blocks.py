@@ -223,9 +223,12 @@ class DeformableFeatureAggregation(BaseModule):
         pts_extend = torch.cat(
             [key_points, torch.ones_like(key_points[..., :1])], dim=-1
         )
+        # points_2d = torch.matmul(
+        #     lidar2img[:, :, None, None], pts_extend[:, None, ..., None]
+        # ).squeeze(-1)
         points_2d = torch.matmul(
             lidar2img[:, :, None, None], pts_extend[:, None, ..., None]
-        ).squeeze(-1)
+        )[..., 0]
         points_2d = points_2d[..., :2] / torch.clamp(points_2d[..., 2:3], min=1e-5)
         if image_wh is not None:
             points_2d = points_2d / image_wh[:, :, None, None]

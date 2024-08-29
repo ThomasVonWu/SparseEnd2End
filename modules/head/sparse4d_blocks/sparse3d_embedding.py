@@ -129,13 +129,13 @@ class SparseBox3DRefinementModule(BaseModule):
         return_cls=True,
     ):
         feature = instance_feature + anchor_embed
-        output = self.layers(feature)  # (bs ,1220, 256) => (bs ,1220, 11)
-        if self.refine_yaw:
+        output = self.layers(feature)  # (bs ,num_query, 256) => (bs ,num_query, 11)
+        if self.refine_yaw:  # default=True
             output[..., :SIN_YAW] = output[..., :SIN_YAW] + anchor[..., :SIN_YAW]
         else:
             output[..., :VX] = output[..., :VX] + anchor[..., :VX]
 
-        if self.normalize_yaw:  # default=false
+        if self.normalize_yaw:  # default=False
             output[..., SIN_YAW:VX] = torch.nn.functional.normalize(
                 output[..., SIN_YAW:VX], dim=-1
             )
@@ -193,12 +193,12 @@ class SparseBox3DKeyPointsGenerator(BaseModule):
             anchor: (bs, 900+x, 11) train:x=5*32*2 test=0;
             anchor_embed: (bs, 900+x, 256) train:x=5*32*2 test=0;
         Return:
-            key_points: [bs, 1220, 7+6, 3]
+            key_points: [bs, num_query, 7+6, 3]
             temp_key_points_list:
         """
         bs, num_anchor = anchor.shape[:2]
-        size = anchor[..., None, [W, L, H]].exp()  # (bs, 1220, 1, 3)
-        key_points = self.fix_scale * size  # (bs, 1220, 7, 3)
+        size = anchor[..., None, [W, L, H]].exp()  # (bs, num_query, 1, 3)
+        key_points = self.fix_scale * size  # (bs, num_query, 7, 3)
         # self.num_learnable_pts default=0 在DFA模块设置为6
         if self.num_learnable_pts > 0 and instance_feature is not None:
             learnable_scale = (
@@ -206,10 +206,10 @@ class SparseBox3DKeyPointsGenerator(BaseModule):
                 .reshape(bs, num_anchor, self.num_learnable_pts, 3)
                 .sigmoid()
                 - 0.5
-            )  # (bs, 1220, 6, 3)
+            )  # (bs, num_query, 6, 3)
             key_points = torch.cat(
                 [key_points, learnable_scale * size], dim=-2
-            )  # (bs, 1220, 7+6, 3)
+            )  # (bs, num_query, 7+6, 3)
 
         rotation_mat = anchor.new_zeros([bs, num_anchor, 3, 3])
 
@@ -219,12 +219,16 @@ class SparseBox3DKeyPointsGenerator(BaseModule):
         rotation_mat[:, :, 1, 1] = anchor[:, :, COS_YAW]
         rotation_mat[:, :, 2, 2] = 1
 
-        # [bs, 1220, 1, 3, 3] @ [bs, 1220, 6+7, 3, 1] => [bs,1220,6+7,3]
-        key_points = torch.matmul(
-            rotation_mat[:, :, None], key_points[..., None]
-        ).squeeze(-1)
-        # [bs,1220,6+7,3] + [bs, 1220, 1, 3]
-        key_points = key_points + anchor[..., None, [X, Y, Z]]
+        # [bs, num_query, 1, 3, 3] @ [bs, num_query, 6+7, 3, 1] => [bs,num_query,6+7,3, 1]
+        # key_points = torch.matmul(rotation_mat[:, :, None], key_points[..., None]).squeeze(-1)
+        key_points = torch.matmul(rotation_mat[:, :, None], key_points[..., None])[
+            ..., 0
+        ]  # deploy friendly
+
+        # [bs,num_query,6+7,3] + [bs, num_query, 1, 3]
+        # key_points = key_points + anchor[..., None, [X, Y, Z]]
+        key_points = key_points + anchor[..., None, :3]  # deploy friendly
+        return key_points
 
         # DFA 模块直接return出去
         if (

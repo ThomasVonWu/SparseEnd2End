@@ -1,8 +1,8 @@
 #!/bin/bash
 # Copyright (c) 2024 SparseEnd2End. All rights reserved @author: Thomas Von Wu.
 
-if [ ! -d "${ENVTRTLOGSDIR}" ]; then
-    mkdir -p "${ENVTRTLOGSDIR}"
+if [ ! -d "${ENVTRTDIR}" ]; then
+    mkdir -p "${ENVTRTDIR}"
 fi
 
 echo "STEP1: build sparse4dbackbone engine -> saving in ${ENV_BACKBONE_ENGINE}..."
@@ -16,10 +16,10 @@ ${ENV_TensorRT_BIN}/trtexec --onnx=${ENV_BACKBONE_ONNX} \
     --dumpOutput \
     --dumpProfile \
     --dumpLayerInfo \
-    --exportOutput=${ENVTRTLOGSDIR}/buildOutput_backbone.json --exportProfile=${ENVTRTLOGSDIR}/buildProfile_backbone.json \
-    --exportLayerInfo=${ENVTRTLOGSDIR}/buildLayerInfo_backbone.json \
+    --exportOutput=${ENVTRTDIR}/buildOutput_backbone.json --exportProfile=${ENVTRTDIR}/buildProfile_backbone.json \
+    --exportLayerInfo=${ENVTRTDIR}/buildLayerInfo_backbone.json \
     --profilingVerbosity=detailed \
-    >${ENVTRTLOGSDIR}/build_backbone.log 2>&1
+    >${ENVTRTDIR}/build_backbone.log 2>&1
 
 echo "STEP2: build 1st frame sparse4dhead engine -> saving in ${ENV_HEAD1_ENGINE}..."
 sleep 2s
@@ -34,10 +34,10 @@ ${ENV_TensorRT_BIN}/trtexec --onnx=${ENV_HEAD1_ONNX} \
     --dumpOutput \
     --dumpProfile \
     --dumpLayerInfo \
-    --exportOutput=${ENVTRTLOGSDIR}/buildOutput_head1.json --exportProfile=${ENVTRTLOGSDIR}/buildProfile_head1.json \
-    --exportLayerInfo=${ENVTRTLOGSDIR}/buildLayerInfo_head1.json \
+    --exportOutput=${ENVTRTDIR}/buildOutput_head1.json --exportProfile=${ENVTRTDIR}/buildProfile_head1.json \
+    --exportLayerInfo=${ENVTRTDIR}/buildLayerInfo_head1.json \
     --profilingVerbosity=detailed \
-    >${ENVTRTLOGSDIR}/build_head1.log 2>&1
+    >${ENVTRTDIR}/build_head1.log 2>&1
 
 echo "STEP3: build frame > 2 sparse4dhead engine -> saving in ${ENV_HEAD2_ENGINE}..."
 sleep 2s
@@ -52,7 +52,7 @@ ${ENV_TensorRT_BIN}/trtexec --onnx=${ENV_HEAD2_ONNX} \
     --dumpOutput \
     --dumpProfile \
     --dumpLayerInfo \
-    --exportOutput=${ENVTRTLOGSDIR}/buildOutput_head2.json --exportProfile=${ENVTRTLOGSDIR}/buildProfile_head2.json \
-    --exportLayerInfo=${ENVTRTLOGSDIR}/buildLayerInfo_head2.json \
+    --exportOutput=${ENVTRTDIR}/buildOutput_head2.json --exportProfile=${ENVTRTDIR}/buildProfile_head2.json \
+    --exportLayerInfo=${ENVTRTDIR}/buildLayerInfo_head2.json \
     --profilingVerbosity=detailed \
-    >${ENVTRTLOGSDIR}/build_head2.log 2>&1
+    >${ENVTRTDIR}/build_head2.log 2>&1

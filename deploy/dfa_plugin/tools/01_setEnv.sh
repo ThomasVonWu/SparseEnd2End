@@ -2,9 +2,9 @@
 
 ################***EnvVersion-1***#################
 ###     LinuxPlatform:            x86_64                                                        ###
-###     TensorRT :                    8.4.0.6                                                          ###
-###     CUDA :                             11.3                                                            ###
-###     cuDNN:                          8.4.1.5                                                         ###
+###     TensorRT :                    8.5.1.7                                                          ###
+###     CUDA :                             11.6                                                            ###
+###     cuDNN:                          8.6.0.163                                                    ###
 ###     CUDA capability :        sm_86                                                         ###
 ################***EnvVersion-1***#################
 
@@ -49,19 +49,14 @@ export CUDASM=$cudasm
 export PATH=$ENV_TensorRT_BIN:$CUDA_BIN:$PATH
 export LD_LIBRARY_PATH=$ENV_TensorRT_LIB:$ENV_CUDA_LIB:$ENVcuDNN_LIB:$ENV_cuDNN_LIB:$LD_LIBRARY_PATH
 
-echo "===================================================================================================================="
-
-echo "===================================================================================================================="
-echo "[INFO] Config Env Done, Please Check EnvPrintOut Above!"
-
-# Part2 Build op:op_deformableAttentionAggr shared libray.
+# Part2 Build op:op_deformableAttentionAggr shared libray, for make .
 export ENVBUILDDIR=build                              # relative path for saving make products
 export ENVTARGETPLUGIN=lib/deformableAttentionAggr.so # relative path for saving dfa shared library
 
-# Part3 Testing Consistency: op_deformableAttentionAggr pytorch->onnx->engine.
-export ENVONNX=deploy/dfa_plugin/onnx/deformableAttentionAggr.onnx  # relative path for saving dfa onnx
-export ENVTRTLOGSDIR=deploy/dfa_plugin/engine                       # relative path for saving dfa engine convertion logs
-export ENVEINGINENAME=$ENVTRTLOGSDIR/deformableAttentionAggr.engine # relative path for saving dfa engine
+# Part3 Build TensorRT and test consistency: op_deformableAttentionAggr pytorch->onnx->engine.
+export ENVONNX=deploy/dfa_plugin/onnx/deformableAttentionAggr.onnx # absolute path for saving dfa onnx
+export ENVTRTDIR=deploy/dfa_plugin/engine                          # absolute path for saving dfa engine convertion logs
+export ENVEINGINENAME=$ENVTRTDIR/deformableAttentionAggr.engine    # absolute path for saving dfa engine
 
 echo "===================================================================================================================="
 echo "||  Config Environment Below:"
@@ -77,6 +72,6 @@ echo "||  ENVBUILDDIR\t: $ENVBUILDDIR"
 echo "||  ENVTARGETPLUGIN\t: $ENVTARGETPLUGIN"
 echo "||  ENVONNX\t: $ENVONNX"
 echo "||  ENVEINGINENAME\t: $ENVEINGINENAME"
-echo "||  ENVTRTLOGSDIR\t: $ENVTRTLOGSDIR"
+echo "||  ENVTRTDIR\t: $ENVTRTDIR"
 echo "===================================================================================================================="
 echo "[INFO] Config Env Done, Please Check EnvPrintOut Above!"

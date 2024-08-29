@@ -37,17 +37,17 @@ def parse_args():
     parser.add_argument(
         "--log",
         type=str,
-        default="deploy/onnxlog/export_head_onnx.log",
+        default="deploy/onnx/export_head_onnx.log",
     )
     parser.add_argument(
         "--save_onnx1",
         type=str,
-        default="deploy/onnxlog/sparse4dhead1st_frame.onnx",
+        default="deploy/onnx/sparse4dhead1st.onnx",
     )
     parser.add_argument(
         "--save_onnx2",
         type=str,
-        default="deploy/onnxlog/sparse4dhead2rd.onnx",
+        default="deploy/onnx/sparse4dhead2rd.onnx",
     )
     parser.add_argument(
         "--osec", action="store_true", help="only export sparse4dhead2rd onnx."
@@ -181,6 +181,7 @@ class Sparse4DHead2rd(nn.Module):
         lidar2img,
         image_wh,
     ):
+        mask = mask.bool() # TensorRT binding type for bool input is NoneType.
         anchor_embed = self.anchor_encoder(anchor)
         temp_anchor_embed = self.anchor_encoder(temp_anchor)
 
@@ -330,7 +331,7 @@ def dummpy_input(
         torch.zeros((bs, nums_topk, embed_dims)).float().cuda()
     )
     dummy_temp_anchor = torch.zeros((bs, nums_topk, anchor_dims)).float().cuda()
-    dummy_mask = torch.randint(0, 2, size=(bs,)).bool().cuda()
+    dummy_mask = torch.randint(0, 2, size=(bs,)).int().cuda()
     dummy_track_id = -1 * torch.ones((bs, nums_query)).int().cuda()
 
     dummy_time_interval = torch.tensor(

@@ -32,12 +32,12 @@ def parse_args():
     parser.add_argument(
         "--log",
         type=str,
-        default="deploy/onnxlog/export_backbone_onnx.log",
+        default="deploy/onnx/export_backbone_onnx.log",
     )
     parser.add_argument(
         "--save_onnx",
         type=str,
-        default="deploy/onnxlog/sparse4dbackbone.onnx",
+        default="deploy/onnx/sparse4dbackbone.onnx",
     )
     args = parser.parse_args()
     return args
@@ -67,7 +67,7 @@ def build_module(cfg, default_args: Optional[Dict] = None) -> Any:
 if __name__ == "__main__":
     args = parse_args()
     os.makedirs(os.path.dirname(args.save_onnx), exist_ok=True)
-    logger, console_handler, file_handler = set_logger(args.log)
+    logger, console_handler, file_handler = set_logger(args.log, True)
     logger.setLevel(logging.DEBUG)
     console_handler.setLevel(logging.DEBUG)
     file_handler.setLevel(logging.DEBUG)

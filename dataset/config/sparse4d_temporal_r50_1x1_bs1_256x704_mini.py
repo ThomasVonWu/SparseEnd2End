@@ -321,6 +321,7 @@ test_pipeline = [
             "timestamp",
             "lidar2img",
             "image_wh",
+            "ori_img"
         ],
         meta_keys=["lidar2global", "global2lidar", "timestamp"],
     ),

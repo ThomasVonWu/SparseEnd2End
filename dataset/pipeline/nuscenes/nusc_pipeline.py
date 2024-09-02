@@ -179,6 +179,13 @@ class ResizeCropFlipImage(object):
         imgs = results["img"]
         N = len(imgs)
         new_imgs = []
+        results["ori_img"] = np.stack(
+            [
+                np.ascontiguousarray(img.astype(np.uint8).transpose(2, 0, 1)[::-1, ...])
+                for img in imgs
+            ],
+            axis=0,
+        )  # (6,3,900,1600) RGB
         for i in range(N):
             img, mat = self._img_transform(
                 np.uint8(imgs[i]),

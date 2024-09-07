@@ -11,16 +11,16 @@
 
 ## Tasklist
 - [X] *Register custom operation : DeformableFeatureAggregation and export ONNX and TensorRT engine. **`25 Aug, 2024`***
-- [X] *Verify the consistency of reasoning results : DeformableFeatureAggregation  PyToch Implementation  vs. TensorRT plugin Implementation. **`25 Aug, 2024`***
-- [] *Reasoning acceleration using CUDA shared memory and CUDA FP16 in DeformableFeatureAggregation plugin Implementation.*
+- [X] *Verify the consistency of reasoning results : DeformableFeatureAggregation  PyToch Implementation  vs. TensorRT plugin Implementation. **`25 Aug, 2024`***  
+- [ ] *Reasoning acceleration using CUDA shared memory and CUDA FP16 in DeformableFeatureAggregation plugin Implementation.*
 - [ ] *Export SparseTransFormer Backbone ONNX&TensorRT engine.*
 - [ ] *Verify the consistency of reasoning results : SparseTransFormer Backbone PyTorch Implementation vs. ONNX Runtime vs. TensorRT engine.*
 - [ ] *Export SparseTransFormer Head ONNX and TensorRT engine.*
 - [ ] *Verify the consistency of reasoning results : SparseTransFormer Head PyTorch Implementation vs. TensorRT engine.*
 - [ ] *Reasoning acceleration using FlashAttention in replace of MultiheadAttention.*
 - [ ] *Reasoning acceleration using FP16/INT8  in replace of FP32 of TensorRT engine.*
-- [] *Image pre-processing Instancbank Caching and model post-processing Implementation with C++.*
-- [] *Reasoning acceleration : Image pre-processing Instancbank Caching and model post-processing Implementation with CUDA.*
+- [ ] *Image pre-processing Instancbank Caching and model post-processing Implementation with C++.*
+- [ ] *Reasoning acceleration : Image pre-processing Instancbank Caching and model post-processing Implementation with CUDA.*
 - [ ] *Full-link reasoning using CUDA, TensorRT and C++.*
 
 # Introduction

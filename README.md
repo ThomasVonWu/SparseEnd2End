@@ -1,10 +1,16 @@
 # SparseEnd2End: Obstacle 3D Detection and Tracking Architecture Based VisionTransformer
 - 👋 Hi, I’m ThomasVonWu. I'd like to introduce you to a  simple and practical repository that uses end-to-end model with sparse transformer to sense 3D obstacles. This repo has no complex dependency for Training | Inference | Deployment(we don't need to install mmdet3d, mmcv, mmcv-full and so on), so it's easy to install in your local workstation or supercomputing gpu clusters. This repository will also provide x86(NVIDIA RTX  Series GPU) | ARM(NVIDIA ORIN) deployment solutions. Finally, you can deploy your e2e model onborad through this repo happily.  
-- 👀 I think you are interested in:  
-    1. how to define and use PyTorch custom operations : DeformableAggregation?    
-    2. how to export a PyTorch model with custom operations to ONNX?  
+- 👀 I guess you are interested in:  
+    1. how to define PyTorch custom operation: DeformableFeatureAggregation and register related onnx custom operator?    
+    2. how to make custom plugin: DeformableFeatureAggregation in TensorRT engine?  
     3. how to export onnx with custom operations to TensorRT engine?  
-    4. how to validate PyTorch and TensorRT inference results consistency?  
+    4. how to validate inference results consistency: PyTorch vs. ONNX vs. TensorRT ?  
+
+## Experimental Results
+|         **Model**        | **ImgSze** | **Framework** | **Precision** | **mAP** | **NDS** | **FPS** |                  **GPU**                  | **ckpt**|
+|:----------------------------:|:------------------:|:------------------------:|:----------------------:|:--------------:|:-------------:|:-------------:|:----------------:|:----------------:|
+|         Sparse4Dv3      |    256x704     |           PyTorch       |            FP32        |     56.37     |     70.97    |     19.8     | NVIDIA GeForce RTX 3090 |[ckpt](https://drive.google.com/file/d/1sSMNB7T7LPKSr8nD9S_tSiu1mJrFMZ1I/view?usp=sharing)
+|         Sparse4Dv3      |    256x704     |          TensorRT     |            FP32        |      wati       |     wait      |     wait     |          NVIDIA ORIN      |wait|
 
 ## News
 * **`25 Aug, 2024`:** I release repo: SparseEnd2End. The complete deployment solution will be released as soon as possible. Please stay tuned! 

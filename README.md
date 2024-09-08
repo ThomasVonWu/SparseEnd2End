@@ -56,7 +56,7 @@
 [Quick Start](QUICK-START.md)
 
 ## Citation
-If you find SparseEnd2End useful in your research or applications, please consider giving us a star &#127775;  
+If you find SparseEnd2End useful in your research or applications, please consider giving me a star &#127775;  
 
 ## 🏷 ChangeLog
 >**08/25/2024：** **[v1.0.0]** This repo now supports Training | Inference in NuscenesDataset. It includes: data dump in JSON, Training | Inference  log caching, TensorBoard hooking, and so on. 

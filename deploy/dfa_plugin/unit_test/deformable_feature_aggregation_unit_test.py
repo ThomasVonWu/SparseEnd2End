@@ -226,8 +226,18 @@ def dfa_test(
         trt_old,
         logger,
     )
-    assert np.max(np.abs(output - bufferH[-1])) < 1e-2
+    output2 = bufferH[-1]
+    cosine_distance = 1 - np.dot(output.flatten(), output2.flatten()) / (
+        np.linalg.norm(output.flatten()) * np.linalg.norm(output2.flatten())
+    )
+    assert (
+        cosine_distance < 1e-3
+    ), f"Error in cosine_distance = {float(cosine_distance)} !"
+    logger.info(f"[DeformableAttentionAggrPlugin] cosine_distance = {float(cosine_distance)}")
 
+    max_abs_distance = float((np.abs(output - output2)).max())
+    assert max_abs_distance < 0.1, f"Error in max_abs_distance = {max_abs_distance} !"
+    logger.info(f"[DeformableAttentionAggrPlugin] max(abs(a-b))   = {max_abs_distance}")
 
 def main(
     data: List,

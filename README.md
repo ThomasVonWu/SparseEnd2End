@@ -23,13 +23,13 @@
 ## Experimental Results
 |         **Model**        | **ImgSize** | **ImgSize** | **Framework** | **Precision** | **mAP** | **NDS** | **FPS** |                  **GPU**                  | **config**| **ckpt**|**onnx**|**engine**|
 |:----------------------------:|:-------------------:|:------------------------:|:------------------------:|:----------------------:|:--------------:|:-------------:|:-------------:|:----------------:|:----------------:|:----------------:|:----------------:|:----------------:|
-|         Sparse4Dv3      |    256x704     |     Resnet50    |           PyTorch       |            FP32        |     56.37     |     70.97    |     19.8     | NVIDIA GeForce RTX 3090 |[config](dataset/config/sparse4d_temporal_r50_1x1_bs1_256x704_mini.py)|[ckpt](https://drive.google.com/file/d/1sSMNB7T7LPKSr8nD9S_tSiu1mJrFMZ1I/view?usp=sharing)
-|         Sparse4Dv3      |    256x704     |     Resnet50    |          TensorRT     |            FP32        |      wait       |     wait      |     wait     | NVIDIA GeForce RTX 3090 |[config](dataset/config/sparse4d_temporal_r50_1x1_bs1_256x704_mini.py)|[ckpt](https://drive.google.com/file/d/1sSMNB7T7LPKSr8nD9S_tSiu1mJrFMZ1I/view?usp=sharing)|
-|         Sparse4Dv3      |    256x704     |     Resnet50    |          TensorRT     |            FP16        |      wait       |     wait      |     wait     | NVIDIA GeForce RTX 3090 |[config](dataset/config/sparse4d_temporal_r50_1x1_bs1_256x704_mini.py)|[ckpt](https://drive.google.com/file/d/1sSMNB7T7LPKSr8nD9S_tSiu1mJrFMZ1I/view?usp=sharing)|
-|         Sparse4Dv3      |    256x704     |     Resnet50    |          TensorRT     |    INT8+FP16    |      wait       |     wait      |     wait     | NVIDIA GeForce RTX 3090 |[config](dataset/config/sparse4d_temporal_r50_1x1_bs1_256x704_mini.py)|[ckpt](https://drive.google.com/file/d/1sSMNB7T7LPKSr8nD9S_tSiu1mJrFMZ1I/view?usp=sharing)|
-|         Sparse4Dv3      |    256x704     |     Resnet50    |          TensorRT     |            FP32        |      wait       |     wait      |     wait     |          NVIDIA ORIN      |[config](dataset/config/sparse4d_temporal_r50_1x1_bs1_256x704_mini.py)|[ckpt](https://drive.google.com/file/d/1sSMNB7T7LPKSr8nD9S_tSiu1mJrFMZ1I/view?usp=sharing)|
-|         Sparse4Dv3      |    256x704     |     Resnet50    |          TensorRT     |            FP16        |      wait       |     wait      |     wait     |          NVIDIA ORIN      |[config](dataset/config/sparse4d_temporal_r50_1x1_bs1_256x704_mini.py)|[ckpt](https://drive.google.com/file/d/1sSMNB7T7LPKSr8nD9S_tSiu1mJrFMZ1I/view?usp=sharing)|
-|         Sparse4Dv3      |    256x704     |     Resnet50    |          TensorRT     |    INT8+FP16    |      wait       |     wait      |     wait     |          NVIDIA ORIN      |[config](dataset/config/sparse4d_temporal_r50_1x1_bs1_256x704_mini.py)|[ckpt](https://drive.google.com/file/d/1sSMNB7T7LPKSr8nD9S_tSiu1mJrFMZ1I/view?usp=sharing)|
+|         Sparse4Dv3      |    256x704     |     Resnet50    |           PyTorch       |            FP32        |     56.37     |     70.97    |     19.8     | NVIDIA GeForce RTX 3090 |[config](dataset/config/sparse4d_temporal_r50_1x1_bs1_256x704_mini.py)|[ckpt](https://drive.google.com/file/d/1sSMNB7T7LPKSr8nD9S_tSiu1mJrFMZ1I/view?usp=sharing)|     wait     |     wait     |
+|         Sparse4Dv3      |    256x704     |     Resnet50    |          TensorRT     |            FP32        |      wait       |     wait      |     wait     | NVIDIA GeForce RTX 3090 |[config](dataset/config/sparse4d_temporal_r50_1x1_bs1_256x704_mini.py)|[ckpt](https://drive.google.com/file/d/1sSMNB7T7LPKSr8nD9S_tSiu1mJrFMZ1I/view?usp=sharing)|     wait     |     wait     |
+|         Sparse4Dv3      |    256x704     |     Resnet50    |          TensorRT     |            FP16        |      wait       |     wait      |     wait     | NVIDIA GeForce RTX 3090 |[config](dataset/config/sparse4d_temporal_r50_1x1_bs1_256x704_mini.py)|[ckpt](https://drive.google.com/file/d/1sSMNB7T7LPKSr8nD9S_tSiu1mJrFMZ1I/view?usp=sharing)|     wait     |     wait     |
+|         Sparse4Dv3      |    256x704     |     Resnet50    |          TensorRT     |    INT8+FP16    |      wait       |     wait      |     wait     | NVIDIA GeForce RTX 3090 |[config](dataset/config/sparse4d_temporal_r50_1x1_bs1_256x704_mini.py)|[ckpt](https://drive.google.com/file/d/1sSMNB7T7LPKSr8nD9S_tSiu1mJrFMZ1I/view?usp=sharing)|     wait     |     wait     |
+|         Sparse4Dv3      |    256x704     |     Resnet50    |          TensorRT     |            FP32        |      wait       |     wait      |     wait     |          NVIDIA ORIN      |[config](dataset/config/sparse4d_temporal_r50_1x1_bs1_256x704_mini.py)|[ckpt](https://drive.google.com/file/d/1sSMNB7T7LPKSr8nD9S_tSiu1mJrFMZ1I/view?usp=sharing)|     wait     |     wait     |
+|         Sparse4Dv3      |    256x704     |     Resnet50    |          TensorRT     |            FP16        |      wait       |     wait      |     wait     |          NVIDIA ORIN      |[config](dataset/config/sparse4d_temporal_r50_1x1_bs1_256x704_mini.py)|[ckpt](https://drive.google.com/file/d/1sSMNB7T7LPKSr8nD9S_tSiu1mJrFMZ1I/view?usp=sharing)|     wait     |     wait     |
+|         Sparse4Dv3      |    256x704     |     Resnet50    |          TensorRT     |    INT8+FP16    |      wait       |     wait      |     wait     |          NVIDIA ORIN      |[config](dataset/config/sparse4d_temporal_r50_1x1_bs1_256x704_mini.py)|[ckpt](https://drive.google.com/file/d/1sSMNB7T7LPKSr8nD9S_tSiu1mJrFMZ1I/view?usp=sharing)|     wait     |     wait     |
 
 
 ## News
@@ -39,15 +39,15 @@
 - [X] *Register custom operation : DeformableFeatureAggregation and export ONNX and TensorRT engine. **`25 Aug, 2024`***
 - [X] *Verify the consistency of reasoning results : DeformableFeatureAggregation  PyToch Implementation  vs. TensorRT plugin Implementation. **`25 Aug, 2024`***  
 - [ ] *Reasoning acceleration using CUDA shared memory and CUDA FP16 in DeformableFeatureAggregation plugin Implementation.*
-- [ ] *Export SparseTransFormer Backbone ONNX&TensorRT engine.*
-- [ ] *Verify the consistency of reasoning results : SparseTransFormer Backbone PyTorch Implementation vs. ONNX Runtime vs. TensorRT engine.*
+- [X] *Export SparseTransFormer Backbone ONNX&TensorRT engine. **`8 Sep, 2024`***
+- [X] *Verify the consistency of reasoning results : SparseTransFormer Backbone PyTorch Implementation vs. ONNX Runtime vs. TensorRT engine. **`8 Sep, 2024`***
 - [ ] *Export SparseTransFormer Head ONNX and TensorRT engine.*
 - [ ] *Verify the consistency of reasoning results : SparseTransFormer Head PyTorch Implementation vs. TensorRT engine.*
 - [ ] *Reasoning acceleration using FlashAttention in replace of MultiheadAttention.*
 - [ ] *Reasoning acceleration using FP16/INT8  in replace of FP32 of TensorRT engine.*
 - [ ] *Image pre-processing Instancbank Caching and model post-processing Implementation with C++.*
 - [ ] *Reasoning acceleration : Image pre-processing Instancbank Caching and model post-processing Implementation with CUDA.*
-- [ ] *Full-link reasoning using CUDA, TensorRT and C++.*
+- [ ] *Full-link reasoning using CUDA, TensorRT and C++ without Python, includeing: ImagePreprocess and ModelPostprocess.*
 
 # Introduction
 > SparseEnd2End is a Sparse-Centric paradigm for end-to-end autonomous driving perception.  

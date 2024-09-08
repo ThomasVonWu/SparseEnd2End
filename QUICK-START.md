@@ -12,6 +12,7 @@ sparseend2end_path="path/to/sparseend2end"
 cd ${sparseend2end_path}
 pip3 install --upgrade pip
 pip3 install torch==1.13.0+cu116 torchvision==0.14.0+cu116 torchaudio==0.13.0 --extra-index-url https://download.pytorch.org/whl/cu116
+python3 -m pip install colored polygraphy --extra-index-url pypi.ngc.nvidia.com
 pip3 install -r requirement.txt
 ```
 

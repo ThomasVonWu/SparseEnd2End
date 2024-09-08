@@ -1,7 +1,5 @@
 # Byte-compiled / optimized / DLL files
 __pycache__/
-*.py[cod]
-*$py.class
 
 # C extensions
 *.so
@@ -24,6 +22,8 @@ build/
 *.onnx
 *.engine
 *.json
+*.pkl
+*.swp
 
 # Sphinx documentation
 docs/_build/

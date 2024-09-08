@@ -31,12 +31,12 @@ def parse_args():
     parser.add_argument(
         "--log",
         type=str,
-        default="deploy/onnxlog/onnx_consistencycheck.log",
+        default="deploy/onnx/onnx_consistencycheck.log",
     )
     parser.add_argument(
         "--onnx",
         type=str,
-        default="deploy/onnxlog/sparse4dbackbone.onnx",
+        default="deploy/onnx/sparse4dbackbone.onnx",
     )
     args = parser.parse_args()
     return args
@@ -48,9 +48,10 @@ def model_infer(model, dummy_img):
     return feature.cpu().numpy()
 
 
-def onnx_infer(dummy_img, args):
-    onnx_model = onnx.load(args.onnx)
-    onnx.checker.check_model(onnx_model)
+def onnx_infer(
+    onnx_model,
+    dummy_img,
+):
 
     session = ort.InferenceSession(onnx_model.SerializeToString())
     ort_inputs = {session.get_inputs()[0].name: dummy_img}
@@ -67,35 +68,48 @@ def build_module(cfg, default_args: Optional[Dict] = None) -> Any:
     return eval(type)(**cfg2)
 
 
-if __name__ == "__main__":
+def main():
     args = parse_args()
-    logger, console_handler, file_handler = set_logger(args.log)
+    logger, _, _ = set_logger(args.log, save_file=False)
     logger.setLevel(logging.DEBUG)
-    console_handler.setLevel(logging.DEBUG)
-    file_handler.setLevel(logging.DEBUG)
 
-    logger.info("Sparse4d Backbone Onnx Inference Consistency Check!...")
+    logger.info("Sparse4d Backbone Onnx Inference Consistency Check......")
 
     cfg = read_cfg(args.cfg)
     model = build_module(cfg["model"])
     checkpoint = args.ckpt
     _ = model.load_state_dict(torch.load(checkpoint)["state_dict"], strict=False)
 
-    np.random.seed(1)
+    onnx_model = onnx.load(args.onnx)
+    onnx.checker.check_model(onnx_model)
 
-    BS = 1
-    NUM_CAMS = 6
-    C = 3
-    H = 256
-    W = 704
-    dummy_img = np.random.rand(BS, NUM_CAMS, C, H, W).astype(np.float32)
+    for i in range(3):
+        np.random.seed(i)
+        logger.debug(f"Test Sample {i} Results:")
+        BS = 1
+        NUM_CAMS = 6
+        C = 3
+        H = 256
+        W = 704
+        dummy_img = np.random.rand(BS, NUM_CAMS, C, H, W).astype(np.float32)
 
-    output1 = model_infer(model.cuda().eval(), torch.from_numpy(dummy_img).cuda())
-    output2 = onnx_infer(dummy_img, args)
+        output1 = model_infer(model.cuda().eval(), torch.from_numpy(dummy_img).cuda())
+        output2 = onnx_infer(onnx_model, dummy_img)
 
-    cosine_distance = 1 - np.dot(output1.flatten(), output2.flatten()) / (
-        np.linalg.norm(output1.flatten()) * np.linalg.norm(output2.flatten())
-    )
-    print(type(cosine_distance))
-    logger.info(f"cosine_distance = {float(cosine_distance)}")
-    logger.info(f"max(abs())      = {float((np.abs(output1 - output2)).max())}")
+        cosine_distance = 1 - np.dot(output1.flatten(), output2.flatten()) / (
+            np.linalg.norm(output1.flatten()) * np.linalg.norm(output2.flatten())
+        )
+        assert (
+            cosine_distance < 1e-3
+        ), f"Error in cosine_distance = {float(cosine_distance)} !"
+        logger.info(f"cosine_distance = {float(cosine_distance)}")
+
+        max_abs_distance = float((np.abs(output1 - output2)).max())
+        assert (
+            max_abs_distance < 0.1
+        ), f"Error in max_abs_distance = {max_abs_distance} !"
+        logger.info(f"max(abs(a-b))   = {max_abs_distance}")
+
+
+if __name__ == "__main__":
+    main()

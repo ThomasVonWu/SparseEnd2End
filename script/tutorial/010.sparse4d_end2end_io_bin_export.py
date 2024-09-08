@@ -294,10 +294,10 @@ class Sparse4D_head(nn.Module):
         self._spatial_shapes = feature_maps[1].clone()
         self._level_start_index = feature_maps[2].clone()
         self._image_wh = metas["image_wh"].clone()
-        self._lidar2cam = metas["lidar2cam"].clone()
-        self._cam_distortion = metas["cam_distortion"].clone()
-        self._cam_intrinsic = metas["cam_intrinsic"].clone()
-        self._aug_mat = metas["aug_mat"].clone()
+        # self._lidar2cam = metas["lidar2cam"].clone()
+        # self._cam_distortion = metas["cam_distortion"].clone()
+        # self._cam_intrinsic = metas["cam_intrinsic"].clone()
+        # self._aug_mat = metas["aug_mat"].clone()
 
         attn_mask = None
         dn_metas = None
@@ -573,42 +573,48 @@ def main():
             data = scatter(data, [0])[0]
             ori_imgs = data["ori_img"].detach().cpu().numpy()
             imgs = data["img"].detach().cpu().numpy()
-            save_bins(inputs=[ori_imgs], outputs=[imgs], names=["ori_imgs", "imgs"], sample_index=i, logger=logger)
+            save_bins(
+                inputs=[ori_imgs],
+                outputs=[imgs],
+                names=["ori_imgs", "imgs"],
+                sample_index=i,
+                logger=logger,
+            )
 
             feature_maps = backbone_hook(img=data.pop("img"))
             logger.info(
                 f"Start to save bin for Sparse4dBackbone, sampleindex={i} >>>>>>>>>>>>>>>>"
             )
-            
-            save_bins_backbone(
-                backbone_hook.io_hook()[0],
-                backbone_hook.io_hook()[1],
-                logger=logger,
-                sample_index=i,
-            )
+
+            # save_bins_backbone(
+            #     backbone_hook.io_hook()[0],
+            #     backbone_hook.io_hook()[1],
+            #     logger=logger,
+            #     sample_index=i,
+            # )
 
             _ = head_hook(feature_maps, data)
-            inputs, outputs, first_frame_flag = head_hook.io_hook()
-            if first_frame_flag:
-                logger.info(
-                    f"Start to save bin for 1st frame Sparse4dHead, sampleindex={i} >>>>>>>>>>>>>>>>"
-                )
-                save_bins_1stframe_head(
-                    inputs,
-                    outputs,
-                    logger=logger,
-                    sample_index=i,
-                )
-            else:
-                logger.info(
-                    f"Start to save bin for frame > 1 Sparse4dHead, sampleindex={i} >>>>>>>>>>>>>>>>"
-                )
-                save_bins_head(
-                    inputs,
-                    outputs,
-                    logger=logger,
-                    sample_index=i,
-                )
+            # inputs, outputs, first_frame_flag = head_hook.io_hook()
+            # if first_frame_flag:
+            #     logger.info(
+            #         f"Start to save bin for 1st frame Sparse4dHead, sampleindex={i} >>>>>>>>>>>>>>>>"
+            #     )
+            #     save_bins_1stframe_head(
+            #         inputs,
+            #         outputs,
+            #         logger=logger,
+            #         sample_index=i,
+            #     )
+            # else:
+            #     logger.info(
+            #         f"Start to save bin for frame > 1 Sparse4dHead, sampleindex={i} >>>>>>>>>>>>>>>>"
+            #     )
+            #     save_bins_head(
+            #         inputs,
+            #         outputs,
+            #         logger=logger,
+            #         sample_index=i,
+            #     )
 
 
 if __name__ == "__main__":

@@ -104,8 +104,6 @@ class DeformableFeatureAggregation(BaseModule):
             instance_feature: (bs, 900+x, 256) train:x=5*32*2 test=0;
             anchor: (bs, 900+x, 11) train:x=5*32*2 test=0;
             anchor_embed: (bs, 900+x, 256) train:x=5*32*2 test=0;
-            feature_maps:来自图像域的特征
-
         Return:
             out: (bs, 900+x, 512)
         """
@@ -241,7 +239,7 @@ class DeformableFeatureAggregation(BaseModule):
         lidar2img: torch.Tensor,
         image_wh: Optional[torch.Tensor] = None,
     ) -> torch.Tensor:
-        """grid sample 区别 DFA模块的一种采样模式:
+        """
         Args:
             feature_maps: List[Tensor]
                         (bs, 6, 256, 64, 176) float32
@@ -293,8 +291,6 @@ class DeformableFeatureAggregation(BaseModule):
         Return:
             features: (bs, num_anchor, self.num_pts, self.embed_dims)
                       (1,1220,13,256)
-
-
         """
         bs, num_anchor = weights.shape[:2]
         # (bs, 1220, 6, 4, 13, 8, 1) * (bs, 1220, 6, 4, 13, 8, 32)  => (bs, 1220, 6, 4, 13, 8, 32)

@@ -21,7 +21,7 @@
 
 
 ## Experimental Results
-|         **Model**        | **ImgSize** | **ImgSize** | **Framework** | **Precision** | **mAP** | **NDS** | **FPS** |                  **GPU**                  | **config**| **ckpt**|**onnx**|**engine**|
+|         **Model**        | **ImgSize** | **Backbone** | **Framework** | **Precision** | **mAP** | **NDS** | **FPS** |                  **GPU**                  | **config**| **ckpt**|**onnx**|**engine**|
 |:----------------------------:|:-------------------:|:------------------------:|:------------------------:|:----------------------:|:--------------:|:-------------:|:-------------:|:----------------:|:----------------:|:----------------:|:----------------:|:----------------:|
 |         Sparse4Dv3      |    256x704     |     Resnet50    |           PyTorch       |            FP32        |     56.37     |     70.97    |     19.8     | NVIDIA GeForce RTX 3090 |[config](dataset/config/sparse4d_temporal_r50_1x1_bs1_256x704_mini.py)|[ckpt](https://drive.google.com/file/d/1sSMNB7T7LPKSr8nD9S_tSiu1mJrFMZ1I/view?usp=sharing)|     wait     |     wait     |
 |         Sparse4Dv3      |    256x704     |     Resnet50    |          TensorRT     |            FP32        |      wait       |     wait      |     wait     | NVIDIA GeForce RTX 3090 |[config](dataset/config/sparse4d_temporal_r50_1x1_bs1_256x704_mini.py)|[ckpt](https://drive.google.com/file/d/1sSMNB7T7LPKSr8nD9S_tSiu1mJrFMZ1I/view?usp=sharing)|     wait     |     wait     |
@@ -45,9 +45,9 @@
 - [ ] *Verify the consistency of reasoning results : SparseTransFormer Head PyTorch Implementation vs. TensorRT engine.*
 - [ ] *Reasoning acceleration using FlashAttention in replace of MultiheadAttention.*
 - [ ] *Reasoning acceleration using FP16/INT8  in replace of FP32 of TensorRT engine.*
-- [ ] *Image pre-processing Instancbank Caching and model post-processing Implementation with C++.*
+- [ ] *Image pre-processing, Instancbank Caching and model post-processing Implementation with C++.*
 - [ ] *Reasoning acceleration : Image pre-processing Instancbank Caching and model post-processing Implementation with CUDA.*
-- [ ] *Full-link reasoning using CUDA, TensorRT and C++ without Python, includeing: ImagePreprocess and ModelPostprocess.*
+- [ ] *Onboard: Full-link reasoning using CUDA, TensorRT and C++.*
 
 # Introduction
 > SparseEnd2End is a Sparse-Centric paradigm for end-to-end autonomous driving perception.  

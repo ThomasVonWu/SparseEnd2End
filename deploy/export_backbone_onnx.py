@@ -16,7 +16,7 @@ from tool.utils.config import read_cfg
 
 
 def parse_args():
-    parser = argparse.ArgumentParser(description="Deploy PerceptionE2E Backbone!")
+    parser = argparse.ArgumentParser(description="Deploy SparseEND2END Backbone!")
     parser.add_argument(
         "--cfg",
         type=str,

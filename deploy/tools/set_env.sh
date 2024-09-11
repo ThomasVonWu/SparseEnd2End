@@ -67,8 +67,8 @@ export ENV_BACKBONE_ENGINE=${ENVTRTDIR}/sparse4dbackbone.engine
 export ENV_HEAD1_ONNX=deploy/onnx/sparse4dhead1st.onnx
 export ENV_HEAD1_ENGINE=${ENVTRTDIR}/sparse4dhead1st.engine
 
-export ENV_HEAD2_ONNX=deploy/onnx/sparse4dhead2rd.onnx
-export ENV_HEAD2_ENGINE=${ENVTRTDIR}/sparse4dhead2rd.engine
+export ENV_HEAD2_ONNX=deploy/onnx/sparse4dhead2nd.onnx
+export ENV_HEAD2_ENGINE=${ENVTRTDIR}/sparse4dhead2nd.engine
 
 echo "===================================================================================================================="
 echo "||  Config Environment Below:"

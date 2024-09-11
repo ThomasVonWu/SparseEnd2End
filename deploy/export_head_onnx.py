@@ -47,10 +47,10 @@ def parse_args():
     parser.add_argument(
         "--save_onnx2",
         type=str,
-        default="deploy/onnx/sparse4dhead2rd.onnx",
+        default="deploy/onnx/sparse4dhead2nd.onnx",
     )
     parser.add_argument(
-        "--osec", action="store_true", help="only export sparse4dhead2rd onnx."
+        "--o2", action="store_true", help="only export sparse4dhead2nd onnx."
     )
     args = parser.parse_args()
     return args
@@ -160,9 +160,9 @@ class Sparse4DHead1st(nn.Module):
         return instance_feature, anchor, cls, qt
 
 
-class Sparse4DHead2rd(nn.Module):
+class Sparse4DHead2nd(nn.Module):
     def __init__(self, model):
-        super(Sparse4DHead2rd, self).__init__()
+        super(Sparse4DHead2nd, self).__init__()
         self.model = model
 
     @staticmethod
@@ -461,7 +461,7 @@ if __name__ == "__main__":
         model, BS, NUMS_CAM, INPUT_H, INPUT_W, first_frame=first_frame, logger=logger
     )
 
-    if not args.osec:
+    if not args.o2:
         first_frame_head = Sparse4DHead1st(copy.deepcopy(model)).cuda()
         logger.info("Export Sparse4DHead1st Onnx >>>>>>>>>>>>>>>>")
         time.sleep(2)
@@ -508,8 +508,8 @@ if __name__ == "__main__":
                 f'🚀 Export onnx completed. ONNX saved in "{args.save_onnx1}" 🤗.'
             )
 
-    head = Sparse4DHead2rd(copy.deepcopy(model)).cuda()
-    logger.info("Export Sparse4DHead2rd Onnx >>>>>>>>>>>>>>>>")
+    head = Sparse4DHead2nd(copy.deepcopy(model)).cuda()
+    logger.info("Export Sparse4DHead2nd Onnx >>>>>>>>>>>>>>>>")
     time.sleep(2)
     with torch.no_grad():
         torch.onnx.export(

@@ -5,6 +5,7 @@
     2. how to make custom plugin: DeformableFeatureAggregation in TensorRT engine?  
     3. how to export onnx with custom operations to TensorRT engine?  
     4. how to validate inference results consistency: PyTorch vs. ONNX vs. TensorRT ?  
+    5. how to deploy temporal fusion transformer head successfully?  
 
 
 ## Algorithm Architecture

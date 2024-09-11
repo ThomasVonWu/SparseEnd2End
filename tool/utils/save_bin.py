@@ -11,7 +11,7 @@ def save_bin_format(x, x_name: str, save_prefix, sample_index, logger):
         f"{x_name}\t:\t{x.flatten()[:5]} ... {x.flatten()[-5:]}, min={x.min()}, max={x.max()}"
     )
 
-    x_shape = "x".join([str(it) for it in x.shape])
+    x_shape = "*".join([str(it) for it in x.shape])
     x_path = os.path.join(
         save_prefix,
         f"sample_{sample_index}_{x_name}_{x_shape}_{x.dtype}.bin",

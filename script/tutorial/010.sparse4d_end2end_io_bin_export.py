@@ -67,7 +67,7 @@ class Sparse4D_backbone(nn.Module):
         """IO tensor is converted to numpy type."""
         img = self._img.detach().cpu().numpy()
         feature = self._feature.detach().cpu().numpy()
-        return img, feature
+        return [img], [feature]
 
     def feature_maps_format(self, feature_maps):
 
@@ -288,13 +288,13 @@ class Sparse4D_head(nn.Module):
         return inputs, outputs
 
     def post_process_io_hook(self):
-        decoder_boxes_3d = self._decoder_boxes_3d.detach().numpy()
-        decoder_scores_3d = self._decoder_scores_3d.detach().numpy()
+        decoder_boxes_3d = self._decoder_boxes_3d.detach().cpu().numpy()
+        decoder_scores_3d = self._decoder_scores_3d.detach().cpu().numpy()
         decoder_labels_3d = (
-            self._decoder_labels_3d.int().detach().numpy()
+            self._decoder_labels_3d.int().detach().cpu().numpy()
         )  # int64 -> int32
-        decoder_cls_scores = self._decoder_cls_scores.detach().numpy()
-        decoder_track_ids = self._decoder_track_ids.int().detach().numpy()
+        decoder_cls_scores = self._decoder_cls_scores.detach().cpu().numpy()
+        decoder_track_ids = self._decoder_track_ids.int().detach().cpu().numpy()
 
         inputs = []
         outputs = [
@@ -492,7 +492,7 @@ def main():
     logger, console_handler, file_handler = set_logger(args.log, save_file=True)
     logger.setLevel(logging.INFO)
     console_handler.setLevel(logging.INFO)
-    file_handler.setLevel(logging.DEBUG)
+    file_handler.setLevel(logging.INFO)
 
     cfg = read_cfg(args.config)  # dict
 

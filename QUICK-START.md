@@ -1,5 +1,5 @@
 
-# 📫 Quick Start LocalWorkStation
+# 📫 Quick Start LocalWorkStation | GPU Cluster
 ### Set up a new virtual environment
 ```bash
 virtualenv sparsee2e --python=python3.8

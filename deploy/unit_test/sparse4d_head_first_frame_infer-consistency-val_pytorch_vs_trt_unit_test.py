@@ -171,7 +171,7 @@ def inference(
                 )
             )
 
-        for i in range(nIO):
+        for i in range(nInput):
             logger.debug(
                 f"LoadEngine: Input{i}={lTensorName[i]} :\tshape:{context.get_tensor_shape(lTensorName[i])},\ttype:{str(trt.nptype(engine.get_tensor_dtype(lTensorName[i])))}"
             )
@@ -275,7 +275,6 @@ def main(
 
 
 if __name__ == "__main__":
-    from tool.utils.logger import logger_wrapper
 
     logger, _, _ = logger_wrapper("", False)
     logger.setLevel(logging.DEBUG)
@@ -290,7 +289,6 @@ if __name__ == "__main__":
         trt_old = False
 
     np.set_printoptions(precision=4, linewidth=200, suppress=True)
-    np.random.seed(1)
 
     logger.info("Starting unit test...")
     data = read_bin()

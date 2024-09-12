@@ -64,24 +64,24 @@ class Sparse4DHead1st(nn.Module):
     @staticmethod
     def head_forward(
         self,
-        instance_feature,
-        anchor,
-        time_interval,
         feature,
         spatial_shapes,
         level_start_index,
-        lidar2img,
+        instance_feature,
+        anchor,
+        time_interval,
         image_wh,
+        lidar2img,
     ):
 
-        # instance bank get inputs
+        # Instance bank get inputs
         temp_instance_feature = None
         temp_anchor_embed = None
 
-        # DAF inputs
+        # DFA inputs
         metas = {
-            "lidar2img": lidar2img,
             "image_wh": image_wh,
+            "lidar2img": lidar2img,
         }
 
         anchor_embed = self.anchor_encoder(anchor)
@@ -136,26 +136,26 @@ class Sparse4DHead1st(nn.Module):
 
     def forward(
         self,
-        instance_feature,
-        anchor,
-        time_interval,
         feature,
         spatial_shapes,
         level_start_index,
-        lidar2img,
+        instance_feature,
+        anchor,
+        time_interval,
         image_wh,
+        lidar2img,
     ):
         head = self.model.head
         instance_feature, anchor, cls, qt = self.head_forward(
             head,
-            instance_feature,
-            anchor,
-            time_interval,
             feature,
             spatial_shapes,
             level_start_index,
-            lidar2img,
+            instance_feature,
+            anchor,
+            time_interval,
             image_wh,
+            lidar2img,
         )
         return instance_feature, anchor, cls, qt
 
@@ -168,18 +168,18 @@ class Sparse4DHead2nd(nn.Module):
     @staticmethod
     def head_forward(
         self,
+        feature,
+        spatial_shapes,
+        level_start_index,
+        instance_feature,
+        anchor,
+        time_interval,
         temp_instance_feature,
         temp_anchor,
         mask,
         track_id,
-        instance_feature,
-        anchor,
-        time_interval,
-        feature,
-        spatial_shapes,
-        level_start_index,
-        lidar2img,
         image_wh,
+        lidar2img,
     ):
         mask = mask.bool()  # TensorRT binding type for bool input is NoneType.
         anchor_embed = self.anchor_encoder(anchor)
@@ -270,34 +270,34 @@ class Sparse4DHead2nd(nn.Module):
 
     def forward(
         self,
+        feature,
+        spatial_shapes,
+        level_start_index,
+        instance_feature,
+        anchor,
+        time_interval,
         temp_instance_feature,
         temp_anchor,
         mask,
         track_id,
-        instance_feature,
-        anchor,
-        time_interval,
-        feature,
-        spatial_shapes,
-        level_start_index,
-        lidar2img,
         image_wh,
+        lidar2img,
     ):
         head = self.model.head
         instance_feature, anchor, cls, qt, track_id = self.head_forward(
             head,
+            feature,
+            spatial_shapes,
+            level_start_index,
+            instance_feature,
+            anchor,
+            time_interval,
             temp_instance_feature,
             temp_anchor,
             mask,
             track_id,
-            instance_feature,
-            anchor,
-            time_interval,
-            feature,
-            spatial_shapes,
-            level_start_index,
-            lidar2img,
             image_wh,
+            lidar2img,
         )
         return instance_feature, anchor, cls, qt, track_id
 
@@ -315,29 +315,6 @@ def dummpy_input(
     first_frame=True,
     logger=None,
 ):
-    """
-    Return:
-        dummy_level_start_index: torch.int32
-    """
-    instance_feature = model.head.instance_bank.instance_feature  # (900, 256)
-    dummy_instance_feature = (
-        instance_feature[None].repeat((bs, 1, 1)).cuda()
-    )  # (bs, 900, 256)
-
-    anchor = model.head.instance_bank.anchor  # (900, 11)
-    dummy_anchor = anchor[None].repeat((bs, 1, 1)).cuda()  # (bs, 900, 11)
-
-    dummy_temp_instance_feature = (
-        torch.zeros((bs, nums_topk, embed_dims)).float().cuda()
-    )
-    dummy_temp_anchor = torch.zeros((bs, nums_topk, anchor_dims)).float().cuda()
-    dummy_mask = torch.randint(0, 2, size=(bs,)).int().cuda()
-    dummy_track_id = -1 * torch.ones((bs, nums_query)).int().cuda()
-
-    dummy_time_interval = torch.tensor(
-        [model.head.instance_bank.default_time_interval] * bs
-    ).cuda()
-
     h_4x, w_4x = input_h // 4, input_w // 4
     h_8x, w_8x = input_h // 8, input_w // 8
     h_16x, w_16x = input_h // 16, input_w // 16
@@ -362,7 +339,25 @@ def dummpy_input(
     )
     dummy_level_start_index = scale_start_index.reshape(nums_cam, 4)
 
-    dummy_lidar2img = torch.randn(bs, nums_cam, 4, 4).to(dummy_feature)
+    instance_feature = model.head.instance_bank.instance_feature  # (900, 256)
+    dummy_instance_feature = (
+        instance_feature[None].repeat((bs, 1, 1)).cuda()
+    )  # (bs, 900, 256)
+
+    anchor = model.head.instance_bank.anchor  # (900, 11)
+    dummy_anchor = anchor[None].repeat((bs, 1, 1)).cuda()  # (bs, 900, 11)
+
+    dummy_time_interval = torch.tensor(
+        [model.head.instance_bank.default_time_interval] * bs
+    ).cuda()
+
+    dummy_temp_instance_feature = (
+        torch.zeros((bs, nums_topk, embed_dims)).float().cuda()
+    )
+    dummy_temp_anchor = torch.zeros((bs, nums_topk, anchor_dims)).float().cuda()
+    dummy_mask = torch.randint(0, 2, size=(bs,)).int().cuda()
+    dummy_track_id = -1 * torch.ones((bs, nums_query)).int().cuda()
+
     dummy_image_wh = (
         torch.tensor([input_w, input_h])
         .unsqueeze(0)
@@ -371,14 +366,16 @@ def dummpy_input(
         .to(dummy_feature)
     )
 
+    dummy_lidar2img = torch.randn(bs, nums_cam, 4, 4).to(dummy_feature)
+
     logger.debug(f"Dummy input : hape&Type&Device Msg >>>>>>")
     roi_x = [
-        "dummy_instance_feature",
-        "dummy_anchor",
-        "dummy_time_interval",
         "dummy_feature",
         "dummy_spatial_shapes",
         "dummy_level_start_index",
+        "dummy_instance_feature",
+        "dummy_anchor",
+        "dummy_time_interval",
         "dummy_image_wh",
         "dummy_lidar2img",
     ]
@@ -401,18 +398,18 @@ def dummpy_input(
             )
 
     return (
-        dummy_instance_feature,
-        dummy_anchor,
-        dummy_time_interval,
         dummy_feature,
         dummy_spatial_shapes,
         dummy_level_start_index,
-        dummy_lidar2img,
-        dummy_image_wh,
+        dummy_instance_feature,
+        dummy_anchor,
+        dummy_time_interval,
         dummy_temp_instance_feature,
         dummy_temp_anchor,
         dummy_mask,
         dummy_track_id,
+        dummy_image_wh,
+        dummy_lidar2img,
     )
 
 
@@ -437,7 +434,7 @@ if __name__ == "__main__":
     model = build_module(cfg["model"])
     checkpoint = args.ckpt
     _ = model.load_state_dict(torch.load(checkpoint)["state_dict"], strict=False)
-    model.eval()
+    model.cuda().eval()
 
     BS = 1
     NUMS_CAM = 6
@@ -445,38 +442,38 @@ if __name__ == "__main__":
     INPUT_W = 704
     first_frame = True
     (
-        dummy_instance_feature,
-        dummy_anchor,
-        dummy_time_interval,
         dummy_feature,
         dummy_spatial_shapes,
         dummy_level_start_index,
-        dummy_lidar2img,
-        dummy_image_wh,
+        dummy_instance_feature,
+        dummy_anchor,
+        dummy_time_interval,
         dummy_temp_instance_feature,
         dummy_temp_anchor,
         dummy_mask,
         dummy_track_id,
+        dummy_image_wh,
+        dummy_lidar2img,
     ) = dummpy_input(
         model, BS, NUMS_CAM, INPUT_H, INPUT_W, first_frame=first_frame, logger=logger
     )
 
     if not args.o2:
-        first_frame_head = Sparse4DHead1st(copy.deepcopy(model)).cuda()
+        first_frame_head = Sparse4DHead1st(copy.deepcopy(model))
         logger.info("Export Sparse4DHead1st Onnx >>>>>>>>>>>>>>>>")
         time.sleep(2)
         with torch.no_grad():
             torch.onnx.export(
                 first_frame_head,
                 (
-                    dummy_instance_feature,
-                    dummy_anchor,
-                    dummy_time_interval,
                     dummy_feature,
                     dummy_spatial_shapes,
                     dummy_level_start_index,
-                    dummy_lidar2img,
+                    dummy_instance_feature,
+                    dummy_anchor,
+                    dummy_time_interval,
                     dummy_image_wh,
+                    dummy_lidar2img,
                 ),
                 args.save_onnx1,
                 input_names=[
@@ -490,10 +487,10 @@ if __name__ == "__main__":
                     "lidar2img",
                 ],
                 output_names=[
-                    "instance_feature",
-                    "anchor",
-                    "class_score",
-                    "quality_score",
+                    "pred_instance_feature",
+                    "pred_anchor",
+                    "pred_class_score",
+                    "pred_quality_score",
                 ],
                 opset_version=15,
                 do_constant_folding=True,
@@ -508,25 +505,25 @@ if __name__ == "__main__":
                 f'🚀 Export onnx completed. ONNX saved in "{args.save_onnx1}" 🤗.'
             )
 
-    head = Sparse4DHead2nd(copy.deepcopy(model)).cuda()
+    head = Sparse4DHead2nd(copy.deepcopy(model))
     logger.info("Export Sparse4DHead2nd Onnx >>>>>>>>>>>>>>>>")
     time.sleep(2)
     with torch.no_grad():
         torch.onnx.export(
             head,
             (
+                dummy_feature,
+                dummy_spatial_shapes,
+                dummy_level_start_index,
+                dummy_instance_feature,
+                dummy_anchor,
+                dummy_time_interval,
                 dummy_temp_instance_feature,
                 dummy_temp_anchor,
                 dummy_mask,
                 dummy_track_id,
-                dummy_instance_feature,
-                dummy_anchor,
-                dummy_time_interval,
-                dummy_feature,
-                dummy_spatial_shapes,
-                dummy_level_start_index,
-                dummy_lidar2img,
                 dummy_image_wh,
+                dummy_lidar2img,
             ),
             args.save_onnx2,
             input_names=[
@@ -544,11 +541,11 @@ if __name__ == "__main__":
                 "lidar2img",
             ],
             output_names=[
-                "instance_feature",
-                "anchor",
-                "class_score",
-                "quality_score",
-                "track_id",
+                "pred_instance_feature",
+                "pred_anchor",
+                "pred_class_score",
+                "pred_quality_score",
+                "pred_track_id",
             ],
             opset_version=15,
             do_constant_folding=True,

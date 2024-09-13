@@ -10,9 +10,10 @@ from cuda import cudart
 from tool.utils.logger import logger_wrapper
 
 
-def read_bin(samples=1):
+def read_bin(samples, logger):
     prefix = "script/tutorial/asset/"
-    data = list()
+    inputs = list()
+    outputs = list()
 
     for i in range(samples):
 
@@ -21,56 +22,117 @@ def read_bin(samples=1):
             f"{prefix}sample_{i}_feature_1*89760*256_float32.bin",
             dtype=np.float32,
         ).reshape(feature_shape)
-        # print(feature.reshape(-1)[:6])
+        logger.debug("[feature]")
+        logger.debug(
+            f"\tfirst5 | last5 : {feature.reshape(-1)[:5]} ...... {feature.reshape(-1)[-5:]}"
+        )
 
         spatial_shapes_shape = [6, 4, 2]
         spatial_shapes = np.fromfile(
             f"{prefix}sample_{i}_spatial_shapes_6*4*2_int32.bin", dtype=np.int32
         ).reshape(spatial_shapes_shape)
-        # print(spatial_shapes.reshape(-1)[:6])
+        logger.debug("[spatial_shapes]")
+        logger.debug(
+            f"\tfirst5 | last5 : {spatial_shapes.reshape(-1)[:5]} ...... {spatial_shapes.reshape(-1)[-5:]}"
+        )
 
         level_start_index_shape = [6, 4]
         level_start_index = np.fromfile(
             f"{prefix}sample_{i}_level_start_index_6*4_int32.bin",
             dtype=np.int32,
         ).reshape(level_start_index_shape)
-        # print(level_start_index.reshape(-1)[:6])
+        logger.debug("[level_start_index]")
+        logger.debug(
+            f"\tfirst5 | last5 : {level_start_index.reshape(-1)[:5]} ...... {level_start_index.reshape(-1)[-5:]}"
+        )
 
         instance_feature_shape = [1, 900, 256]
         instance_feature = np.fromfile(
             f"{prefix}sample_{i}_instance_feature_1*900*256_float32.bin",
             dtype=np.float32,
         ).reshape(instance_feature_shape)
-        # print(instance_feature.reshape(-1)[:6])
+        logger.debug("[instance_feature]")
+        logger.debug(
+            f"\tfirst5 | last5 : {instance_feature.reshape(-1)[:5]} ...... {instance_feature.reshape(-1)[-5:]}"
+        )
 
         anchor_shape = [1, 900, 11]
         anchor = np.fromfile(
             f"{prefix}sample_{i}_anchor_1*900*11_float32.bin", dtype=np.float32
         ).reshape(anchor_shape)
-        # print(anchor.reshape(-1)[:6])
+        logger.debug("[anchor]")
+        logger.debug(
+            f"\tfirst5 | last5 : {anchor.reshape(-1)[:5]} ......  {anchor.reshape(-1)[-5:]}"
+        )
 
         time_interval_shape = [1]
         time_interval = np.fromfile(
             f"{prefix}sample_{i}_time_interval_1_float32.bin",
             dtype=np.float32,
         ).reshape(time_interval_shape)
-        # print(time_interval)
+        logger.debug("[time_interval]")
+        logger.debug(f"\tfirst5 | last5 : {time_interval}")
 
         image_wh_shape = [1, 6, 2]
         image_wh = np.fromfile(
             f"{prefix}sample_{i}_image_wh_1*6*2_float32.bin",
             dtype=np.float32,
         ).reshape(image_wh_shape)
-        # print(image_wh.reshape(-1)[:6])
+        logger.debug("[image_wh]")
+        logger.debug(
+            f"\tfirst5 | last5 : {image_wh.reshape(-1)[:5]} ...... {image_wh.reshape(-1)[-5:]}"
+        )
 
         lidar2img_shape = [1, 6, 4, 4]
         lidar2img = np.fromfile(
             f"{prefix}sample_{i}_lidar2img_1*6*4*4_float32.bin",
             dtype=np.float32,
         ).reshape(lidar2img_shape)
-        # print(lidar2img.reshape(-1)[:6])
+        logger.debug("[lidar2img]")
+        logger.debug(
+            f"\tfirst5 | last5 : {lidar2img.reshape(-1)[:5]} ...... {lidar2img.reshape(-1)[-5:]}"
+        )
 
-        data.append(
+        pred_instance_feature_shape = [1, 900, 256]
+        pred_instance_feature = np.fromfile(
+            f"{prefix}sample_{i}_pred_instance_feature_1*900*256_float32.bin",
+            dtype=np.float32,
+        ).reshape(pred_instance_feature_shape)
+        logger.debug("[pred_instance_feature]")
+        logger.debug(
+            f"\tfirst5 | last5 : {pred_instance_feature.reshape(-1)[:5]} ...... {pred_instance_feature.reshape(-1)[-5:]}"
+        )
+
+        pred_anchor_shape = [1, 900, 11]
+        pred_anchor = np.fromfile(
+            f"{prefix}sample_{i}_pred_anchor_1*900*11_float32.bin",
+            dtype=np.float32,
+        ).reshape(pred_anchor_shape)
+        logger.debug("[pred_anchor]")
+        logger.debug(
+            f"\tfirst5 | last5 : {pred_anchor.reshape(-1)[:5]} ...... {pred_anchor.reshape(-1)[-5:]}"
+        )
+        pred_class_score_shape = [1, 900, 10]
+        pred_class_score = np.fromfile(
+            f"{prefix}sample_{i}_pred_class_score_1*900*10_float32.bin",
+            dtype=np.float32,
+        ).reshape(pred_class_score_shape)
+        logger.debug("[pred_class_score]")
+        logger.debug(
+            f"\tfirst5 | last5 : {pred_class_score.reshape(-1)[:5]} ...... {pred_class_score.reshape(-1)[-5:]}"
+        )
+
+        pred_quality_score_shape = [1, 900, 2]
+        pred_quality_score = np.fromfile(
+            f"{prefix}sample_{i}_pred_quality_score_1*900*2_float32.bin",
+            dtype=np.float32,
+        ).reshape(pred_quality_score_shape)
+        logger.debug("[pred_quality_score]")
+        logger.debug(
+            f"\tfirst5 | last5 : {pred_quality_score.reshape(-1)[:5]} ...... {pred_quality_score.reshape(-1)[-5:]}"
+        )
+
+        inputs.append(
             [
                 feature,
                 spatial_shapes,
@@ -82,7 +144,16 @@ def read_bin(samples=1):
                 lidar2img,
             ]
         )
-    return data
+
+        outputs.append(
+            [
+                pred_instance_feature,
+                pred_anchor,
+                pred_class_score,
+                pred_quality_score,
+            ]
+        )
+    return inputs, outputs
 
 
 def getPlugin(plugin_name) -> trt.tensorrt.IPluginV2:
@@ -93,7 +164,7 @@ def getPlugin(plugin_name) -> trt.tensorrt.IPluginV2:
 
 
 def build_network(trtFile, logger):
-    trtlogger = trt.Logger(trt.Logger.ERROR)
+    trtlogger = trt.Logger(trt.Logger.INFO)
     trt.init_libnvinfer_plugins(trtlogger, "")
 
     if os.path.isfile(trtFile):
@@ -173,11 +244,11 @@ def inference(
 
         for i in range(nInput):
             logger.debug(
-                f"LoadEngine: Input{i}={lTensorName[i]} :\tshape:{context.get_tensor_shape(lTensorName[i])},\ttype:{str(trt.nptype(engine.get_tensor_dtype(lTensorName[i])))}"
+                f"LoadEngine: BindingInput{i}={lTensorName[i]} :\tshape:{context.get_tensor_shape(lTensorName[i])},\ttype:{str(trt.nptype(engine.get_tensor_dtype(lTensorName[i])))}"
             )
         for i in range(nInput, nIO):
             logger.debug(
-                f"LoadEngine: Output{i}={lTensorName[i]}:\tshape:{context.get_tensor_shape(lTensorName[i])},\ttype:{str(trt.nptype(engine.get_tensor_dtype(lTensorName[i])))}"
+                f"LoadEngine: BindingOutput{i}={lTensorName[i]}:\tshape:{context.get_tensor_shape(lTensorName[i])},\ttype:{str(trt.nptype(engine.get_tensor_dtype(lTensorName[i])))}"
             )
 
     bufferD = []
@@ -211,11 +282,6 @@ def inference(
     for b in bufferD:
         cudart.cudaFree(b)
 
-    for i in range(nInput):
-        printArrayInformation(bufferH[i], logger, info="input[%s]" % i)
-    for i in range(nInput, nIO):
-        printArrayInformation(bufferH[nInput], logger, info="output[%s]" % (i - nInput))
-
     return nInput, nIO, bufferH
 
 
@@ -229,10 +295,25 @@ def printArrayInformation(x, logger, info: str):
             np.min(x),
         )
     )
+    logger.debug(
+        "\tfirst5 | last5 %s  ......  %s" % (x.reshape(-1)[:5], x.reshape(-1)[-5:])
+    )
+
+
+def inference_consistency_validatation(predicted_data, expected_data, output_names):
+    for x, y, name in zip(predicted_data, expected_data, output_names):
+        max_abs_distance = float((np.abs(x - y)).max())
+        logger.info(f"[max(abs()) error] {name} = {max_abs_distance}")
+
+        cosine_distance = 1 - np.dot(x.flatten(), y.flatten()) / (
+            np.linalg.norm(x.flatten()) * np.linalg.norm(y.flatten())
+        )
+        logger.info(f"[cosine_distance ] {name} = {float(cosine_distance)}")
 
 
 def main(
-    data: List[np.ndarray],
+    input_bins: List[np.ndarray],
+    output_bins: List[np.ndarray],
     trt_old: bool,
     logger,
     plugin_name="DeformableAttentionAggrPlugin",
@@ -246,7 +327,7 @@ def main(
         logger.error(f"{plugin_name} Engine Building Failed: {trtFile} !")
         return
 
-    for x in data:
+    for x, y in zip(input_bins, output_bins):
         (
             feature,
             spatial_shapes,
@@ -271,7 +352,35 @@ def main(
             trt_old,
             logger,
         )
-        exit(0)
+
+        input_names = [
+            "feature",
+            "spatial_shapes",
+            "level_start_index",
+            "instance_feature",
+            "anchor",
+            "time_interval",
+            "image_wh",
+            "lidar2img",
+        ]
+
+        output_names = [
+            "pred_instance_feature",
+            "pred_anchor",
+            "pred_class_score",
+            "pred_quality_score",
+        ]
+
+        assert len(input_names) == nInput
+        assert len(output_names) == nIO - nInput
+
+        for i, name in enumerate(input_names):
+            printArrayInformation(bufferH[i], logger, info=f"{name}")
+        for i, name in enumerate(output_names):
+            printArrayInformation(bufferH[i + nInput], logger, info=f"{name}")
+
+        assert len(output_names) == len(y)
+        inference_consistency_validatation(bufferH[nInput:], y, output_names)
 
 
 if __name__ == "__main__":
@@ -291,6 +400,6 @@ if __name__ == "__main__":
     np.set_printoptions(precision=4, linewidth=200, suppress=True)
 
     logger.info("Starting unit test...")
-    data = read_bin()
-    main(data, trt_old, logger)
+    inputs, expected_outputs = read_bin(1, logger)
+    main(inputs, expected_outputs, trt_old, logger)
     logger.info("All tests are passed!!!")

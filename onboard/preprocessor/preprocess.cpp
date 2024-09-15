@@ -10,7 +10,7 @@ Status Preprocess::forward(const CudaWrapper<std::uint8_t>& raw_imgs,
                            const cudaStream_t& stream,
                            const CudaWrapper<float>& model_input_imgs) {
   if (raw_imgs.getSize() !=
-      params_.cam_nums *
+      params_.num_cams *
           (params_.raw_img_c * params_.raw_img_h * params_.raw_img_w)) {
     LOG_ERROR(kLogContext, "Input raw imgs' size mismatches with params.");
 
@@ -18,7 +18,7 @@ Status Preprocess::forward(const CudaWrapper<std::uint8_t>& raw_imgs,
   }
 
   if (model_input_imgs.getSize() !=
-      params_.cam_nums *
+      params_.num_cams *
           (params_.model_input_img_c * params_.model_input_img_h *
            params_.model_input_img_w)) {
     LOG_ERROR(kLogContext, "Model input imgs' size mismatches with params.");
@@ -27,7 +27,7 @@ Status Preprocess::forward(const CudaWrapper<std::uint8_t>& raw_imgs,
   }
 
   const Status Ret_Code = ImgPreprocessorLauncher(
-      raw_imgs.getPtr(), static_cast<std::uint32_t>(params_.cam_nums),
+      raw_imgs.getPtr(), static_cast<std::uint32_t>(params_.num_cams),
       params_.raw_img_c, params_.raw_img_h, params_.raw_img_w,
       params_.model_input_img_h, params_.model_input_img_w,
       params_.img_aug.crop_h, params_.img_aug.crop_w,
@@ -40,7 +40,7 @@ Status ImagePreprocessor::forward(const CudaWrapper<std::uint8_t>& raw_imgs,
                                   const cudaStream_t& stream,
                                   const CudaWrapper<half>& model_input_imgs) {
   if (raw_imgs.getSize() !=
-      params_.cam_nums *
+      params_.num_cams *
           (params_.raw_img_c * params_.raw_img_h * params_.raw_img_w)) {
     LOG_ERROR(kLogContext, "Input raw imgs' size mismatches with params.");
 
@@ -48,7 +48,7 @@ Status ImagePreprocessor::forward(const CudaWrapper<std::uint8_t>& raw_imgs,
   }
 
   if (model_input_imgs.getSize() !=
-      params_.cam_nums *
+      params_.num_cams *
           (params_.model_input_img_c * params_.model_input_img_h *
            params_.model_input_img_w)) {
     LOG_ERROR(kLogContext, "Model input imgs' size mismatches with params.");
@@ -57,7 +57,7 @@ Status ImagePreprocessor::forward(const CudaWrapper<std::uint8_t>& raw_imgs,
   }
 
   Status Ret_Code = ImgPreprocessorLauncher(
-      raw_imgs.getPtr(), static_cast<std::uint32_t>(params_.cam_nums),
+      raw_imgs.getPtr(), static_cast<std::uint32_t>(params_.num_cams),
       params_.raw_img_c, params_.raw_img_h, params_.raw_img_w,
       params_.model_input_img_h, params_.model_input_img_w,
       params_.img_aug.crop_h, params_.img_aug.crop_w,

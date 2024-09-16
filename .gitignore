@@ -14,10 +14,11 @@ build/
 
 # Django stuff:
 *.log
+*.INFO
+LOG_*
 
 # dump file
 *.npy
-*.txt
 *.bin
 *.onnx
 *.engine

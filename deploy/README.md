@@ -51,11 +51,11 @@ make log likes below:
 1-Finish Compile CUDA Make Policy build/deformableAttentionAggr.cu.mk
 2-Finish Compile CXX Make Policy build/deformableAttentionAggrPlugin.cpp.mk
 make lib/deformableAttentionAggr.so
-make[1]: Entering directory '/mnt/data/end2endlocal/tmp/e2eod_trackformer/deploy/dfa_plugin'
+make[1]: Entering directory '/mnt/data/end2endlocal/tmp/SparseEnd2End/deploy/dfa_plugin'
 3-Finish Compile CXX Objects : build/deformableAttentionAggrPlugin.cpp.o
 4-Finish Compile CUDA Objects build/deformableAttentionAggr.cu.o
 5-Finish Compile Target : lib/deformableAttentionAggr.so!
-make[1]: Leaving directory '/mnt/data/end2endlocal/tmp/e2eod_trackformer/deploy/dfa_plugin'
+make[1]: Leaving directory '/mnt/data/end2endlocal/tmp/SparseEnd2End/deploy/dfa_plugin'
 ```
 
 ## STEP3. BUILD Sparse4D Engine

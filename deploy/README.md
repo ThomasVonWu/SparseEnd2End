@@ -2,27 +2,47 @@
 
 ## STEP1. Export Onnx
 ```bash
-cd /path/to/e2eod_trackformer
-python deploy/nusc_export_onnx/export_backbone_onnx.py --cfg /path/to/cfg --ckpt /path/to/ckpt
-python deploy/nusc_export_onnx/export_head_onnx.py --cfg /path/to/cfg --ckpt /path/to/ckpt
+cd /path/to/SparseEnd2End
+python deploy/export_backbone_onnx.py --cfg /path/to/cfg --ckpt /path/to/ckpt
+python deploy/export_head_onnx.py --cfg /path/to/cfg --ckpt /path/to/ckpt
 ```
 onnx will save in deploy/onnxlog like below:  
->deploy/onnxlog  
->├── 1st_frame_sparse4dhead.onnx  
+>deploy/onnx  
 >├── export_backbone_onnx.log  
 >├── export_head_onnx.log  
 >├── sparse4dbackbone.onnx  
->└── sparse4dhead.onnx  
+>└── sparse4dhead1st.onnx  
+>├── sparse4dhead2nd.onnx  
 
 ## STEP2. Compile Custom operator: deformableAttentionAggrPlugin.so
-You need to first set env for youself in 01_setEnv.sh, then run below:
+Firstly, you need to set env for youself in 01_setEnv.sh, then run below:
 ```bash
 cd deploy/dfa_plugin
 . tools/01_setEnv.sh
 ```
 env setting likes below:
+```bash
+====================================================================================================================
+||  Config Environment Below:
+||  TensorRT LIB        : /mnt/env/tensorrt/TensorRT-8.5.1.7/lib
+||  TensorRT INC        :  /mnt/env/tensorrt/TensorRT-8.5.1.7/include
+||  TensorRT BIN        : /mnt/env/tensorrt/TensorRT-8.5.1.7/bin
+||  CUDA_LIB    : /usr/local/cuda-11.6/lib64
+||  CUDA_ INC   : /usr/local/cuda-11.6/include
+||  CUDA_BIN    : /usr/local/cuda-11.6/bin
+||  CUDNN_LIB   : /mnt/env/tensorrt/cudnn-linux-x86_64-8.6.0.163_cuda11-archive/lib
+||  CUDASM      : sm_86
+||  ENVBUILDDIR : build
+||  ENVTARGETPLUGIN     : lib/deformableAttentionAggr.so
+||  ENVONNX     : deploy/dfa_plugin/onnx/deformableAttentionAggr.onnx
+||  ENVEINGINENAME      : deploy/dfa_plugin/engine/deformableAttentionAggr.engine
+||  ENVTRTDIR   : deploy/dfa_plugin/engine
+====================================================================================================================
+```
 
-then you need to export sharelibrary:
+[INFO] Config Env Done, Please Check EnvPrintOut Above!
+
+then you need to export share library:
 ```bash
 make -j8
 ```
@@ -46,13 +66,13 @@ cd ..
 bash build_sparse4d_engine.sh
 ```
 trt log likes below:
->trtlog  
->├── build_backbone.log  
+>deploy/engine  
 >├── build_backbone.engine  
->├── build_head1.log  
->├── build_head1.engine  
+>├── build_head1st.engine  
+>├── build_head2nd.engine  
+>├── build_backbone.log  
 >├── build_head2.log  
->├── build_head2.engine  
+>├── build_head1.log  
 >├── buildLayerInfo_backbone.json  
 >├── buildLayerInfo_head1.json  
 >├── buildLayerInfo_head2.json  

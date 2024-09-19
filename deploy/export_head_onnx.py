@@ -13,6 +13,7 @@ from torch import nn
 
 from modules.sparse4d_detector import *
 from modules.head.sparse4d_blocks.instance_bank import topk
+from modules.ops import deformable_aggregation_function as DAF
 
 from tool.utils.config import read_cfg
 from typing import Optional, Dict, Any
@@ -88,6 +89,7 @@ class Sparse4DHead1st(nn.Module):
 
         feature_maps = [feature, spatial_shapes, level_start_index]
         prediction = []
+        tmp_outs = []
         for i, op in enumerate(self.operation_order):
             print("i: ", i, "\top: ", op)
             if self.layers[i] is None:
@@ -111,13 +113,47 @@ class Sparse4DHead1st(nn.Module):
             elif op == "norm" or op == "ffn":
                 instance_feature = self.layers[i](instance_feature)
             elif op == "deformable":
-                instance_feature = self.layers[i](
-                    instance_feature,
-                    anchor,
-                    anchor_embed,
-                    feature_maps,
-                    metas,
+                # instance_feature = self.layers[i](
+                #     instance_feature,
+                #     anchor,
+                #     anchor_embed,
+                #     feature_maps,
+                #     metas,
+                # )
+                bs, num_anchor = instance_feature.shape[:2]
+                key_points = self.layers[i].kps_generator(anchor, instance_feature)
+                weights = self.layers[i]._get_weights(
+                    instance_feature, anchor_embed, metas
                 )
+                points_2d = (
+                    self.layers[i]
+                    .project_points(
+                        key_points,
+                        metas["lidar2img"],  # lidar2img
+                        metas.get("image_wh"),
+                    )
+                    .permute(0, 2, 3, 1, 4)
+                    .reshape(bs, num_anchor, self.layers[i].num_pts, self.layers[i].num_cams, 2)
+                )
+                weights = (
+                    weights.permute(0, 1, 4, 2, 3, 5)
+                    .contiguous()
+                    .reshape(
+                        bs,
+                        num_anchor,
+                        self.layers[i].num_pts,
+                        self.layers[i].num_cams,
+                        self.layers[i].num_levels,
+                        self.layers[i].num_groups,
+                    )
+                )
+
+                features = DAF(*feature_maps, points_2d, weights)
+                features = features.reshape(bs, num_anchor, self.layers[i].embed_dims)
+                output = self.layers[i].output_proj(features)
+                assert self.layers[i].residual_mode == "cat"
+                instance_feature = torch.cat([output, instance_feature], dim=-1)
+                tmp_outs.append(features)
             elif op == "refine":
                 anchor, cls, qt = self.layers[i](
                     instance_feature,
@@ -132,7 +168,18 @@ class Sparse4DHead1st(nn.Module):
                 prediction.append(anchor)
                 if i != len(self.operation_order) - 1:
                     anchor_embed = self.anchor_encoder(anchor)
-        return instance_feature, anchor, cls, qt
+        return (
+            instance_feature,
+            anchor,
+            cls,
+            qt,
+            tmp_outs[0],
+            tmp_outs[1],
+            tmp_outs[2],
+            tmp_outs[3],
+            tmp_outs[4],
+            tmp_outs[5],
+        )
 
     def forward(
         self,
@@ -146,7 +193,7 @@ class Sparse4DHead1st(nn.Module):
         lidar2img,
     ):
         head = self.model.head
-        instance_feature, anchor, cls, qt = self.head_forward(
+        return self.head_forward(
             head,
             feature,
             spatial_shapes,
@@ -157,7 +204,6 @@ class Sparse4DHead1st(nn.Module):
             image_wh,
             lidar2img,
         )
-        return instance_feature, anchor, cls, qt
 
 
 class Sparse4DHead2nd(nn.Module):
@@ -193,6 +239,7 @@ class Sparse4DHead2nd(nn.Module):
 
         feature_maps = [feature, spatial_shapes, level_start_index]
         prediction = []
+        tmp_outs = []
         for i, op in enumerate(self.operation_order):
             print("op:  ", op)
             if self.layers[i] is None:
@@ -216,13 +263,47 @@ class Sparse4DHead2nd(nn.Module):
             elif op == "norm" or op == "ffn":
                 instance_feature = self.layers[i](instance_feature)
             elif op == "deformable":
-                instance_feature = self.layers[i](
-                    instance_feature,
-                    anchor,
-                    anchor_embed,
-                    feature_maps,
-                    metas,
+                # instance_feature = self.layers[i](
+                #     instance_feature,
+                #     anchor,
+                #     anchor_embed,
+                #     feature_maps,
+                #     metas,
+                # )
+                bs, num_anchor = instance_feature.shape[:2]
+                key_points = self.layers[i].kps_generator(anchor, instance_feature)
+                weights = self.layers[i]._get_weights(
+                    instance_feature, anchor_embed, metas
                 )
+                points_2d = (
+                    self.layers[i]
+                    .project_points(
+                        key_points,
+                        metas["lidar2img"],  # lidar2img
+                        metas.get("image_wh"),
+                    )
+                    .permute(0, 2, 3, 1, 4)
+                    .reshape(bs, num_anchor, self.layers[i].num_pts, self.layers[i].num_cams, 2)
+                )
+                weights = (
+                    weights.permute(0, 1, 4, 2, 3, 5)
+                    .contiguous()
+                    .reshape(
+                        bs,
+                        num_anchor,
+                        self.layers[i].num_pts,
+                        self.layers[i].num_cams,
+                        self.layers[i].num_levels,
+                        self.layers[i].num_groups,
+                    )
+                )
+
+                features = DAF(*feature_maps, points_2d, weights)
+                features = features.reshape(bs, num_anchor, self.layers[i].embed_dims)
+                output = self.layers[i].output_proj(features)
+                assert self.layers[i].residual_mode == "cat"
+                instance_feature = torch.cat([output, instance_feature], dim=-1)
+                tmp_outs.append(features)
             elif op == "refine":
                 anchor, cls, qt = self.layers[i](
                     instance_feature,
@@ -266,7 +347,19 @@ class Sparse4DHead2nd(nn.Module):
                     temp_anchor_embed = anchor_embed[
                         :, : self.instance_bank.num_temp_instances
                     ]
-        return instance_feature, anchor, cls, qt, track_id
+        return (
+            instance_feature,
+            anchor,
+            cls,
+            qt,
+            track_id,
+            tmp_outs[0],
+            tmp_outs[1],
+            tmp_outs[2],
+            tmp_outs[3],
+            tmp_outs[4],
+            tmp_outs[5],
+        )
 
     def forward(
         self,
@@ -284,7 +377,19 @@ class Sparse4DHead2nd(nn.Module):
         lidar2img,
     ):
         head = self.model.head
-        instance_feature, anchor, cls, qt, track_id = self.head_forward(
+        (
+            instance_feature,
+            anchor,
+            cls,
+            qt,
+            track_id,
+            tmp_outs0,
+            tmp_outs1,
+            tmp_outs2,
+            tmp_outs3,
+            tmp_outs4,
+            tmp_outs5,
+        ) = self.head_forward(
             head,
             feature,
             spatial_shapes,
@@ -299,7 +404,19 @@ class Sparse4DHead2nd(nn.Module):
             image_wh,
             lidar2img,
         )
-        return instance_feature, anchor, cls, qt, track_id
+        return (
+            instance_feature,
+            anchor,
+            cls,
+            qt,
+            track_id,
+            tmp_outs0,
+            tmp_outs1,
+            tmp_outs2,
+            tmp_outs3,
+            tmp_outs4,
+            tmp_outs5,
+        )
 
 
 def dummpy_input(
@@ -491,6 +608,12 @@ if __name__ == "__main__":
                     "pred_anchor",
                     "pred_class_score",
                     "pred_quality_score",
+                    "tmp_outs0",
+                    "tmp_outs1",
+                    "tmp_outs2",
+                    "tmp_outs3",
+                    "tmp_outs4",
+                    "tmp_outs5",
                 ],
                 opset_version=15,
                 do_constant_folding=True,
@@ -546,6 +669,12 @@ if __name__ == "__main__":
                 "pred_class_score",
                 "pred_quality_score",
                 "pred_track_id",
+                "tmp_outs0",
+                "tmp_outs1",
+                "tmp_outs2",
+                "tmp_outs3",
+                "tmp_outs4",
+                "tmp_outs5",
             ],
             opset_version=15,
             do_constant_folding=True,

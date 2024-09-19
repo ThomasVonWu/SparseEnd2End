@@ -1,6 +1,12 @@
 # SparseEnd2End: Obstacle 3D Detection and Tracking Architecture Based VisionTransformer
-- 👋 Hi, I’m ThomasVonWu. I'd like to introduce you to a  simple and practical repository that uses end-to-end model with sparse transformer to sense 3D obstacles. This repo has no complex dependency for Training | Inference | Deployment(which means, we don't need to install [MMDetection3d](https://github.com/open-mmlab/mmdetection3d), [mmcv](https://github.com/open-mmlab/mmcv), [mmcv-full](https://github.com/open-mmlab/mmcv), [mmdeploy](https://github.com/open-mmlab/mmdeploy), etc.), so it's easy to install in your local workstation or supercomputing gpu clusters. This repository will also provide x86(NVIDIA RTX  Series GPU) | ARM(NVIDIA ORIN) deployment solutions. Finally, you can deploy your e2e model onborad through this repo happily.  
-- 👀 I guess you are interested in:  
+[![license](https://img.shields.io/github/license/ThomasVonWu/SparseEnd2End
+)](https://github.com/ThomasVonWu/SparseEnd2End/blob/main/LICENSE)
+[![open issues](https://img.shields.io/github/issues-raw/ThomasVonWu/SparseEnd2End
+)](https://github.com/ThomasVonWu/SparseEnd2End/issues)
+
+| [**Blog**](https://zhuanlan.zhihu.com/p/715179777) |  
+👋 Hi, I’m ThomasVonWu. I'd like to introduce you to a  simple and practical repository that uses end-to-end model with sparse transformer to sense 3D obstacles. This repo has no complex dependency for Training | Inference | Deployment(which means, we don't need to install [MMDetection3d](https://github.com/open-mmlab/mmdetection3d), [mmcv](https://github.com/open-mmlab/mmcv), [mmcv-full](https://github.com/open-mmlab/mmcv), [mmdeploy](https://github.com/open-mmlab/mmdeploy), etc.), so it's easy to install in your local workstation or supercomputing gpu clusters. This repository will also provide x86(NVIDIA RTX  Series GPU) | ARM(NVIDIA ORIN) deployment solutions. Finally, you can deploy your e2e model onborad through this repo happily.  
+👀 I guess you are interested in:  
     1. how to define PyTorch custom operation: DeformableFeatureAggregation and register related onnx custom operator?    
     2. how to make custom plugin: DeformableFeatureAggregation in TensorRT engine?  
     3. how to export onnx with custom operations to TensorRT engine?  

@@ -5,8 +5,8 @@ if [ ! -d "${ENVTRTDIR}" ]; then
     mkdir -p "${ENVTRTDIR}"
 fi
 
-echo "STEP1: build sparse4dbackbone engine -> saving in ${ENV_BACKBONE_ENGINE}..."
 # STEP1: build sparse4dbackbone engine
+echo "STEP1: build sparse4dbackbone engine -> saving in ${ENV_BACKBONE_ENGINE}..."
 ${ENV_TensorRT_BIN}/trtexec --onnx=${ENV_BACKBONE_ONNX} \
     --memPoolSize=workspace:2048 \
     --saveEngine=${ENV_BACKBONE_ENGINE} \
@@ -21,9 +21,9 @@ ${ENV_TensorRT_BIN}/trtexec --onnx=${ENV_BACKBONE_ONNX} \
     --profilingVerbosity=detailed \
     >${ENVTRTDIR}/build_backbone.log 2>&1
 
+# STEP2: build 1st frame sparse4dhead engine
 echo "STEP2: build 1st frame sparse4dhead engine -> saving in ${ENV_HEAD1_ENGINE}..."
 sleep 2s
-# STEP2: build 1st frame sparse4dhead engine
 ${ENV_TensorRT_BIN}/trtexec --onnx=${ENV_HEAD1_ONNX} \
     --plugins=$ENVTARGETPLUGIN \
     --memPoolSize=workspace:2048 \
@@ -34,14 +34,15 @@ ${ENV_TensorRT_BIN}/trtexec --onnx=${ENV_HEAD1_ONNX} \
     --dumpOutput \
     --dumpProfile \
     --dumpLayerInfo \
-    --exportOutput=${ENVTRTDIR}/buildOutput_head1.json --exportProfile=${ENVTRTDIR}/buildProfile_head1.json \
+    --exportOutput=${ENVTRTDIR}/buildOutput_head1.json \
+    --exportProfile=${ENVTRTDIR}/buildProfile_head1.json \
     --exportLayerInfo=${ENVTRTDIR}/buildLayerInfo_head1.json \
     --profilingVerbosity=detailed \
     >${ENVTRTDIR}/build_head1.log 2>&1
 
+# STEP3: build frame > 2 sparse4dhead engine
 echo "STEP3: build frame > 2 sparse4dhead engine -> saving in ${ENV_HEAD2_ENGINE}..."
 sleep 2s
-# STEP3: build frame > 2 sparse4dhead engine
 ${ENV_TensorRT_BIN}/trtexec --onnx=${ENV_HEAD2_ONNX} \
     --plugins=$ENVTARGETPLUGIN \
     --memPoolSize=workspace:2048 \

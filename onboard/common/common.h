@@ -6,7 +6,7 @@
 #include <vector>
 
 namespace SparseEnd2End {
-namespace image {
+namespace common {
 
 static constexpr const char* const kLogContext = "SparseE2ELog";
 
@@ -61,6 +61,6 @@ enum class Status : std::uint8_t {
   kDecoderErr = 50U
 };
 
-}  // namespace image
+}  // namespace common
 }  // namespace SparseEnd2End
 #endif  // ONBOARD_COMMON_COMMON_H

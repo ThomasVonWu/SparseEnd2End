@@ -8,6 +8,7 @@ import tensorrt as trt
 from typing import List
 from cuda import cudart
 from tool.utils.logger import logger_wrapper
+from deploy.utils.utils import printArrayInformation
 
 
 def read_bin(samples, logger):
@@ -22,85 +23,62 @@ def read_bin(samples, logger):
             f"{prefix}sample_{i}_feature_1*89760*256_float32.bin",
             dtype=np.float32,
         ).reshape(feature_shape)
-        logger.debug("[feature]")
-        logger.debug(
-            f"\tfirst5 | last5 : {feature.reshape(-1)[:5]} ...... {feature.reshape(-1)[-5:]}"
-        )
+        printArrayInformation(feature, logger, "feature", "PyTorch")
 
         spatial_shapes_shape = [6, 4, 2]
         spatial_shapes = np.fromfile(
             f"{prefix}sample_{i}_spatial_shapes_6*4*2_int32.bin", dtype=np.int32
         ).reshape(spatial_shapes_shape)
-        logger.debug("[spatial_shapes]")
-        logger.debug(
-            f"\tfirst5 | last5 : {spatial_shapes.reshape(-1)[:5]} ...... {spatial_shapes.reshape(-1)[-5:]}"
-        )
+        printArrayInformation(spatial_shapes, logger, "spatial_shapes", "PyTorch")
 
         level_start_index_shape = [6, 4]
         level_start_index = np.fromfile(
             f"{prefix}sample_{i}_level_start_index_6*4_int32.bin",
             dtype=np.int32,
         ).reshape(level_start_index_shape)
-        logger.debug("[level_start_index]")
-        logger.debug(
-            f"\tfirst5 | last5 : {level_start_index.reshape(-1)[:5]} ...... {level_start_index.reshape(-1)[-5:]}"
-        )
+        printArrayInformation(level_start_index, logger, "level_start_index", "PyTorch")
 
         instance_feature_shape = [1, 900, 256]
         instance_feature = np.fromfile(
             f"{prefix}sample_{i}_instance_feature_1*900*256_float32.bin",
             dtype=np.float32,
         ).reshape(instance_feature_shape)
-        logger.debug("[instance_feature]")
-        logger.debug(
-            f"\tfirst5 | last5 : {instance_feature.reshape(-1)[:5]} ...... {instance_feature.reshape(-1)[-5:]}"
-        )
+        printArrayInformation(instance_feature, logger, "instance_feature", "PyTorch")
 
         anchor_shape = [1, 900, 11]
         anchor = np.fromfile(
             f"{prefix}sample_{i}_anchor_1*900*11_float32.bin", dtype=np.float32
         ).reshape(anchor_shape)
-        logger.debug("[anchor]")
-        logger.debug(
-            f"\tfirst5 | last5 : {anchor.reshape(-1)[:5]} ......  {anchor.reshape(-1)[-5:]}"
-        )
+        printArrayInformation(anchor, logger, "anchor", "PyTorch")
 
         time_interval_shape = [1]
         time_interval = np.fromfile(
             f"{prefix}sample_{i}_time_interval_1_float32.bin",
             dtype=np.float32,
         ).reshape(time_interval_shape)
-        logger.debug("[time_interval]")
-        logger.debug(f"\tfirst5 | last5 : {time_interval}")
+        printArrayInformation(time_interval, logger, "time_interval", "PyTorch")
 
         image_wh_shape = [1, 6, 2]
         image_wh = np.fromfile(
             f"{prefix}sample_{i}_image_wh_1*6*2_float32.bin",
             dtype=np.float32,
         ).reshape(image_wh_shape)
-        logger.debug("[image_wh]")
-        logger.debug(
-            f"\tfirst5 | last5 : {image_wh.reshape(-1)[:5]} ...... {image_wh.reshape(-1)[-5:]}"
-        )
+        printArrayInformation(image_wh, logger, "image_wh", "PyTorch")
 
         lidar2img_shape = [1, 6, 4, 4]
         lidar2img = np.fromfile(
             f"{prefix}sample_{i}_lidar2img_1*6*4*4_float32.bin",
             dtype=np.float32,
         ).reshape(lidar2img_shape)
-        logger.debug("[lidar2img]")
-        logger.debug(
-            f"\tfirst5 | last5 : {lidar2img.reshape(-1)[:5]} ...... {lidar2img.reshape(-1)[-5:]}"
-        )
+        printArrayInformation(lidar2img, logger, "lidar2img", "PyTorch")
 
         pred_instance_feature_shape = [1, 900, 256]
         pred_instance_feature = np.fromfile(
             f"{prefix}sample_{i}_pred_instance_feature_1*900*256_float32.bin",
             dtype=np.float32,
         ).reshape(pred_instance_feature_shape)
-        logger.debug("[pred_instance_feature]")
-        logger.debug(
-            f"\tfirst5 | last5 : {pred_instance_feature.reshape(-1)[:5]} ...... {pred_instance_feature.reshape(-1)[-5:]}"
+        printArrayInformation(
+            pred_instance_feature, logger, "pred_instance_feature", "PyTorch"
         )
 
         pred_anchor_shape = [1, 900, 11]
@@ -108,28 +86,22 @@ def read_bin(samples, logger):
             f"{prefix}sample_{i}_pred_anchor_1*900*11_float32.bin",
             dtype=np.float32,
         ).reshape(pred_anchor_shape)
-        logger.debug("[pred_anchor]")
-        logger.debug(
-            f"\tfirst5 | last5 : {pred_anchor.reshape(-1)[:5]} ...... {pred_anchor.reshape(-1)[-5:]}"
-        )
+        printArrayInformation(pred_anchor, logger, "pred_anchor", "PyTorch")
+
         pred_class_score_shape = [1, 900, 10]
         pred_class_score = np.fromfile(
             f"{prefix}sample_{i}_pred_class_score_1*900*10_float32.bin",
             dtype=np.float32,
         ).reshape(pred_class_score_shape)
-        logger.debug("[pred_class_score]")
-        logger.debug(
-            f"\tfirst5 | last5 : {pred_class_score.reshape(-1)[:5]} ...... {pred_class_score.reshape(-1)[-5:]}"
-        )
+        printArrayInformation(pred_class_score, logger, "pred_class_score", "PyTorch")
 
         pred_quality_score_shape = [1, 900, 2]
         pred_quality_score = np.fromfile(
             f"{prefix}sample_{i}_pred_quality_score_1*900*2_float32.bin",
             dtype=np.float32,
         ).reshape(pred_quality_score_shape)
-        logger.debug("[pred_quality_score]")
-        logger.debug(
-            f"\tfirst5 | last5 : {pred_quality_score.reshape(-1)[:5]} ...... {pred_quality_score.reshape(-1)[-5:]}"
+        printArrayInformation(
+            pred_quality_score, logger, "pred_quality_score", "PyTorch"
         )
 
         inputs.append(
@@ -285,21 +257,6 @@ def inference(
     return nInput, nIO, bufferH
 
 
-def printArrayInformation(x, logger, info: str):
-    logger.debug(f"Name={info}")
-    logger.debug(
-        "\tSumAbs=%.3f, Max=%.3f, Min=%.3f"
-        % (
-            np.sum(abs(x)),
-            np.max(x),
-            np.min(x),
-        )
-    )
-    logger.debug(
-        "\tfirst5 | last5 %s  ......  %s" % (x.reshape(-1)[:5], x.reshape(-1)[-5:])
-    )
-
-
 def inference_consistency_validatation(predicted_data, expected_data, output_names):
     for x, y, name in zip(predicted_data, expected_data, output_names):
         max_abs_distance = float((np.abs(x - y)).max())
@@ -318,7 +275,8 @@ def main(
     logger,
     plugin_name="DeformableAttentionAggrPlugin",
     soFile="deploy/dfa_plugin/lib/deformableAttentionAggr.so",
-    trtFile="deploy/engine/sparse4dhead1st.engine",
+    trtFile="deploy/engine/sparse4dhead1st_polygraphy.engine",
+    # trtFile="deploy/engine/sparse4dhead1st.engine",
 ):
     ctypes.cdll.LoadLibrary(soFile)
     plugin = getPlugin(plugin_name)
@@ -365,6 +323,12 @@ def main(
         ]
 
         output_names = [
+            "tmp_outs0",
+            "tmp_outs1",
+            "tmp_outs2",
+            "tmp_outs3",
+            "tmp_outs4",
+            "tmp_outs5",
             "pred_instance_feature",
             "pred_anchor",
             "pred_class_score",
@@ -375,12 +339,14 @@ def main(
         assert len(output_names) == nIO - nInput
 
         for i, name in enumerate(input_names):
-            printArrayInformation(bufferH[i], logger, info=f"{name}")
-        for i, name in enumerate(output_names):
-            printArrayInformation(bufferH[i + nInput], logger, info=f"{name}")
+            printArrayInformation(bufferH[i], logger, info=f"{name}", prefix="TensorRT")
+        for i, name in enumerate(output_names[6:10]):
+            printArrayInformation(
+                bufferH[i + nInput+6], logger, info=f"{name}", prefix="TensorRT"
+            )
 
-        assert len(output_names) == len(y)
-        inference_consistency_validatation(bufferH[nInput:], y, output_names)
+        assert len(output_names[6:10]) == len(y)
+        inference_consistency_validatation(bufferH[nInput + 6 :], y, output_names[6:10])
 
 
 if __name__ == "__main__":

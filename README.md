@@ -1,18 +1,27 @@
 # SparseEnd2End: Obstacle 3D Detection and Tracking Architecture Based VisionTransformer
+<div align="center">
+
 [![license](https://img.shields.io/github/license/ThomasVonWu/SparseEnd2End
 )](https://github.com/ThomasVonWu/SparseEnd2End/blob/main/LICENSE)
 [![open issues](https://img.shields.io/github/issues-raw/ThomasVonWu/SparseEnd2End
 )](https://github.com/ThomasVonWu/SparseEnd2End/issues)
+<img src="https://img.shields.io/github/repo-size/ThomasVonWu/SparseEnd2End.svg"/>
+<img src="https://img.shields.io/badge/language-c++ | cuda-red.svg"/>
+<img src="https://img.shields.io/github/stars/ThomasVonWu/SparseEnd2End.svg"/>
 
+</div>
+
+--------------------------------------------------------------------------------
 | [**Blog**](https://zhuanlan.zhihu.com/p/715179777) |  
-👋 Hi, I’m ThomasVonWu. I'd like to introduce you to a  simple and practical repository that uses end-to-end model with sparse transformer to sense 3D obstacles. This repo has no complex dependency for Training | Inference | Deployment(which means, we don't need to install [MMDetection3d](https://github.com/open-mmlab/mmdetection3d), [mmcv](https://github.com/open-mmlab/mmcv), [mmcv-full](https://github.com/open-mmlab/mmcv), [mmdeploy](https://github.com/open-mmlab/mmdeploy), etc.), so it's easy to install in your local workstation or supercomputing gpu clusters. This repository will also provide x86(NVIDIA RTX  Series GPU) | ARM(NVIDIA ORIN) deployment solutions. Finally, you can deploy your e2e model onborad through this repo happily.  
-👀 I guess you are interested in:  
-    1. how to define PyTorch custom operation: DeformableFeatureAggregation and register related onnx custom operator?    
-    2. how to make custom plugin: DeformableFeatureAggregation in TensorRT engine?  
-    3. how to export onnx with custom operations to TensorRT engine?  
-    4. how to validate inference results consistency: PyTorch vs. ONNX vs. TensorRT ?  
-    5. how to deploy temporal fusion transformer head successfully?  
 
+👋 Hi, I’m ThomasVonWu. I'd like to introduce you to a  simple and practical **deployment repository based on TensorRT** which uses end-to-end perception paradigm with sparse transformer to sense 3D obstacles. This repository has no complex dependency for Training | Inference | Deployment(which means, we don't need to install [MMDetection3d](https://github.com/open-mmlab/mmdetection3d), [mmcv](https://github.com/open-mmlab/mmcv), [mmcv-full](https://github.com/open-mmlab/mmcv), [mmdeploy](https://github.com/open-mmlab/mmdeploy), etc.), so it's easy to install in your local workstation or supercomputing gpu clusters. This repository will also provide x86(NVIDIA RTX  Series GPU) | ARM(NVIDIA ORIN) deployment solutions. Finally, you can deploy your e2e model onborad through this repository happily.  
+👀 I guess you are interested in:  
+- how to define a PyTorch custom operator: DeformableFeatureAggregation and register related ONNX node.
+- how to build a custom opertator plugin: DeformableFeatureAggregation in TensorRT engine with Makefile or CMake.
+- how to convert ONNX format file with custom opertator to TensorRT engine and make it as  part of the whole  engine.
+- how to validate inference results consistency : PyTorch results vs. ONNX Runtime results vs. TensorRT results.
+- how to convert PyTorch model with temporal fusion transformer head to ONNX.
+- how to locate the TensorRT layer accurately when overflow occurs during using fp16 quantization for model parameter.
 
 ## Algorithm Architecture
 <center>
@@ -40,7 +49,7 @@
 
 
 ## News
-* **`25 Aug, 2024`:** I release repo: SparseEnd2End. The complete deployment solution will be released as soon as possible. Please stay tuned! 
+* **`25 Aug, 2024`:** I release repository: SparseEnd2End. The complete deployment solution will be released as soon as possible. Please stay tuned! 
 
 ## Tasklist
 - [X] *Register custom operation : DeformableFeatureAggregation and export ONNX and TensorRT engine. **`25 Aug, 2024`***
@@ -66,4 +75,4 @@
 If you find SparseEnd2End useful in your research or applications, please consider giving me a star &#127775;  
 
 ## 🏷 ChangeLog
->**08/25/2024：** **[v1.0.0]** This repo now supports Training | Inference in NuscenesDataset. It includes: data dump in JSON, Training | Inference  log caching, TensorBoard hooking, and so on. 
+>**08/25/2024：** **[v1.0.0]** This repository now supports Training | Inference in NuscenesDataset. It includes: data dump in JSON, Training | Inference  log caching, TensorBoard hooking, and so on. 

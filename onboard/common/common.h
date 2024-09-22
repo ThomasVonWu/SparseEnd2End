@@ -5,7 +5,7 @@
 #include <array>
 #include <vector>
 
-namespace SparseEnd2End {
+namespace sparse_end2end {
 namespace common {
 
 static constexpr const char* const kLogContext = "SparseE2ELog";
@@ -62,5 +62,5 @@ enum class Status : std::uint8_t {
 };
 
 }  // namespace common
-}  // namespace SparseEnd2End
+}  // namespace sparse_end2end
 #endif  // ONBOARD_COMMON_COMMON_H

@@ -216,8 +216,20 @@ class ResizeCropFlipImage(object):
         # PIL just for img transform
         origin_dtype = img.dtype
         assert origin_dtype == np.uint8
+        """ Test resize gap between opencv with pillow.
+        img_1 = cv2.resize(
+            src=img.copy(), dsize=resize_dims, interpolation=cv2.INTER_LINEAR
+        )
+        img_2 = np.array(
+            Image.fromarray(img.copy()).resize(resize_dims, Image.BILINEAR)
+        )
+        max_abs_err = np.max(np.abs(img_2 - img_1))
+        print(max_abs_err) # 255
+        """
+        img = cv2.resize(src=img, dsize=resize_dims, interpolation=cv2.INTER_LINEAR)
         img = Image.fromarray(img)
-        img = img.resize(resize_dims).crop(crop)
+        # img = img.resize(resize_dims).crop(crop) # change to opencv
+        img = img.crop(crop)
         if flip:
             img = img.transpose(method=Image.FLIP_LEFT_RIGHT)
         img = img.rotate(rotate)

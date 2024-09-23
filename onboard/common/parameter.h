@@ -40,7 +40,10 @@ class E2EParams {
  public:
   E2EParams(const InstanceBankParams& instance_bank_params = {900U, 11U, std::vector<float>(900 * 11), 600U, 2.0F, 0.5F,
                                                               0.6F},
-            const PreprocessorParams& preprocessor_params = {6U, 3U, 1080U, 1920U, 3U, 256U, 704U})
+            const PreprocessorParams& preprocessor_params = {6U, 3U, 1080U, 1920U, 3U, 256U, 704U},
+            const E2EEngine& sparse4dbackbone_engine = {"", {}, {}},
+            const E2EEngine& sparse4dhead1st_engine = {"", {}, {}},
+            const E2EEngine& sparse4dhead2nd_engine = {"", {}, {}})
       : instance_bank_params(instance_bank_params), preprocessor_params(preprocessor_params) {}
 
   ~E2EParams() = default;

@@ -16,8 +16,8 @@
 
 👋 Hi, I’m ThomasVonWu. I'd like to introduce you to a  simple and practical **deployment repository based on TensorRT** which uses end-to-end perception paradigm with sparse transformer to sense 3D obstacles. This repository has no complex dependency for Training | Inference | Deployment(which means, we don't need to install [MMDetection3d](https://github.com/open-mmlab/mmdetection3d), [mmcv](https://github.com/open-mmlab/mmcv), [mmcv-full](https://github.com/open-mmlab/mmcv), [mmdeploy](https://github.com/open-mmlab/mmdeploy), etc.), so it's easy to install in your local workstation or supercomputing gpu clusters. This repository will also provide x86(NVIDIA RTX  Series GPU) | ARM(NVIDIA ORIN) deployment solutions. Finally, you can deploy your e2e model onborad through this repository happily.  
 👀 I guess you are interested in:  
-- how to define a PyTorch custom operator: DeformableFeatureAggregation and register related ONNX node.
-- how to build a custom opertator plugin: DeformableFeatureAggregation in TensorRT engine with Makefile or CMake.
+- how to define a PyTorch custom operator: DeformableAttentionAggr and register related ONNX node.
+- how to build a custom opertator plugin: DeformableAttentionAggr in TensorRT engine with Makefile or CMake.
 - how to convert ONNX format file with custom opertator to TensorRT engine and make it as  part of the whole  engine.
 - how to validate inference results consistency : PyTorch results vs. ONNX Runtime results vs. TensorRT results.
 - how to convert PyTorch model with temporal fusion transformer head to ONNX.
@@ -40,7 +40,7 @@
 |         **Model**        | **ImgSize** | **Backbone** | **Framework** | **Precision** | **mAP** | **NDS** | **FPS** |                  **GPU**                  | **config**| **ckpt**|**onnx**|**engine**|
 |:----------------------------:|:-------------------:|:------------------------:|:------------------------:|:----------------------:|:--------------:|:-------------:|:-------------:|:----------------:|:----------------:|:----------------:|:----------------:|:----------------:|
 |         Sparse4Dv3      |    256x704     |     Resnet50    |           PyTorch       |            FP32        |     56.37     |     70.97    |     19.8     | NVIDIA GeForce RTX 3090 |[config](dataset/config/sparse4d_temporal_r50_1x1_bs1_256x704_mini.py)|[ckpt](https://drive.google.com/file/d/1sSMNB7T7LPKSr8nD9S_tSiu1mJrFMZ1I/view?usp=sharing)|     --     |     --     |
-|         Sparse4Dv3      |    256x704     |     Resnet50    |          TensorRT     |            FP32        |      wait       |     wait      |     wait     | NVIDIA GeForce RTX 3090 |[config](dataset/config/sparse4d_temporal_r50_1x1_bs1_256x704_mini.py)|[ckpt](https://drive.google.com/file/d/1sSMNB7T7LPKSr8nD9S_tSiu1mJrFMZ1I/view?usp=sharing)|     wait     |     wait     |
+|         Sparse4Dv3      |    256x704     |     Resnet50    |          TensorRT     |            FP32        |      wait       |     wait      |     wait     | NVIDIA GeForce RTX 3090 |[config](dataset/config/sparse4d_temporal_r50_1x1_bs1_256x704_mini.py)|[ckpt](https://drive.google.com/file/d/1sSMNB7T7LPKSr8nD9S_tSiu1mJrFMZ1I/view?usp=sharing)|[onnx](https://drive.google.com/drive/folders/1dbjnV5AW4-VB0zbYUsUAhGjo0lGm177m?usp=sharing)|[engine](https://drive.google.com/drive/folders/1ZIxTDVsG0QaW9FwSSnrS1JZUKF0_OymG?usp=sharing)|
 |         Sparse4Dv3      |    256x704     |     Resnet50    |          TensorRT     |            FP16        |      wait       |     wait      |     wait     | NVIDIA GeForce RTX 3090 |[config](dataset/config/sparse4d_temporal_r50_1x1_bs1_256x704_mini.py)|[ckpt](https://drive.google.com/file/d/1sSMNB7T7LPKSr8nD9S_tSiu1mJrFMZ1I/view?usp=sharing)|     wait     |     wait     |
 |         Sparse4Dv3      |    256x704     |     Resnet50    |          TensorRT     |    INT8+FP16    |      wait       |     wait      |     wait     | NVIDIA GeForce RTX 3090 |[config](dataset/config/sparse4d_temporal_r50_1x1_bs1_256x704_mini.py)|[ckpt](https://drive.google.com/file/d/1sSMNB7T7LPKSr8nD9S_tSiu1mJrFMZ1I/view?usp=sharing)|     wait     |     wait     |
 |         Sparse4Dv3      |    256x704     |     Resnet50    |          TensorRT     |            FP32        |      wait       |     wait      |     wait     |          NVIDIA ORIN      |[config](dataset/config/sparse4d_temporal_r50_1x1_bs1_256x704_mini.py)|[ckpt](https://drive.google.com/file/d/1sSMNB7T7LPKSr8nD9S_tSiu1mJrFMZ1I/view?usp=sharing)|     wait     |     wait     |
@@ -49,20 +49,21 @@
 
 
 ## News
+* **`24 Sep, 2024`:** I release repository: SparseEnd2End. The complete deployment solution was released. 
 * **`25 Aug, 2024`:** I release repository: SparseEnd2End. The complete deployment solution will be released as soon as possible. Please stay tuned! 
 
 ## Tasklist
-- [X] *Register custom operation : DeformableFeatureAggregation and export ONNX and TensorRT engine. **`25 Aug, 2024`***
-- [X] *Verify the consistency of reasoning results : DeformableFeatureAggregation  PyToch Implementation  vs. TensorRT plugin Implementation. **`25 Aug, 2024`***  
-- [ ] *Reasoning acceleration using CUDA shared memory and CUDA FP16 in DeformableFeatureAggregation plugin Implementation.*
+- [X] *Register custom operation : DeformableAttentionAggr and export ONNX and TensorRT engine. **`25 Aug, 2024`***
+- [X] *Verify the consistency of reasoning results : DeformableAttentionAggr  PyToch Implementation  vs. TensorRT plugin Implementation. **`25 Aug, 2024`***  
 - [X] *Export SparseTransFormer Backbone ONNX&TensorRT engine. **`8 Sep, 2024`***
 - [X] *Verify the consistency of reasoning results : SparseTransFormer Backbone PyTorch Implementation vs. ONNX Runtime vs. TensorRT engine. **`8 Sep, 2024`***
-- [ ] *Export SparseTransFormer Head ONNX and TensorRT engine.*
-- [ ] *Verify the consistency of reasoning results : SparseTransFormer Head PyTorch Implementation vs. TensorRT engine.*
+- [X] *Export SparseTransFormer Head ONNX and TensorRT engine. **`24 Sep, 2024`***
+- [X] *Verify the consistency of reasoning results : SparseTransFormer Head PyTorch Implementation vs. TensorRT engine. **`24 Sep, 2024`***
+- [ ] *Reasoning acceleration using CUDA shared memory and CUDA FP16 in DeformableAttentionAggr plugin Implementation.*
 - [ ] *Reasoning acceleration using FlashAttention in replace of MultiheadAttention.*
 - [ ] *Reasoning acceleration using FP16/INT8  in replace of FP32 of TensorRT engine.*
-- [ ] *Image pre-processing, Instancbank Caching and model post-processing Implementation with C++.*
 - [ ] *Reasoning acceleration : Image pre-processing Instancbank Caching and model post-processing Implementation with CUDA.*
+- [ ] *Image pre-processing, Instancbank Caching and model post-processing Implementation with C++.*
 - [ ] *Onboard: Full-link reasoning using CUDA, TensorRT and C++.*
 
 # Introduction

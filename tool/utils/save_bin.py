@@ -29,6 +29,7 @@ def save_bins(
     save_prefix: str = "script/tutorial/asset",
 ):
     os.makedirs(save_prefix, exist_ok=True)
+    assert len(inputs + outputs) == len(names)
 
     for x, x_name in zip(inputs + outputs, names):
         save_bin_format(x, x_name, save_prefix, sample_index, logger)

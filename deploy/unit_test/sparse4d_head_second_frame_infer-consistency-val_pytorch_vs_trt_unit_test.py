@@ -1,14 +1,27 @@
 # Copyright (c) 2024 SparseEnd2End. All rights reserved @author: Thomas Von Wu.
 """ If you get following results, congratulations
-[2024-09-24::21:25:07] [INFO]: [max(abs()) error] pred_instance_feature = 0.0006016641855239868
-[2024-09-24::21:25:07] [INFO]: [cosine_distance ] pred_instance_feature = 0.0
-[2024-09-24::21:25:07] [INFO]: [max(abs()) error] pred_anchor = 0.0004584789276123047
-[2024-09-24::21:25:07] [INFO]: [cosine_distance ] pred_anchor = -1.1920928955078125e-07
-[2024-09-24::21:25:07] [INFO]: [max(abs()) error] pred_class_score = 0.0003018379211425781
-[2024-09-24::21:25:07] [INFO]: [cosine_distance ] pred_class_score = 5.960464477539063e-08
-[2024-09-24::21:25:07] [INFO]: [max(abs()) error] pred_quality_score = 0.00012242794036865234
-[2024-09-24::21:25:07] [INFO]: [cosine_distance ] pred_quality_score = 0.0
-[2024-09-24::21:25:07] [INFO]: All tests are passed!!!
+[2024-09-24::22:57:55] [INFO]: Sample 0 inference consistency validatation:
+[2024-09-24::22:57:55] [INFO]: [max(abs()) error] pred_track_id = 0.0
+[2024-09-24::22:57:55] [INFO]: [cosine_distance ] pred_track_id = 0.0
+[2024-09-24::22:57:55] [INFO]: [max(abs()) error] pred_instance_feature = 0.007264554500579834
+[2024-09-24::22:57:55] [INFO]: [cosine_distance ] pred_instance_feature = 0.0
+[2024-09-24::22:57:55] [INFO]: [max(abs()) error] pred_anchor = 0.014062881469726562
+[2024-09-24::22:57:55] [INFO]: [cosine_distance ] pred_anchor = -1.1920928955078125e-07
+[2024-09-24::22:57:55] [INFO]: [max(abs()) error] pred_class_score = 0.0039052963256835938
+[2024-09-24::22:57:55] [INFO]: [cosine_distance ] pred_class_score = 5.960464477539063e-08
+[2024-09-24::22:57:55] [INFO]: [max(abs()) error] pred_quality_score = 0.0037108659744262695
+[2024-09-24::22:57:55] [INFO]: [cosine_distance ] pred_quality_score = 1.1920928955078125e-07
+[2024-09-24::22:57:56] [INFO]: Sample 1 inference consistency validatation:
+[2024-09-24::22:57:56] [INFO]: [max(abs()) error] pred_track_id = 0.0
+[2024-09-24::22:57:56] [INFO]: [cosine_distance ] pred_track_id = 0.0
+[2024-09-24::22:57:56] [INFO]: [max(abs()) error] pred_instance_feature = 0.0004710555076599121
+[2024-09-24::22:57:56] [INFO]: [cosine_distance ] pred_instance_feature = 1.1920928955078125e-07
+[2024-09-24::22:57:56] [INFO]: [max(abs()) error] pred_anchor = 0.0003387928009033203
+[2024-09-24::22:57:56] [INFO]: [cosine_distance ] pred_anchor = 1.1920928955078125e-07
+[2024-09-24::22:57:56] [INFO]: [max(abs()) error] pred_class_score = 0.0007314682006835938
+[2024-09-24::22:57:56] [INFO]: [cosine_distance ] pred_class_score = 1.1920928955078125e-07
+[2024-09-24::22:57:56] [INFO]: [max(abs()) error] pred_quality_score = 0.0002580881118774414
+[2024-09-24::22:57:56] [INFO]: [cosine_distance ] pred_quality_score = 0.0
 """
 import os
 import ctypes
@@ -27,7 +40,7 @@ def read_bin(samples, logger):
     inputs = list()
     outputs = list()
 
-    for i in range(samples):
+    for i in range(1, samples):
 
         feature_shape = [1, 89760, 256]
         feature = np.fromfile(
@@ -68,6 +81,36 @@ def read_bin(samples, logger):
             dtype=np.float32,
         ).reshape(time_interval_shape)
         printArrayInformation(time_interval, logger, "time_interval", "PyTorch")
+
+        temp_instance_feature_shape = [1, 600, 256]
+        temp_instance_feature = np.fromfile(
+            f"{prefix}sample_{i}_temp_instance_feature_1*600*256_float32.bin",
+            dtype=np.float32,
+        ).reshape(temp_instance_feature_shape)
+        printArrayInformation(
+            temp_instance_feature, logger, "temp_instance_feature", "PyTorch"
+        )
+
+        temp_anchor_shape = [1, 600, 11]
+        temp_anchor = np.fromfile(
+            f"{prefix}sample_{i}_temp_anchor_1*600*11_float32.bin",
+            dtype=np.float32,
+        ).reshape(temp_anchor_shape)
+        printArrayInformation(temp_anchor, logger, "temp_anchor", "PyTorch")
+
+        mask_shape = [1]
+        mask = np.fromfile(
+            f"{prefix}sample_{i}_mask_1_int32.bin",
+            dtype=np.int32,
+        ).reshape(mask_shape)
+        printArrayInformation(mask, logger, "mask", "PyTorch")
+
+        track_id_shape = [1, 900]
+        track_id = np.fromfile(
+            f"{prefix}sample_{i}_track_id_1*900_int32.bin",
+            dtype=np.int32,
+        ).reshape(track_id_shape)
+        printArrayInformation(track_id, logger, "track_id", "PyTorch")
 
         image_wh_shape = [1, 6, 2]
         image_wh = np.fromfile(
@@ -115,6 +158,13 @@ def read_bin(samples, logger):
             pred_quality_score, logger, "pred_quality_score", "PyTorch"
         )
 
+        pred_track_id_shape = [1, 900]
+        pred_track_id = np.fromfile(
+            f"{prefix}sample_{i}_pred_track_id_1*900_int32.bin",
+            dtype=np.int32,
+        ).reshape(pred_track_id_shape)
+        printArrayInformation(pred_track_id, logger, "pred_track_id", "PyTorch")
+
         inputs.append(
             [
                 feature,
@@ -123,6 +173,10 @@ def read_bin(samples, logger):
                 instance_feature,
                 anchor,
                 time_interval,
+                temp_instance_feature,
+                temp_anchor,
+                mask,
+                track_id,
                 image_wh,
                 lidar2img,
             ]
@@ -130,6 +184,7 @@ def read_bin(samples, logger):
 
         outputs.append(
             [
+                pred_track_id,
                 pred_instance_feature,
                 pred_anchor,
                 pred_class_score,
@@ -171,6 +226,10 @@ def inference(
     instance_feature: np.ndarray,
     anchor: np.ndarray,
     time_interval: np.ndarray,
+    temp_instance_feature: np.ndarray,
+    temp_anchor: np.ndarray,
+    mask: np.ndarray,
+    track_id: np.ndarray,
     image_wh: np.ndarray,
     lidar2img: np.ndarray,
     engine: str,
@@ -184,6 +243,10 @@ def inference(
     bufferH.append(instance_feature)
     bufferH.append(anchor)
     bufferH.append(time_interval)
+    bufferH.append(temp_instance_feature)
+    bufferH.append(temp_anchor)
+    bufferH.append(mask)
+    bufferH.append(track_id)
     bufferH.append(image_wh)
     bufferH.append(lidar2img)
 
@@ -268,7 +331,9 @@ def inference(
     return nInput, nIO, bufferH
 
 
-def inference_consistency_validatation(predicted_data, expected_data, output_names):
+def inference_consistency_validatation(
+    predicted_data: List, expected_data: List, output_names: List
+):
     for x, y, name in zip(predicted_data, expected_data, output_names):
         max_abs_distance = float((np.abs(x - y)).max())
         logger.info(f"[max(abs()) error] {name} = {max_abs_distance}")
@@ -286,16 +351,16 @@ def main(
     logger,
     plugin_name="DeformableAttentionAggrPlugin",
     soFile="deploy/dfa_plugin/lib/deformableAttentionAggr.so",
-    trtFile="deploy/engine/sparse4dhead1st_polygraphy.engine",
-    # trtFile="deploy/engine/sparse4dhead1st.engine",
+    trtFile="deploy/engine/sparse4dhead2nd_polygraphy.engine",
 ):
     ctypes.cdll.LoadLibrary(soFile)
     plugin = getPlugin(plugin_name)
     engine = build_network(trtFile, logger)
     if engine == None:
-        logger.error(f"{plugin_name} Engine Building Failed: {trtFile}!")
+        logger.error(f"{plugin_name} Engine Building Failed: {trtFile} !")
         return
 
+    sample_id = 0
     for x, y in zip(input_bins, output_bins):
         (
             feature,
@@ -304,6 +369,10 @@ def main(
             instance_feature,
             anchor,
             time_interval,
+            temp_instance_feature,
+            temp_anchor,
+            mask,
+            track_id,
             image_wh,
             lidar2img,
         ) = x
@@ -315,6 +384,10 @@ def main(
             instance_feature,
             anchor,
             time_interval,
+            temp_instance_feature,
+            temp_anchor,
+            mask,
+            track_id,
             image_wh,
             lidar2img,
             engine,
@@ -329,12 +402,18 @@ def main(
             "instance_feature",
             "anchor",
             "time_interval",
+            "temp_instance_feature",
+            "temp_anchor",
+            "mask",
+            "track_id",
             "image_wh",
             "lidar2img",
         ]
 
+        # Sequence of output_names should be same with engine binding sequence.
         output_names = [
             "tmp_outs0",
+            "pred_track_id",
             "tmp_outs1",
             "tmp_outs2",
             "tmp_outs3",
@@ -351,13 +430,39 @@ def main(
 
         for i, name in enumerate(input_names):
             printArrayInformation(bufferH[i], logger, info=f"{name}", prefix="TensorRT")
-        for i, name in enumerate(output_names[6:10]):
-            printArrayInformation(
-                bufferH[i + nInput + 6], logger, info=f"{name}", prefix="TensorRT"
-            )
+        printArrayInformation(
+            bufferH[1 + nInput], logger, info=f"{output_names[1]}", prefix="TensorRT"
+        )
+        printArrayInformation(
+            bufferH[-4], logger, info=f"{output_names[-4]}", prefix="TensorRT"
+        )
+        printArrayInformation(
+            bufferH[-3], logger, info=f"{output_names[-3]}", prefix="TensorRT"
+        )
+        printArrayInformation(
+            bufferH[-2], logger, info=f"{output_names[-2]}", prefix="TensorRT"
+        )
+        printArrayInformation(
+            bufferH[-1], logger, info=f"{output_names[-1]}", prefix="TensorRT"
+        )
 
-        assert len(output_names[6:10]) == len(y)
-        inference_consistency_validatation(bufferH[nInput + 6 :], y, output_names[6:10])
+        assert 5 == len(y)
+        # inference_consistency_validatation(
+        #     bufferH[nInput : nInput + 5], y, output_names[:5]
+        # )
+        logger.info(f"Sample {sample_id} inference consistency validatation:")
+        inference_consistency_validatation(
+            [bufferH[nInput + 1], bufferH[-4], bufferH[-3], bufferH[-2], bufferH[-1]],
+            y,
+            [
+                output_names[1],
+                output_names[-4],
+                output_names[-3],
+                output_names[-2],
+                output_names[-1],
+            ],
+        )
+        sample_id += 1
 
 
 if __name__ == "__main__":
@@ -377,6 +482,6 @@ if __name__ == "__main__":
     np.set_printoptions(precision=4, linewidth=200, suppress=True)
 
     logger.info("Starting unit test...")
-    inputs, expected_outputs = read_bin(1, logger)
+    inputs, expected_outputs = read_bin(3, logger)
     main(inputs, expected_outputs, trt_old, logger)
     logger.info("All tests are passed!!!")

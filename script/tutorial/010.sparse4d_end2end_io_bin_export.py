@@ -141,15 +141,13 @@ class Sparse4D_backbone(nn.Module):
 class Sparse4D_head(nn.Module):
     def __init__(self, model):
         super(Sparse4D_head, self).__init__()
-        self.head = model
-        self.first_frame = True
+        self._head = model
+        self._first_frame = True
 
     def head_io_hook(
         self,
     ):
-        first_frame = True
-
-        """ Head common input tensor names. """
+        """Head common input tensor names."""
         # feature = self._feature.detach().cpu().numpy()
         spatial_shapes = (
             self._spatial_shapes.int().detach().cpu().numpy()
@@ -177,7 +175,6 @@ class Sparse4D_head(nn.Module):
             and self._pred_track_id is not None
         ):
             """Head frame > 1 input tensor names."""
-            first_frame = False
             temp_instance_feature = self._temp_instance_feature.detach().cpu().numpy()
             temp_anchor = self._temp_anchor.detach().cpu().numpy()
             mask = self._mask.int().detach().cpu().numpy()  # int64->in32
@@ -188,9 +185,9 @@ class Sparse4D_head(nn.Module):
                 self._pred_track_id.int().detach().cpu().numpy()
             )  # int64->in32
 
-        if first_frame:
+        if self._first_frame:
             inputs = [
-                # feature,
+                # feature, # repeat with the backbone output
                 spatial_shapes,
                 level_start_index,
                 instance_feature,
@@ -205,7 +202,7 @@ class Sparse4D_head(nn.Module):
                 pred_class_score,
                 pred_quality_score,
             ]
-            return inputs, outputs, first_frame
+            return inputs, outputs
 
         inputs = [
             temp_instance_feature,
@@ -215,7 +212,7 @@ class Sparse4D_head(nn.Module):
             instance_feature,
             anchor,
             time_interval,
-            # feature,
+            # feature, # repeat with the backbone output
             spatial_shapes,
             level_start_index,
             image_wh,
@@ -228,7 +225,7 @@ class Sparse4D_head(nn.Module):
             pred_quality_score,
             pred_track_id,
         ]
-        return inputs, outputs, first_frame
+        return inputs, outputs
 
     def instance_bank_io_hook(self):
         """InstanceBank::get() input tensor names."""
@@ -321,8 +318,8 @@ class Sparse4D_head(nn.Module):
             temp_instance_feature,
             temp_anchor,
             time_interval,
-        ) = self.head.instance_bank.get(
-            batch_size, metas, dn_metas=self.head.sampler.dn_metas
+        ) = self._head.instance_bank.get(
+            batch_size, metas, dn_metas=self._head.sampler.dn_metas
         )
 
         """InstanceBank::get() input hook. """
@@ -337,27 +334,26 @@ class Sparse4D_head(nn.Module):
         self._instance_feature = instance_feature.clone()
         self._anchor = anchor.clone()
         self._time_interval = time_interval.clone()
-        if self.first_frame:
+        if self._first_frame:
             assert temp_instance_feature is None
             assert temp_anchor is None
-            assert self.head.instance_bank.mask is None
-            assert self.head.instance_bank.track_id is None
+            assert self._head.instance_bank.mask is None
+            assert self._head.instance_bank.track_id is None
 
             self._temp_instance_feature = None
             self._temp_anchor = None
             self._mask = None
             self._track_id = None
-            self.first_frame = False
         else:
             assert temp_instance_feature is not None
             assert temp_anchor is not None
-            assert self.head.instance_bank.mask is not None
-            assert self.head.instance_bank.track_id is not None
+            assert self._head.instance_bank.mask is not None
+            assert self._head.instance_bank.track_id is not None
 
             self._temp_instance_feature = temp_instance_feature.clone()
             self._temp_anchor = temp_anchor.clone()
-            self._mask = self.head.instance_bank.mask.clone()
-            self.track_id = self.head.instance_bank.track_id.clone()
+            self._mask = self._head.instance_bank.mask.clone()
+            self._track_id = self._head.instance_bank.track_id.clone()
 
         self._image_wh = metas["image_wh"].clone()
         self._lidar2img = metas["lidar2img"].clone()
@@ -365,20 +361,20 @@ class Sparse4D_head(nn.Module):
         attn_mask = None
         temp_dn_reg_target = None
 
-        anchor_embed = self.head.anchor_encoder(anchor)
+        anchor_embed = self._head.anchor_encoder(anchor)
         if temp_anchor is not None:
-            temp_anchor_embed = self.head.anchor_encoder(temp_anchor)
+            temp_anchor_embed = self._head.anchor_encoder(temp_anchor)
         else:
             temp_anchor_embed = None
 
         prediction = []
         classification = []
         quality = []
-        for i, op in enumerate(self.head.operation_order):
-            if self.head.layers[i] is None:
+        for i, op in enumerate(self._head.operation_order):
+            if self._head.layers[i] is None:
                 continue
             elif op == "temp_gnn":
-                instance_feature = self.head.graph_model(
+                instance_feature = self._head.graph_model(
                     i,
                     instance_feature,
                     temp_instance_feature,
@@ -388,7 +384,7 @@ class Sparse4D_head(nn.Module):
                     attn_mask=attn_mask if temp_instance_feature is None else None,
                 )
             elif op == "gnn":
-                instance_feature = self.head.graph_model(
+                instance_feature = self._head.graph_model(
                     i,
                     instance_feature,
                     value=instance_feature,
@@ -396,9 +392,9 @@ class Sparse4D_head(nn.Module):
                     attn_mask=attn_mask,
                 )
             elif op == "norm" or op == "ffn":
-                instance_feature = self.head.layers[i](instance_feature)
+                instance_feature = self._head.layers[i](instance_feature)
             elif op == "deformable":
-                instance_feature = self.head.layers[i](
+                instance_feature = self._head.layers[i](
                     instance_feature,
                     anchor,
                     anchor_embed,
@@ -406,32 +402,32 @@ class Sparse4D_head(nn.Module):
                     metas,
                 )
             elif op == "refine":
-                anchor, cls, qt = self.head.layers[i](
+                anchor, cls, qt = self._head.layers[i](
                     instance_feature,
                     anchor,
                     anchor_embed,
                     time_interval=time_interval,
                     return_cls=(
-                        self.head.training
-                        or len(prediction) == self.head.num_single_frame_decoder - 1
-                        or i == len(self.head.operation_order) - 1
+                        self._head.training
+                        or len(prediction) == self._head.num_single_frame_decoder - 1
+                        or i == len(self._head.operation_order) - 1
                     ),
                 )
                 prediction.append(anchor)
                 classification.append(cls)
                 quality.append(qt)
-                if len(prediction) == self.head.num_single_frame_decoder:
-                    instance_feature, anchor = self.head.instance_bank.update(
+                if len(prediction) == self._head.num_single_frame_decoder:
+                    instance_feature, anchor = self._head.instance_bank.update(
                         instance_feature, anchor, cls
                     )
-                if i != len(self.head.operation_order) - 1:
-                    anchor_embed = self.head.anchor_encoder(anchor)
+                if i != len(self._head.operation_order) - 1:
+                    anchor_embed = self._head.anchor_encoder(anchor)
                 if (
-                    len(prediction) > self.head.num_single_frame_decoder
+                    len(prediction) > self._head.num_single_frame_decoder
                     and temp_anchor_embed is not None
                 ):
                     temp_anchor_embed = anchor_embed[
-                        :, : self.head.instance_bank.num_temp_instances
+                        :, : self._head.instance_bank.num_temp_instances
                     ]
 
         """Head output hook. """
@@ -439,8 +435,8 @@ class Sparse4D_head(nn.Module):
         self._pred_anchor = anchor.clone()
         self._pred_class_score = cls.clone()
         self._pred_quality_score = qt.clone()
-        if self.head.instance_bank.track_id is not None:
-            self._pred_track_id = self.head.instance_bank.track_id.clone()
+        if self._head.instance_bank.track_id is not None:
+            self._pred_track_id = self._head.instance_bank.track_id.clone()
 
         output = {}
         output.update(
@@ -451,26 +447,26 @@ class Sparse4D_head(nn.Module):
             }
         )
 
-        self.head.instance_bank.cache(instance_feature, anchor, cls, metas)
+        self._head.instance_bank.cache(instance_feature, anchor, cls, metas)
 
         """InstanceBank::cache() output hook. """
-        self._ibank_temp_confidence = self.head.instance_bank.temp_confidence.clone()
-        self._ibank_confidence = self.head.instance_bank.confidence.clone()
-        self._ibank_cached_feature = self.head.instance_bank.cached_feature.clone()
-        self._ibank_cached_anchor = self.head.instance_bank.cached_anchor.clone()
+        self._ibank_temp_confidence = self._head.instance_bank.temp_confidence.clone()
+        self._ibank_confidence = self._head.instance_bank.confidence.clone()
+        self._ibank_cached_feature = self._head.instance_bank.cached_feature.clone()
+        self._ibank_cached_anchor = self._head.instance_bank.cached_anchor.clone()
 
-        track_id = self.head.instance_bank.get_track_id(
-            cls, self.head.decoder.score_threshold
+        track_id = self._head.instance_bank.get_track_id(
+            cls, self._head.decoder.score_threshold
         )
         output["track_id"] = track_id  # [1, 900], int64
 
         """InstanceBank::get_track_id() output hook. """
-        self._ibank_prev_id = self.head.instance_bank.prev_id.clone()
+        self._ibank_prev_id = self._head.instance_bank.prev_id.clone()
         self._ibank_updated_cur_track_id = track_id.clone()
-        self._ibank_updated_temp_track_id = self.head.instance_bank.track_id.clone()
+        self._ibank_updated_temp_track_id = self._head.instance_bank.track_id.clone()
 
         """Postprocessor output  hook. """
-        output = self.head.decoder.decode(
+        output = self._head.decoder.decode(
             output["classification"],
             output["prediction"],
             output.get("track_id"),
@@ -553,8 +549,9 @@ def main():
             )
 
             head_hook(feature_maps, data)
-            inputs, outputs, first_frame_flag = head_hook.head_io_hook()
-            if first_frame_flag:
+            inputs, outputs = head_hook.head_io_hook()
+            if head_hook._first_frame:
+                head_hook._first_frame = False
                 logger.info(
                     f"Start to save bin for first frame Sparse4dHead, sampleindex={i} >>>>>>>>>>>>>>>>"
                 )
@@ -592,7 +589,6 @@ def main():
                         "instance_feature",
                         "anchor",
                         "time_interval",
-                        "# feature",
                         "spatial_shapes",
                         "level_start_index",
                         "image_wh",
@@ -603,6 +599,7 @@ def main():
                         "pred_quality_score",
                         "pred_track_id",
                     ],
+                    logger=logger,
                     sample_index=i,
                 )
 

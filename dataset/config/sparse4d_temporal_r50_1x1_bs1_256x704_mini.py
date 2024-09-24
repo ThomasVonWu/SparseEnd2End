@@ -132,7 +132,7 @@ model = dict(
             act_cfg=dict(type="ReLU", inplace=True),
         ),
         deformable_model=dict(
-            type="DeformableFeatureAggregation",
+            type="DeformableAttentionAggr",
             embed_dims=embed_dims,
             num_groups=num_groups,
             num_levels=num_levels,
@@ -316,13 +316,7 @@ test_pipeline = [
     dict(type="NuScenesSparse4DAdaptor"),
     dict(
         type="Collect",
-        keys=[
-            "img",
-            "timestamp",
-            "lidar2img",
-            "image_wh",
-            "ori_img"
-        ],
+        keys=["img", "timestamp", "lidar2img", "image_wh", "ori_img"],
         meta_keys=["lidar2global", "global2lidar", "timestamp"],
     ),
 ]

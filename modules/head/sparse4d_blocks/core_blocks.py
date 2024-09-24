@@ -16,14 +16,14 @@ except:
     DAF = None
 
 __all__ = [
-    "DeformableFeatureAggregation",
+    "DeformableAttentionAggr",
     "DenseDepthNet",
     "AsymmetricFFN",
     "GridMask",
 ]
 
 
-class DeformableFeatureAggregation(BaseModule):
+class DeformableAttentionAggr(BaseModule):
     def __init__(
         self,
         embed_dims: int = 256,
@@ -39,7 +39,7 @@ class DeformableFeatureAggregation(BaseModule):
         use_camera_embed=False,
         residual_mode="add",
     ):
-        super(DeformableFeatureAggregation, self).__init__()
+        super(DeformableAttentionAggr, self).__init__()
         if embed_dims % num_groups != 0:
             raise ValueError(
                 f"embed_dims must be divisible by num_groups, "
@@ -254,7 +254,7 @@ class DeformableFeatureAggregation(BaseModule):
         num_cams = feature_maps[0].shape[1]
         bs, num_anchor, num_pts = key_points.shape[:3]
 
-        points_2d = DeformableFeatureAggregation.project_points(
+        points_2d = DeformableAttentionAggr.project_points(
             key_points, lidar2img, image_wh
         )
         points_2d = points_2d * 2 - 1

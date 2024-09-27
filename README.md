@@ -61,7 +61,7 @@
 - [X] *Verify the consistency of reasoning results : SparseTransFormer Head PyTorch Implementation vs. TensorRT engine. **`24 Sep, 2024`***
 - [ ] *Reasoning acceleration using CUDA shared memory and CUDA FP16 in DeformableAttentionAggr plugin Implementation.*
 - [ ] *Reasoning acceleration using FlashAttention in replace of MultiheadAttention.*
-- [ ] *Reasoning acceleration using FP16/INT8  in replace of FP32 of TensorRT engine.*
+- [ ] *Reasoning acceleration using FP16/INT8  in replace of FP32 for TensorRT engine.*
 - [ ] *Reasoning acceleration : Image pre-processing Instancbank Caching and model post-processing Implementation with CUDA.*
 - [ ] *Image pre-processing, Instancbank Caching and model post-processing Implementation with C++.*
 - [ ] *Onboard: Full-link reasoning using CUDA, TensorRT and C++.*

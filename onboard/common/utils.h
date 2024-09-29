@@ -13,11 +13,12 @@ namespace sparse_end2end {
 namespace common {
 
 template <typename T>
-std::tuple<bool, std::vector<T>> read_wrapper(const std::string& filename) {
+std::vector<T> read_wrapper(const std::string& filename) {
   std::ifstream file(filename, std::ios::in);
   if (!file) {
     throw "[ERROR] read file failed";
-    return std::make_tuple(false, std::vector<T>{});
+    // LOG_ERROR(kLogContext, "Read file failed: " + file_path);
+    return std::vector<T>{};
   }
 
   file.seekg(0, std::ifstream::end);
@@ -28,7 +29,7 @@ std::tuple<bool, std::vector<T>> read_wrapper(const std::string& filename) {
   file.read((char*)buffer.data(), static_cast<std::streamsize>(fsize));
   file.close();
 
-  return std::make_tuple(true, buffer);
+  return buffer;
 }
 
 template <typename T>

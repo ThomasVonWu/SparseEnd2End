@@ -31,6 +31,17 @@ enum class ObstacleType : std::uint8_t {
   OBSTACLETYPE_INVALID = 255U,
 };
 
+enum class CameraFrameID : std::uint8_t {
+  CAM_FRONT = 0U,
+  CAM_FRONT_RIGHT = 1U,
+  CAM_FRONT_LEFT = 2U,
+  CAM_BACK = 3U,
+  CAM_BACK_LEFT = 4U,
+  CAM_BACK_RIGHT = 5U,
+  CameraFrameID_Max = 6U,
+  CameraFrameID_INVALID = 255U,
+};
+
 struct Obstacle {
   float x = 0.0F;
   float y = 0.0F;

@@ -450,9 +450,7 @@ class NuScenes4DDetTrackDataset(Dataset):
             json.dump(nusc_submissions, f, indent=True, ensure_ascii=False)
         return res_path
 
-    def _evaluate_single(
-        self, result_path, logger=None, result_name="img_bbox", tracking=False
-    ):
+    def _evaluate_single(self, result_path, result_name="img_bbox", tracking=False):
         from nuscenes import NuScenes
 
         output_dir = os.path.join(*os.path.split(result_path)[:-1])

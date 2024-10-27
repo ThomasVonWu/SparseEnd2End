@@ -362,9 +362,7 @@ class EvalHook(Hook):
             runner (:obj:`e2e.Runner`): The underlined training runner.
             results (list): Output results.
         """
-        eval_res = self.dataloader.dataset.evaluate(
-            results, logger=runner.logger, **self.eval_kwargs
-        )
+        eval_res = self.dataloader.dataset.evaluate(results, **self.eval_kwargs)
 
         for name, val in eval_res.items():
             runner.log_buffer.output[name] = val

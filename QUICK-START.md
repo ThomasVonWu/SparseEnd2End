@@ -69,8 +69,15 @@ Set PythonEnvironment
 export PYTHONPATH=$PYTHONPATH:./
 ```
 
-Train&Test in dp mode.
+Train in dp mode.
 ```bash
 clear && python script/train.py dataset/config/[your_config.py]
+or 
+# Using "no-validate" to avoid getting the invalid box type error during evaluation after each epoch.
+clear && python script/train.py dataset/config/[your_config.py]  --no-validate
+```
+
+Test in dp mode
+```bash
 clear && python script/test.py  dataset/config/[your_config.py] --checkpoint path/to/checkpoint
 ```

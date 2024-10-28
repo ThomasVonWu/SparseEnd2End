@@ -15,6 +15,15 @@ from ..utils.collate import collate_fn
 __all__ = ["dataloader_wrapper", "dataloader_wrapper_without_dist"]
 
 
+def _worker_init_fn(worker_id, num_workers, rank, seed):
+    worker_seed = num_workers * rank + worker_id + seed
+    random.seed(worker_seed)
+    np.random.seed(worker_seed)
+    torch.manual_seed(worker_seed)
+    torch.cuda.manual_seed(worker_seed)
+    torch.cuda.manual_seed_all(worker_seed)
+
+
 def dataloader_wrapper(
     dataset,
     samples_per_gpu,
@@ -48,13 +57,13 @@ def dataloader_wrapper(
         DataLoader: A PyTorch dataloader.
     """
 
-    def _worker_init_fn(worker_id, num_workers, rank, seed):
-        worker_seed = num_workers * rank + worker_id + seed
-        random.seed(worker_seed)
-        np.random.seed(worker_seed)
-        torch.manual_seed(worker_seed)
-        torch.cuda.manual_seed(worker_seed)
-        torch.cuda.manual_seed_all(worker_seed)
+    # def _worker_init_fn(worker_id, num_workers, rank, seed):
+    #     worker_seed = num_workers * rank + worker_id + seed
+    #     random.seed(worker_seed)
+    #     np.random.seed(worker_seed)
+    #     torch.manual_seed(worker_seed)
+    #     torch.cuda.manual_seed(worker_seed)
+    #     torch.cuda.manual_seed_all(worker_seed)
 
     rank, world_size = get_dist_info()
     batch_sampler = None
@@ -159,13 +168,13 @@ def dataloader_wrapper_without_dist(
         DataLoader: A PyTorch dataloader.
     """
 
-    def _worker_init_fn(worker_id, num_workers, rank, seed):
-        # The seed of each worker equals to
-        # num_worker * rank + worker_id + user_seed
-        worker_seed = num_workers * rank + worker_id + seed
-        np.random.seed(worker_seed)
-        random.seed(worker_seed)
-        torch.manual_seed(worker_seed)
+    # def _worker_init_fn(worker_id, num_workers, rank, seed):
+    #     # The seed of each worker equals to
+    #     # num_worker * rank + worker_id + user_seed
+    #     worker_seed = num_workers * rank + worker_id + seed
+    #     np.random.seed(worker_seed)
+    #     random.seed(worker_seed)
+    #     torch.manual_seed(worker_seed)
 
     rank, world_size = get_dist_info()
 

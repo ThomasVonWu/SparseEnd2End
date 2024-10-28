@@ -32,9 +32,10 @@ def parse_args():
         action="store_true",
         help="whether not to evaluate the checkpoint during training",
     )
-    parser.add_argument("--local_rank", type=int, default=0)
-    args = parser.parse_args()
+    parser.add_argument("--local-rank", type=int, default=0)
+    parser.add_argument("--resume-from", help="the checkpoint file to resume from")
 
+    args = parser.parse_args()
     if "LOCAL_RANK" not in os.environ:
         os.environ["LOCAL_RANK"] = str(args.local_rank)
     return args
@@ -70,6 +71,9 @@ def main():
     cfg["gpu_ids"] = (
         range(1) if cfg.get("gpu_ids", None) is None else range(cfg["gpu_ids"])
     )
+
+    if args.resume_from is not None:
+        cfg["resume_from"] = args.resume_from
 
     ## Create Logger
     timestamp = time.strftime("%Y%m%d_%H%M%S", time.localtime())

@@ -24,6 +24,7 @@ def get_kmeans_anchor(
             gt_boxes_list.append(x["gt_boxes"])
         else:
             print("[WARNING] Gt boxes is empty!")
+            continue
     gt_boxes = np.concatenate(gt_boxes_list, axis=0)
     distance = np.linalg.norm(gt_boxes[:, :3], axis=-1, ord=2)
     mask = distance <= detection_range

@@ -97,3 +97,9 @@ python3 -m torch.distributed.launch --nproc_per_node=${gpu_nums} --master_port=$
 or 
 clear && bash script/dist_train.sh ${config_path}
 ```
+
+Evaluation Offline
+```bash
+# If you use -- ,you can evaluation offline
+python script/offline_eval.py ---cfg /path/to/train/cfg -dir_path /path/to/train/cached/ckpt/dir/path --iter_per_epoch [int] 
+```

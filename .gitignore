@@ -26,6 +26,7 @@ LOG_*
 *.pkl
 *.swp
 *.pth
+*.pdf
 
 # Jupyter Notebook
 .ipynb_checkpoints

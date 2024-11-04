@@ -36,10 +36,18 @@
 </center>
 
 
-## Experimental Results
+## nuScenes Benchmark
+### Results on Validation Split: `SparseEnd2End` v.s. `HorizonRobotics/Sparse4D`
+These training reproduction experiments were conducted using 4 NVIDIA H20 GPUs with 80 GB memory.
+|model | backbone |pretrain| img size | Epoch | Traning | FPS | NDS | mAP |  AMOTA |AMOTP |IDS| config | ckpt | log | GPU |
+|  :----:  | :---: | :---: | :---: | :---: | :---:| :---:|:---:|:---: | :---: | :----: | :----: | :---: | :----: | :----: | :----: |
+|Sparse4Dv3(HorizonRobotics/Sparse4D)|Res50|[ImageNet](https://download.pytorch.org/models/resnet50-19c8e357.pth)|256x704| 100 |22H | 19.8 |0.5637|0.4646|0.477|1.167|456| - | - | - | RTX3090 |
+|Sparse4Dv3(SparseEnd2End)|Res50|[ImageNet](https://download.pytorch.org/models/resnet50-19c8e357.pth)|256x704| 150 |77.5H | - |0.5637|0.4645|0.477|1.167|456| [cfg](dataset/config/sparse4d_temporal_r50_1x4_bs22_256x704.py) | [ckpt](https://drive.google.com/file/d/1sSMNB7T7LPKSr8nD9S_tSiu1mJrFMZ1I/view?usp=sharing) | [log](https://drive.google.com/file/d/1_TkatIdrfGzaZvUT02y3d4ctl2HIQ5oG/view?usp=drive_link) | H20 |
+
+## SparseEnd2End Deployment Experiments Results
 |         **Model**        | **ImgSize** | **Backbone** | **Framework** | **Precision** | **mAP** | **NDS** | **FPS** |                  **GPU**                  | **config**| **ckpt**|**onnx**|**engine**|
 |:----------------------------:|:-------------------:|:------------------------:|:------------------------:|:----------------------:|:--------------:|:-------------:|:-------------:|:----------------:|:----------------:|:----------------:|:----------------:|:----------------:|
-|         Sparse4Dv3      |    256x704     |     Resnet50    |           PyTorch       |            FP32        |     56.37     |     70.97    |     19.8     | NVIDIA GeForce RTX 3090 |[config](dataset/config/sparse4d_temporal_r50_1x1_bs1_256x704_mini.py)|[ckpt](https://drive.google.com/file/d/1sSMNB7T7LPKSr8nD9S_tSiu1mJrFMZ1I/view?usp=sharing)|     --     |     --     |
+|         Sparse4Dv3      |    256x704     |     Resnet50    |           PyTorch       |            FP32        |     0.4645     |     0.5637    |     19.8     | NVIDIA GeForce RTX 3090 |[config](dataset/config/sparse4d_temporal_r50_1x1_bs1_256x704_mini.py)|[ckpt](https://drive.google.com/file/d/1sSMNB7T7LPKSr8nD9S_tSiu1mJrFMZ1I/view?usp=sharing)|     --     |     --     |
 |         Sparse4Dv3      |    256x704     |     Resnet50    |          TensorRT     |            FP32        |      wait       |     wait      |     wait     | NVIDIA GeForce RTX 3090 |[config](dataset/config/sparse4d_temporal_r50_1x1_bs1_256x704_mini.py)|[ckpt](https://drive.google.com/file/d/1sSMNB7T7LPKSr8nD9S_tSiu1mJrFMZ1I/view?usp=sharing)|[onnx](https://drive.google.com/drive/folders/1dbjnV5AW4-VB0zbYUsUAhGjo0lGm177m?usp=sharing)|[engine](https://drive.google.com/drive/folders/1ZIxTDVsG0QaW9FwSSnrS1JZUKF0_OymG?usp=sharing)|
 |         Sparse4Dv3      |    256x704     |     Resnet50    |          TensorRT     |            FP16        |      wait       |     wait      |     wait     | NVIDIA GeForce RTX 3090 |[config](dataset/config/sparse4d_temporal_r50_1x1_bs1_256x704_mini.py)|[ckpt](https://drive.google.com/file/d/1sSMNB7T7LPKSr8nD9S_tSiu1mJrFMZ1I/view?usp=sharing)|     wait     |     wait     |
 |         Sparse4Dv3      |    256x704     |     Resnet50    |          TensorRT     |    INT8+FP16    |      wait       |     wait      |     wait     | NVIDIA GeForce RTX 3090 |[config](dataset/config/sparse4d_temporal_r50_1x1_bs1_256x704_mini.py)|[ckpt](https://drive.google.com/file/d/1sSMNB7T7LPKSr8nD9S_tSiu1mJrFMZ1I/view?usp=sharing)|     wait     |     wait     |

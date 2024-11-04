@@ -85,7 +85,7 @@ def main():
         wrap_fp16_model(model)
 
     checkpoint = load_checkpoint(model, args.checkpoint, map_location="cpu")
-    print(checkpoint["meta"]["CLASSES"])
+    # print(checkpoint["meta"]["CLASSES"])
 
     ## GPU Inference
     if not distributed:

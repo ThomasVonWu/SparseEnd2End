@@ -39,10 +39,10 @@
 ## nuScenes Benchmark
 ### Results on Validation Split: `SparseEnd2End` v.s. `HorizonRobotics/Sparse4D`
 These training reproduction experiments were conducted using 4 NVIDIA H20 GPUs with 80 GB memory.
-|model | backbone |pretrain| img size | Epoch | Traning | FPS | NDS | mAP |  AMOTA |AMOTP |IDS| config | ckpt | log | GPU |
-|  :----:  | :---: | :---: | :---: | :---: | :---:| :---:|:---:|:---: | :---: | :----: | :----: | :---: | :----: | :----: | :----: |
-|Sparse4Dv3(HorizonRobotics/Sparse4D)|Res50|[ImageNet](https://download.pytorch.org/models/resnet50-19c8e357.pth)|256x704| 100 |22H | 19.8 |0.5637|0.4646|0.477|1.167|456| - | - | - | RTX3090 |
-|Sparse4Dv3(SparseEnd2End)|Res50|[ImageNet](https://download.pytorch.org/models/resnet50-19c8e357.pth)|256x704| 150 |77.5H | - |0.5637|0.4645|0.477|1.167|456| [cfg](dataset/config/sparse4d_temporal_r50_1x4_bs22_256x704.py) | [ckpt](https://drive.google.com/file/d/1sSMNB7T7LPKSr8nD9S_tSiu1mJrFMZ1I/view?usp=sharing) | [log](https://drive.google.com/file/d/1_TkatIdrfGzaZvUT02y3d4ctl2HIQ5oG/view?usp=drive_link) | H20 |
+|model | src | backbone |pretrain| img size | Epoch | Traning | FPS | NDS | mAP |  AMOTA |AMOTP |IDS| config | ckpt | log | GPU |
+|  :----:  | :---: | :---: | :---: | :---: | :---:| :---:|:---:|:---: | :---: | :----: | :----: | :---: | :----: | :----: | :----: |:----: |
+|Sparse4Dv3|[HorizonRobotics/Sparse4D](https://github.com/HorizonRobotics/Sparse4D)|Resnet50|[ImageNet](https://download.pytorch.org/models/resnet50-19c8e357.pth)|256x704| 100 |22H | 19.8 |0.5637|0.4646|0.477|1.167|456| - | - | - | RTX3090 |
+|Sparse4Dv3|[ThomasVonWu/SparseEnd2End](https://github.com/ThomasVonWu/SparseEnd2End)|Resnet50|[ImageNet](https://download.pytorch.org/models/resnet50-19c8e357.pth)|256x704| 150 |77.5H | - |0.5637|0.4645|0.477|1.167|456| [cfg](dataset/config/sparse4d_temporal_r50_1x4_bs22_256x704.py) | [ckpt](https://drive.google.com/file/d/1sSMNB7T7LPKSr8nD9S_tSiu1mJrFMZ1I/view?usp=sharing) | [log](https://drive.google.com/file/d/1_TkatIdrfGzaZvUT02y3d4ctl2HIQ5oG/view?usp=drive_link) | H20 |
 
 ## SparseEnd2End Deployment Experiments Results
 |         **Model**        | **ImgSize** | **Backbone** | **Framework** | **Precision** | **mAP** | **NDS** | **FPS** |                  **GPU**                  | **config**| **ckpt**|**onnx**|**engine**|

@@ -39,7 +39,7 @@
 ## nuScenes Benchmark
 ### Results on Validation Split: `ThomasVonWu/SparseEnd2End` v.s. `HorizonRobotics/Sparse4D`
 These training reproduction experiments were conducted using 4 NVIDIA H20 GPUs with 96 GB memory.
-|model | src | backbone |pretrain| img size | Epoch | Traning | FPS | NDS | mAP |  AMOTA |AMOTP |IDS| config | ckpt | log | GPU |
+|model | repository | backbone |pretrain| img size | Epoch | Traning | FPS | NDS | mAP |  AMOTA |AMOTP |IDS| config | ckpt | log | GPU |
 |  :----:  | :---: | :---: | :---: | :---: | :---:| :---:|:---:|:---: | :---: | :----: | :----: | :---: | :----: | :----: | :----: |:----: |
 |Sparse4Dv3|[HorizonRobotics/Sparse4D](https://github.com/HorizonRobotics/Sparse4D)|Resnet50|[ImageNet](https://download.pytorch.org/models/resnet50-19c8e357.pth)|256x704| 100 |22H | 19.8 |0.5637|0.4646|0.477|1.167|456| - | - | - | RTX3090 |
 |Sparse4Dv3|[ThomasVonWu/SparseEnd2End](https://github.com/ThomasVonWu/SparseEnd2End)|Resnet50|[ImageNet](https://download.pytorch.org/models/resnet50-19c8e357.pth)|256x704| 150 |77.5H | - |0.5623|0.4645|0.457|1.196|541| [cfg](dataset/config/sparse4d_temporal_r50_1x4_bs22_256x704.py) | [ckpt](https://drive.google.com/file/d/1sSMNB7T7LPKSr8nD9S_tSiu1mJrFMZ1I/view?usp=sharing) | [log](https://drive.google.com/file/d/1_TkatIdrfGzaZvUT02y3d4ctl2HIQ5oG/view?usp=drive_link) | H20 |

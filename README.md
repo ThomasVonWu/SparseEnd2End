@@ -3,7 +3,7 @@
 
 [![license](https://img.shields.io/github/license/ThomasVonWu/SparseEnd2End
 )](https://github.com/ThomasVonWu/SparseEnd2End/blob/main/LICENSE)
-[![issues](https://img.shields.io/github/issues/ThomasVonWu/SparseEnd2End?color=F48D73)](https://github.com/ThomasVonWu/SparseEnd2End/issues?q=is%3Aissue+is%3Aclosed)
+[![issues](https://img.shields.io/github/issues/ThomasVonWu/SparseEnd2End?color=F48D73)](https://github.com/ThomasVonWu/SparseEnd2End/issues?q=is%3Aopen+is%3Aissue)
 [![issues](https://img.shields.io/github/issues-closed/ThomasVonWu/SparseEnd2End
 )](https://github.com/ThomasVonWu/SparseEnd2End/issues?q=is%3Aissue+is%3Aclosed)
 <img src="https://img.shields.io/github/repo-size/ThomasVonWu/SparseEnd2End.svg"/>

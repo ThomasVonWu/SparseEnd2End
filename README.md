@@ -3,10 +3,11 @@
 
 [![license](https://img.shields.io/github/license/ThomasVonWu/SparseEnd2End
 )](https://github.com/ThomasVonWu/SparseEnd2End/blob/main/LICENSE)
-[![open issues](https://img.shields.io/github/issues-raw/ThomasVonWu/SparseEnd2End
-)](https://github.com/ThomasVonWu/SparseEnd2End/issues)
+[![issues](https://img.shields.io/github/issues/ThomasVonWu/SparseEnd2End?color=F48D73)](https://github.com/ThomasVonWu/SparseEnd2End/issues?q=is%3Aissue+is%3Aclosed)
+[![issues](https://img.shields.io/github/issues-closed/ThomasVonWu/SparseEnd2End
+)](https://github.com/ThomasVonWu/SparseEnd2End/issues?q=is%3Aissue+is%3Aclosed)
 <img src="https://img.shields.io/github/repo-size/ThomasVonWu/SparseEnd2End.svg"/>
-<img src="https://img.shields.io/badge/language-c++ | cuda-red.svg"/>
+<img src="https://img.shields.io/badge/language-C++/CUDA-red.svg"/>
 <img src="https://img.shields.io/github/stars/ThomasVonWu/SparseEnd2End.svg"/>
 
 </div>
@@ -51,9 +52,9 @@ These training reproduction experiments were conducted using 4 NVIDIA H20 GPUs w
 |         Sparse4Dv3      |    256x704     |     Resnet50    |          TensorRT     |            FP32        |      wait       |     wait      |     wait     |  RTX 3090 |[config](dataset/config/sparse4d_temporal_r50_1x1_bs1_256x704_mini.py)|[ckpt](https://drive.google.com/file/d/1sSMNB7T7LPKSr8nD9S_tSiu1mJrFMZ1I/view?usp=sharing)|[onnx](https://drive.google.com/drive/folders/1dbjnV5AW4-VB0zbYUsUAhGjo0lGm177m?usp=sharing)|[engine](https://drive.google.com/drive/folders/1ZIxTDVsG0QaW9FwSSnrS1JZUKF0_OymG?usp=sharing)|
 |         Sparse4Dv3      |    256x704     |     Resnet50    |          TensorRT     |            FP16        |      wait       |     wait      |     wait     |  RTX 3090 |[config](dataset/config/sparse4d_temporal_r50_1x1_bs1_256x704_mini.py)|[ckpt](https://drive.google.com/file/d/1sSMNB7T7LPKSr8nD9S_tSiu1mJrFMZ1I/view?usp=sharing)|     wait     |     wait     |
 |         Sparse4Dv3      |    256x704     |     Resnet50    |          TensorRT     |    INT8+FP16    |      wait       |     wait      |     wait     |  RTX 3090 |[config](dataset/config/sparse4d_temporal_r50_1x1_bs1_256x704_mini.py)|[ckpt](https://drive.google.com/file/d/1sSMNB7T7LPKSr8nD9S_tSiu1mJrFMZ1I/view?usp=sharing)|     wait     |     wait     |
-|         Sparse4Dv3      |    256x704     |     Resnet50    |          TensorRT     |            FP32        |      wait       |     wait      |     wait     |          NVIDIA ORIN      |[config](dataset/config/sparse4d_temporal_r50_1x1_bs1_256x704_mini.py)|[ckpt](https://drive.google.com/file/d/1sSMNB7T7LPKSr8nD9S_tSiu1mJrFMZ1I/view?usp=sharing)|     wait     |     wait     |
-|         Sparse4Dv3      |    256x704     |     Resnet50    |          TensorRT     |            FP16        |      wait       |     wait      |     wait     |          NVIDIA ORIN      |[config](dataset/config/sparse4d_temporal_r50_1x1_bs1_256x704_mini.py)|[ckpt](https://drive.google.com/file/d/1sSMNB7T7LPKSr8nD9S_tSiu1mJrFMZ1I/view?usp=sharing)|     wait     |     wait     |
-|         Sparse4Dv3      |    256x704     |     Resnet50    |          TensorRT     |    INT8+FP16    |      wait       |     wait      |     wait     |          NVIDIA ORIN      |[config](dataset/config/sparse4d_temporal_r50_1x1_bs1_256x704_mini.py)|[ckpt](https://drive.google.com/file/d/1sSMNB7T7LPKSr8nD9S_tSiu1mJrFMZ1I/view?usp=sharing)|     wait     |     wait     |
+|         Sparse4Dv3      |    256x704     |     Resnet50    |          TensorRT     |            FP32        |      wait       |     wait      |     wait     |      NVIDIA ORIN      |[config](dataset/config/sparse4d_temporal_r50_1x1_bs1_256x704_mini.py)|[ckpt](https://drive.google.com/file/d/1sSMNB7T7LPKSr8nD9S_tSiu1mJrFMZ1I/view?usp=sharing)|     wait     |     wait     |
+|         Sparse4Dv3      |    256x704     |     Resnet50    |          TensorRT     |            FP16        |      wait       |     wait      |     wait     |      NVIDIA ORIN      |[config](dataset/config/sparse4d_temporal_r50_1x1_bs1_256x704_mini.py)|[ckpt](https://drive.google.com/file/d/1sSMNB7T7LPKSr8nD9S_tSiu1mJrFMZ1I/view?usp=sharing)|     wait     |     wait     |
+|         Sparse4Dv3      |    256x704     |     Resnet50    |          TensorRT     |    INT8+FP16    |      wait       |     wait      |     wait     |      NVIDIA ORIN      |[config](dataset/config/sparse4d_temporal_r50_1x1_bs1_256x704_mini.py)|[ckpt](https://drive.google.com/file/d/1sSMNB7T7LPKSr8nD9S_tSiu1mJrFMZ1I/view?usp=sharing)|     wait     |     wait     |
 
 
 ## News

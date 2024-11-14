@@ -86,3 +86,4 @@ If you find SparseEnd2End useful in your research or applications, please consid
 
 ## 🏷 ChangeLog
 >**08/25/2024：** **[v1.0.0]** This repository now supports Training | Inference in NuscenesDataset. It includes: data dump in JSON, Training | Inference  log caching, TensorBoard hooking, and so on. 
+>**11/14/2024：** **[v2.0.0]** Reproduce training results of HorizonRobotics/Sparse4D with FP32. 

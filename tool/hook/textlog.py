@@ -1,7 +1,9 @@
 # Copyright (c) 2024 SparseEnd2End. All rights reserved @author: Thomas Von Wu.
+import os
+import json
 import datetime
 from collections import OrderedDict
-from typing import Dict, Optional, Union
+from typing import Dict, Union
 
 import torch
 import torch.distributed as dist
@@ -55,6 +57,10 @@ class TextLoggerHook(LoggerHook):
     def before_run(self, runner) -> None:
         super().before_run(runner)
         self.start_iter = runner.iter
+
+        self.json_log_path = os.path.join(
+            runner.work_dir, f"{runner.timestamp}.log.json"
+        )
 
     def _get_max_memory(self, runner) -> int:
         device = getattr(runner.model, "output_device", None)
@@ -140,8 +146,20 @@ class TextLoggerHook(LoggerHook):
                 val = f"{val:.4f}"
             log_items.append(f"{name}: {val}")
         log_str += ", ".join(log_items)
+        
+        if runner.rank == 0:
+            runner.logger.info(log_str)
 
-        runner.logger.info(log_str)
+    def _dump_log(self, log_dict: Dict, runner) -> None:
+        # dump log in json format
+        json_log = OrderedDict()
+        for k, v in log_dict.items():
+            json_log[k] = self._round_float(v)
+        # only append log at last line
+        if runner.rank == 0:
+            with open(self.json_log_path, "a+") as f:
+                json.dump(json_log, f, indent=True, ensure_ascii=False)
+                f.write("\n")
 
     def _round_float(self, items):
         if isinstance(items, list):
@@ -181,6 +199,7 @@ class TextLoggerHook(LoggerHook):
         log_dict = dict(log_dict, **runner.log_buffer.output)  # type: ignore
 
         self._log_info(log_dict, runner)
+        self._dump_log(log_dict, runner)
         return log_dict
 
     def after_run(self, runner) -> None:

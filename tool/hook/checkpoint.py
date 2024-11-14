@@ -132,7 +132,8 @@ class CheckpointHook(Hook):
         if self.every_n_iters(runner, self.interval) or (
             self.save_last and self.is_last_iter(runner)
         ):
-            runner.logger.info(f"Saving checkpoint at {runner.iter + 1} iterations")
+            if runner.rank == 0:
+                runner.logger.info(f"Saving checkpoint at {runner.iter + 1} iterations")
             if self.sync_buffer:
                 allreduce_params(runner.model.buffers())
             self._save_checkpoint(runner)

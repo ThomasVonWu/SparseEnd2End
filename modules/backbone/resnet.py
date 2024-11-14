@@ -1,12 +1,11 @@
 # Copyright (c) 2024 SparseEnd2End. All rights reserved @author: Thomas Von Wu.
-import warnings
 
 import torch.nn as nn
 import torch.utils.checkpoint as cp
 from ..cnn.base_module import BaseModule
 from torch.nn.modules.batchnorm import _BatchNorm
 from modules.cnn.base_module import BaseModule, Sequential
-
+from tool.runner.fp16_utils import auto_fp16
 
 class BasicBlock(BaseModule):
     expansion = 1
@@ -492,6 +491,7 @@ class ResNet(BaseModule):
             layer_name = f"layer{i + 1}"
             self.add_module(layer_name, res_layer)
             self.res_layers.append(layer_name)
+            self.fp16_enabled = False
 
         self._freeze_stages()
 
@@ -640,6 +640,7 @@ class ResNet(BaseModule):
             for param in m.parameters():
                 param.requires_grad = False
 
+    @auto_fp16()
     def forward(self, x):
         """Forward function."""
         if self.deep_stem:

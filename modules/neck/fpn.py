@@ -1,6 +1,8 @@
 # Copyright (c) 2024 SparseEnd2End. All rights reserved @author: Thomas Von Wu.
 import torch.nn as nn
 import torch.nn.functional as F
+
+from tool.runner.fp16_utils import auto_fp16
 from modules.cnn.base_module import BaseModule, ConvModule
 
 
@@ -151,7 +153,7 @@ class FPN(BaseModule):
                 )
                 self.fpn_convs.append(extra_fpn_conv)
 
-    # @auto_fp16()
+    @auto_fp16()
     def forward(self, inputs):
         """Forward function."""
         assert len(inputs) == len(self.in_channels)

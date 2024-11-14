@@ -17,6 +17,8 @@ from .decoder import *
 from .loss.base_loss import *
 from .loss.sparse4d_losses import *
 
+from tool.runner.fp16_utils import force_fp32
+
 __all__ = ["Sparse4DHead"]
 
 
@@ -227,9 +229,9 @@ class Sparse4DHead(BaseModule):
             num_free_instance = num_instance - num_dn_anchor  # 320+900-320=900
             attn_mask = anchor.new_ones((num_instance, num_instance), dtype=torch.bool)
             attn_mask[:num_free_instance, :num_free_instance] = False
-            attn_mask[num_free_instance:, num_free_instance:] = (
-                dn_attn_mask  # (1120, 1120)
-            )
+            attn_mask[
+                num_free_instance:, num_free_instance:
+            ] = dn_attn_mask  # (1120, 1120)
 
         anchor_embed = self.anchor_encoder(anchor)  # (bs, 320+900, 256)
         if temp_anchor is not None:
@@ -400,6 +402,7 @@ class Sparse4DHead(BaseModule):
             output["track_id"] = track_id  # [1, 900], int64
         return output
 
+    @force_fp32(apply_to=("model_outs"))
     def loss(self, model_outs, data, feature_maps=None):
         # ===================== prediction losses ======================
         cls_scores = model_outs["classification"]
@@ -529,6 +532,7 @@ class Sparse4DHead(BaseModule):
             num_dn_pos,
         )
 
+    @force_fp32(apply_to=("model_outs"))
     def post_process(self, model_outs, output_idx=-1):
         return self.decoder.decode(
             model_outs["classification"],

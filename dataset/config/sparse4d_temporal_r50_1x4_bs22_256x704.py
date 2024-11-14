@@ -395,8 +395,7 @@ data_aug_conf = {
 tracking_threshold = 0.2
 data = dict(
     samples_per_gpu=batch_size,
-    # workers_per_gpu=batch_size//2,
-    workers_per_gpu=0,
+    workers_per_gpu=batch_size//2,
     train=dict(
         **data_basic_config,
         ann_file="data/nusc_anno_dumpjson/train",

@@ -59,4 +59,4 @@ RUN pip3 install numpy==1.23.5 \
     opencv-contrib-python==4.10.0.84
 
 ### STEP5: Fix evaluation bug.
-RUN sed -i 's/self.class_range.keys()/list(self.class_range.keys())/g' /usr/local/lib/python3.8/dist-packages/nuscenes/eval/detection/data_classes.py
+RUN sed -i 's/self.class_range.keys()/list(self.class_range.keys())/g' /opt/conda/lib/python3.8/site-packages/nuscenes/eval/detection/data_classes.py

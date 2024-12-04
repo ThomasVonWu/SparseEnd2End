@@ -17,8 +17,7 @@ onnx will save in deploy/onnxlog like below:
 ## STEP2. Compile Custom operator: deformableAttentionAggrPlugin.so
 Firstly, you need to set env for youself in 01_setEnv.sh, then run below:
 ```bash
-cd deploy/dfa_plugin
-. tools/01_setEnv.sh
+. deploy/dfa_plugin/tools/01_setEnv.sh
 ```
 env setting likes below:
 ```bash
@@ -38,12 +37,11 @@ env setting likes below:
 ||  ENVEINGINENAME      : deploy/dfa_plugin/engine/deformableAttentionAggr.engine
 ||  ENVTRTDIR   : deploy/dfa_plugin/engine
 ====================================================================================================================
-```
-
 [INFO] Config Env Done, Please Check EnvPrintOut Above!
-
+```
 then you need to export share library:
 ```bash
+cd deploy/dfa_plugin
 make -j8
 ```
 make log likes below:  
@@ -59,10 +57,11 @@ make[1]: Leaving directory '/mnt/data/end2endlocal/tmp/SparseEnd2End/deploy/dfa_
 ```
 
 ## STEP3. BUILD Sparse4D Engine
-You need to first set env for youself in set_env.sh, then run below:
+Firstly, you need to set env for youself in set_env.sh, then run below:
 ```bash
-cd ..
-. tools/set_env.sh
+cd -
+. deploy/tools/set_env.sh
+cd deploy
 bash build_sparse4d_engine.sh
 ```
 trt log likes below:

@@ -1,6 +1,6 @@
 # Copyright (c) 2024 SparseEnd2End. All rights reserved @author: Thomas Von Wu.
-cmake_minimum_required(VERSION 3.10.0)
-project(SparseEnd2EndOnboard)
+cmake_minimum_required(VERSION 3.22.0)
+project(SparseEnd2EndOnboard CUDA CXX)
 
 set(CMAKE_BUILD_TYPE "Release")
 set(CMAKE_CXX_STANDARD 17)

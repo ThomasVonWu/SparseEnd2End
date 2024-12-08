@@ -1,10 +1,11 @@
+// Copyright (c) 2024 SparseEnd2End. All rights reserved @author: Thomas Von Wu.
 #ifndef ONBOARD_COMMON_UTILS_H
 #define ONBOARD_COMMON_UTILS_H
 
 #include <yaml-cpp/yaml.h>
 
 #include <fstream>
-#include <ostream>
+#include <iostream>
 #include <string>
 #include <tuple>
 #include <vector>
@@ -16,7 +17,8 @@ template <typename T>
 std::vector<T> read_wrapper(const std::string& filename) {
   std::ifstream file(filename, std::ios::in);
   if (!file) {
-    throw "[ERROR] read file failed";
+    std::cout << "Read file failed : " << file_path;
+    throw "[ERROR] Read file failed";
     // LOG_ERROR(kLogContext, "Read file failed: " + file_path);
     return std::vector<T>{};
   }
@@ -37,7 +39,7 @@ void write_wrapper(const std::vector<T>& data, const std::string& filename) {
   std::ofstream file;
   file.open(filename, std::ios::out);
   if (!file.is_open()) {
-    throw "[ERROR] open file failed";
+    throw "[ERROR] Open file failed";
     return;
   }
   file.write((char*)data.data(), static_cast<std::streamsize>(data.size()) * sizeof(T));
@@ -48,6 +50,7 @@ YAML::Node loadYamlFile(const std::string& file_path) {
   try {
     YAML::Node node = YAML::LoadFile(file_path);
     if (!node) {
+      std::cout << "Loaded node is null : " << file_path << std::endl;
       // LOG_ERROR(kLogContext, "Loaded node is null: " + file_path);
       exit(EXIT_FAILURE);
       return YAML::Node();
@@ -55,15 +58,18 @@ YAML::Node loadYamlFile(const std::string& file_path) {
     return node;
   } catch (const YAML::Exception& e) {
     std::string errorMessage = e.what();
+    std::cout << "Failed to load YAML file: " << file_path << std::endl;
     // LOG_ERROR(kLogContext, "Failed to load YAML file: " + file_path + "->" + errorMessage);
     exit(EXIT_FAILURE);
     return YAML::Node();
   }
 }
 
+/// @brief Read Yaml key(Node) and get one value assigned to variable `out_val`.
 template <typename T>
 inline void readYamlNode(const YAML::Node& yaml, const std::string& key, T& out_val) {
   if (!yaml[key] || yaml[key].Type() == YAML::NodeType::Null) {
+    std::cout << "Yaml file not set : " << key << std::endl;
     // LOG_ERROR(kLogContext, "Yaml file not set " << key << " value, Aborting!!!");
     exit(EXIT_FAILURE);
   } else {
@@ -71,9 +77,29 @@ inline void readYamlNode(const YAML::Node& yaml, const std::string& key, T& out_
       out_val = yaml[key].as<T>();
     } catch (const YAML::BadConversion& e) {
       std::string errorMessage = e.what();
+      std::cout << "Failed to convert YAML key : " << key << std::endl;
       // LOG_ERROR(kLogContext, "Failed to convert YAML key " << key << " value, Aborting!!!");
       exit(EXIT_FAILURE);
     }
+  }
+}
+
+/// @brief Read Yaml Node(key) and get sequence values push into STL `vector`.
+template <typename T>
+inline void readYamlNode(const YAML::Node& yaml, const std::string& key, std::vector<T>& out_vals) {
+  if (!yaml[key]) {
+    std::cout << "Yaml file not set : " << key << std::endl;
+    // LOG_ERROR(kLogContext, "Yaml file not set " << key << " value, Aborting!!!");
+    exit(EXIT_FAILURE);
+  }
+  if (yaml[key].IsSequence() && yaml[key].size() == out_vals.size()) {
+    std::cout << "Yaml key node:" << key << " must be sequence and it's length must be the same with output vector!"
+              << std::endl;
+    exit(EXIT_FAILURE);
+  }
+
+  for (size_t i = 0, len = yaml[key].size(); i < len; ++i) {
+    out_vals[i] = value.as<T>()
   }
 }
 
@@ -82,6 +108,7 @@ YAML::Node getYamlSubNode(const YAML::Node& yaml, const std::string& node) {
   if (ret && ret.Type() != YAML::NodeType::Null) {
     return ret;
   } else {
+    std::cout << "Failed to get YAML subnode : " << node << std::endl;
     // LOG_ERROR(kLogContext, " : Failed to  get  YAML  subnode " << node << ". Aborting!!!");
     exit(EXIT_FAILURE);
   }
@@ -90,6 +117,7 @@ YAML::Node getYamlSubNode(const YAML::Node& yaml, const std::string& node) {
 void fileExists(const std::string& filename) {
   std::ifstream file(filename);
   if (!file.good()) {
+    std::cout << "Failed to Open file : " << filename << std::endl;
     // LOG_ERROR(kLogContext, "Failed to Open file: " + filename);
     exit(EXIT_FAILURE);
   }

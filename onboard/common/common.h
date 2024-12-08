@@ -10,7 +10,7 @@ namespace common {
 
 static constexpr const char* const kLogContext = "SparseE2ELog";
 
-struct E2EEngine {
+struct E2ETrtEngine {
   std::string engine_path;
   std::vector<std::string> input_names;
   std::vector<std::string> output_names;

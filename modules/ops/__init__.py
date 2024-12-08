@@ -77,8 +77,7 @@ def feature_maps_format(feature_maps, inverse=False):
         dtype=torch.int64,
         device=col_feats.device,
     )
-    ## =》(6, 4) 获取每个相机每个尺度的feature_map的面积
-    ## scale_start_index 用于记录col_feats中 1维度 n*c'的索引？
+    ## scale_start_index : flattened spatial_shape  boundary index.
     scale_start_index = spatial_shape[..., 0] * spatial_shape[..., 1]
     scale_start_index = scale_start_index.flatten().cumsum(dim=0)
     scale_start_index = torch.cat(

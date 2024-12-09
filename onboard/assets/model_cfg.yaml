@@ -23,3 +23,10 @@ SparseE2E:
     - EnginePath: "onboard/assets/trt_engine/sparse4dhead2nd.engine"
     - EngineInputNames: ["feature", "spatial_shapes", "level_start_index", "instance_feature", "anchor", "time_interval", "temp_instance_feature", "temp_anchor", "mask", "track_id", "image_wh", "lidar2img"]
     - EngineOutputNames: ["tmp_outs0", "pred_track_id", "tmp_outs1", "tmp_outs2", "tmp_outs3", "tmp_outs4", "tmp_outs5", "pred_instance_feature", "pred_anchor", "pred_class_score", "pred_quality_score"]
+  InstanceBankParams:
+    - NumQuerys: 900
+    - QueryDims: 11
+    - TopKQuerys: 600
+    - MaxTimeInterval: 2.0
+    - DefaultTimeInterval: 0.5
+    - ConfidenceDecay: 0.6

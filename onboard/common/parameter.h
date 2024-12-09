@@ -30,7 +30,7 @@ struct InstanceBankParams {
   std::uint32_t num_querys = 900U;
   std::uint32_t query_dims = 11U;
   std::vector<float> kmeans_anchors;
-  std::uint32_t topK_num_querys = 600U;
+  std::uint32_t topk_querys = 600U;
   float max_time_interval = 2.0F;
   float default_time_interval = 0.5F;
   float confidence_decay = 0.6F;

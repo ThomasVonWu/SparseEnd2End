@@ -33,26 +33,26 @@ common::E2EParams parseParams(const std::string& params_dir, const std::string& 
       {"CAM_BACK_RIGHT", common::CameraFrameID::CAM_BACK_RIGHT},
   };
 
-  /// STEP1: Parse kmeans anchor from offline bin file.
-  std::vector<float>(success_status, kmeans_anchor) =
-      common::read_wrapper<float>(params_dir + "/kmeans_anchor_900x11_float32.bin");
+  /// @brief STEP1: Parse kmeans anchor from offline bin file.
+  std::vector<float>(success_status, kmeans_anchors) =
+      common::read_wrapper<float>(params_dir + "/kmeans_anchors_900x11_float32.bin");
 
-  /// STEP2: Parse calibration parameters:
-  // std::vector<float>(success_status, lidar2img) = common::read_wrapper(params_dir +
-  // "onboard/assets/lidar2img_5*6*4*4_float32.bin");
+  /// @brief STEP2: Parse calibration parameters:
+  std::vector<float>(success_status, lidar2img) =
+      common::read_wrapper(params_dir + "onboard/assets/lidar2img_5*6*4*4_float32.bin");
 
-  /// STEP3: Parse model config file from YAML file.
+  /// @brief STEP3: Parse model config file from YAML file.
   YAML::Node config_file_node = common::loadYamlFile(params_dir + "/model_cfg.yaml");
 
   YAML::Node sparse_e2e_node = common::getYamlSubNode(config_file_node, "SparseE2E");
 
-  /// STEP3-1: Parse Node TaskCameraFrameID.
+  /// @brief STEP3-1: Parse Node TaskCameraFrameID.
   std::vector<common::CameraFrameID> task_camera_frame_id;
   YAML::Node task_camera_frame_id_node = getYamlSubNode(sparse_e2e_node, "TaskCameraFrameID");
   std::vector<std::string> task_camera_frame_id_strs = task_camera_frame_id_node.as<std::vector<std::string>>();
   size_t num_cams = task_camera_frame_id_strs.size();
 
-  /// STEP3-2: Parse Node: `ImgPreprocessor` in YAML.
+  /// @brief STEP3-2: Parse Node: `ImgPreprocessor` in YAML.
   YAML::Node img_preprocessor_node = common::getYamlSubNode(sparse_e2e_node, "ImgPreprocessor");
 
   /// STEP3-2.1: Parse Node: `ImgPreprocessor/RawImgShape_CHW` in YAML.
@@ -66,13 +66,13 @@ common::E2EParams parseParams(const std::string& params_dir, const std::string& 
       model_input_img_shape_chw_node.as<std::vector<std::uint32_t>>();
   model_input_img_shape_chw_tmp.assign(model_input_img_shape_chw.begin(), model_input_img_shape_chw.end());
 
-  /// STEP3-3: Parse Node: `ModelExtractFeatTrtEngine` in YAML.
+  /// @brief STEP3-3: Parse Node: `ModelExtractFeatTrtEngine` in YAML.
   YAML::Node model_extract_feat_trt_engine_node = common::getYamlSubNode(sparse_e2e_node, "ModelExtractFeatTrtEngine");
 
   /// STEP3-3.1: Parse Node: `ModelExtractFeatTrtEngine/EnginePath` in YAML.
   YAML::Node sparse4d_backbone_engine_path_node =
       common::getYamlSubNode(model_extract_feat_trt_engine_node, "EnginePath");
-  std::string sparse4d_engine_path = sparse4d_backbone_engine_path_node.as<std::string>();
+  std::string sparse4d_backbone_engine_path = sparse4d_backbone_engine_path_node.as<std::string>();
 
   /// STEP3-3.2 : Parse Node: `ModelExtractFeatTrtEngine/EngineInputNames` in YAML.
   YAML::Node sparse4d_backbone_engine_input_names_node =
@@ -129,7 +129,76 @@ common::E2EParams parseParams(const std::string& params_dir, const std::string& 
   model_extract_feat_level_start_index.pop_back();
   model_extract_feat_level_start_index.insert(model_extract_feat_level_start_index.begin(), 0);
 
-  /// STEP3-6 Parse Node: `ModelExtractFeatTrtEngine/ModelHeadFirstFrameEngine` in YAML.
+  /// @brief STEP3-4 Parse Node: `ModelHeadFirstFrameEngine` in YAML.
+  YAML::Node model_head_first_frame_engine_node = common::getYamlSubNode(sparse_e2e_node, "ModelHeadFirstFrameEngine");
+
+  /// STEP3-4.1 Parse Node:`ModelHeadFirstFrameEngine/EnginePath` in YAML.
+  YAML::Node sparse4d_head1st_engine_path_node =
+      common::getYamlSubNode(model_head_first_frame_engine_node, "EnginePath");
+  std::string sparse4d_head1st_engine_path = sparse4d_head1st_engine_path_node.as<std::string>();
+
+  /// STEP3-4.2 : Parse Node: `ModelHeadFirstFrameEngine/EngineInputNames` in YAML.
+  YAML::Node sparse4d_head1st_engine_input_names_node =
+      common::getYamlSubNode(model_head_first_frame_engine_node, "EngineInputNames");
+  std::vector<std::string> sparse4d_head1st_engine_input_names =
+      sparse4d_head1st_engine_input_names_node.as<std::vector<std::string>>();
+
+  /// STEP3-4.3 : Parse Node: `ModelHeadFirstFrameEngine/EngineOutputNames` in YAML.
+  YAML::Node sparse4d_head1st_engine_output_names_node =
+      common::getYamlSubNode(model_head_first_frame_engine_node, "EngineOutputNames");
+  std::vector<std::string> sparse4d_head1st_engine_output_names =
+      sparse4d_head1st_engine_output_names_node.as<std::vector<std::string>>();
+
+  /// @brief STEP3-5 Parse Node: `ModelHeadSecondFrameEngine` in YAML.
+  YAML::Node model_head_second_frame_engine_node =
+      common::getYamlSubNode(sparse_e2e_node, "ModelHeadSecondFrameEngine");
+
+  /// STEP3-5.1 Parse Node:`ModelHeadSecondFrameEngine/EnginePath` in YAML.
+  YAML::Node sparse4d_head2nd_engine_path_node =
+      common::getYamlSubNode(model_head_second_frame_engine_node, "EnginePath");
+  std::string sparse4d_head2nd_engine_path = sparse4d_head2nd_engine_path_node.as<std::string>();
+
+  /// STEP3-5.2 : Parse Node: `ModelHeadSecondFrameEngine/EngineInputNames` in YAML.
+  YAML::Node sparse4d_head2nd_engine_input_names_node =
+      common::getYamlSubNode(model_head_second_frame_engine_node, "EngineInputNames");
+  std::vector<std::string> sparse4d_head2nd_engine_input_names =
+      sparse4d_head2nd_engine_input_names_node.as<std::vector<std::string>>();
+
+  /// STEP3-5.3 : Parse Node: `ModelHeadSecondFrameEngine/EngineOutputNames` in YAML.
+  YAML::Node sparse4d_head2nd_engine_output_names_node =
+      common::getYamlSubNode(model_head_second_frame_engine_node, "EngineOutputNames");
+  std::vector<std::string> sparse4d_head2nd_engine_output_names =
+      sparse4d_head2nd_engine_output_names_node.as<std::vector<std::string>>();
+
+  /// STEP Parse Node: `InstanceBankParams` in YAML.
+  YAML::Node instance_bank_params_node = common::getYamlSubNode(sparse_e2e_node, "InstanceBankParams");
+
+  YAML::Node num_querys_node = common::getYamlSubNode(instance_bank_params_node, "NumQuerys");
+  std::uint32_t num_querys = num_querys_node.as<std::uint32_t>();
+
+  YAML::Node query_dims_node = common::getYamlSubNode(instance_bank_params_node, "QueryDims");
+  std::uint32_t query_dims = query_dims_node.as<std::uint32_t>();
+
+  YAML::Node topk_querys_node = common::getYamlSubNode(instance_bank_params_node, "TopKQuerys");
+  std::uint32_t topk_querys = topk_querys_node.as<std::uint32_t>();
+
+  YAML::Node max_time_interval_node = common::getYamlSubNode(instance_bank_params_node, "MaxTimeInterval");
+  float max_time_interval = max_time_interval_node.as<float>();
+
+  YAML::Node default_time_interval_node = common::getYamlSubNode(instance_bank_params_node, "DefaultTimeInterval");
+  float default_time_interval = default_time_interval_node.as<float>();
+
+  YAML::Node confidence_decay_node = common::getYamlSubNode(instance_bank_params_node, "ConfidenceDecay");
+  float confidence_decay = confidence_decay_node.as<float>();
+
+  common::InstanceBankParams instance_bank_params;
+  instance_bank_params.num_querys = num_querys;
+  instance_bank_params.query_dims = query_dims;
+  instance_bank_params.kmeans_anchors = kmeans_anchors;
+  instance_bank_params.topk_querys = topk_querys;
+  instance_bank_params.max_time_interval = max_time_interval;
+  instance_bank_params.default_time_interval = default_time_interval;
+  instance_bank_params.confidence_decay = confidence_decay;
 }
 
 }  // namespace processor

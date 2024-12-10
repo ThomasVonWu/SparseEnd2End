@@ -166,18 +166,18 @@ __global__ void imgAugKernel(const std::uint8_t* input,
       __float2half(b_value);
 }
 
-Status imgPreprocessLauncher(const std::uint8_t* raw_imgs_ptr,
-                             const std::uint32_t num_cams,
-                             const std::uint32_t raw_img_c,
-                             const std::uint32_t raw_img_h,
-                             const std::uint32_t raw_img_w,
-                             const std::uint32_t target_img_h,
-                             const std::uint32_t target_img_w,
-                             const std::uint32_t crop_h,
-                             const std::uint32_t crop_w,
-                             const float resize_ratio,
-                             const cudaStream_t& stream,
-                             float* output_images_cuda_ptr)
+common::Status imgPreprocessLauncher(const std::uint8_t* raw_imgs_ptr,
+                                     const std::uint32_t num_cams,
+                                     const std::uint32_t raw_img_c,
+                                     const std::uint32_t raw_img_h,
+                                     const std::uint32_t raw_img_w,
+                                     const std::uint32_t target_img_h,
+                                     const std::uint32_t target_img_w,
+                                     const std::uint32_t crop_h,
+                                     const std::uint32_t crop_w,
+                                     const float resize_ratio,
+                                     const cudaStream_t& stream,
+                                     float* output_images_cuda_ptr)
 
 {
   const std::uint32_t thread_num = 32U;
@@ -189,24 +189,24 @@ Status imgPreprocessLauncher(const std::uint8_t* raw_imgs_ptr,
       output_images_cuda_ptr);
 
   if (cudaError::cudaSuccess == cudaGetLastError()) {
-    return Status::kSuccess;
+    return common::Status::kSuccess;
   } else {
-    return Status::kImgPreprocessLaunchErr;
+    return common::Status::kImgPreprocessLaunchErr;
   }
 }
 
-Status ImgPreprocessLauncher(const std::uint8_t* raw_imgs_ptr,
-                             const std::uint32_t num_cams,
-                             const std::uint32_t raw_img_c,
-                             const std::uint32_t raw_img_h,
-                             const std::uint32_t raw_img_w,
-                             const std::uint32_t target_img_h,
-                             const std::uint32_t target_img_w,
-                             const std::uint32_t crop_h,
-                             const std::uint32_t crop_w,
-                             const float resize_ratio,
-                             const cudaStream_t& stream,
-                             half* output_images_cuda_ptr)
+common::Status ImgPreprocessLauncher(const std::uint8_t* raw_imgs_ptr,
+                                     const std::uint32_t num_cams,
+                                     const std::uint32_t raw_img_c,
+                                     const std::uint32_t raw_img_h,
+                                     const std::uint32_t raw_img_w,
+                                     const std::uint32_t target_img_h,
+                                     const std::uint32_t target_img_w,
+                                     const std::uint32_t crop_h,
+                                     const std::uint32_t crop_w,
+                                     const float resize_ratio,
+                                     const cudaStream_t& stream,
+                                     half* output_images_cuda_ptr)
 
 {
   const std::uint32_t thread_num = 32U;
@@ -218,9 +218,9 @@ Status ImgPreprocessLauncher(const std::uint8_t* raw_imgs_ptr,
       output_images_cuda_ptr);
 
   if (cudaError::cudaSuccess == cudaGetLastError()) {
-    return Status::kSuccess;
+    return common::Status::kSuccess;
   } else {
-    return Status::kImgPreprocessLaunchErr;
+    return common::Status::kImgPreprocessLaunchErr;
   }
 }
 

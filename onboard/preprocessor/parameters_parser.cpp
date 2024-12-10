@@ -34,12 +34,10 @@ common::E2EParams parseParams(const std::string& params_dir, const std::string& 
   };
 
   /// @brief STEP1: Parse kmeans anchor from offline bin file.
-  std::vector<float>(success_status, kmeans_anchors) =
-      common::read_wrapper<float>(params_dir + "/kmeans_anchors_900x11_float32.bin");
+  std::vector<float> kmeans_anchors = common::read_wrapper<float>(params_dir + "/kmeans_anchors_900x11_float32.bin");
 
   /// @brief STEP2: Parse calibration parameters:
-  std::vector<float>(success_status, lidar2img) =
-      common::read_wrapper(params_dir + "onboard/assets/lidar2img_5*6*4*4_float32.bin");
+  std::vector<float> lidar2img = common::read_wrapper(params_dir + "onboard/assets/lidar2img_5*6*4*4_float32.bin");
 
   /// @brief STEP3: Parse model config file from YAML file.
   YAML::Node config_file_node = common::loadYamlFile(params_dir + "/model_cfg.yaml");
@@ -65,6 +63,21 @@ common::E2EParams parseParams(const std::string& params_dir, const std::string& 
   std::vector<std::uint32_t> model_input_img_shape_chw =
       model_input_img_shape_chw_node.as<std::vector<std::uint32_t>>();
   model_input_img_shape_chw_tmp.assign(model_input_img_shape_chw.begin(), model_input_img_shape_chw.end());
+
+  /// Calculate image preprocess's parameters: crop_height/crop_width/resize_ratio.
+  float resize_ratio =
+      std::max(static_cast<float>(model_input_img_shape_chw[1]) / static_cast<float>(raw_img_shape_chw[1]),
+               static_cast<float>(model_input_img_shape_chw[2]) / static_cast<float>(raw_img_shape_chw[2]));
+  std::uint32_t resize_dimH =
+      static_cast<std::uint32_t>(std::floor(resize_ratio * static_cast<float>(raw_img_shape_chw[1])));
+  std::uint32_t resize_dimW =
+      static_cast<std::uint32_t>(std::floor(resize_ratio * static_cast<float>(raw_img_shape_chw[2])));
+  std::uint32_t crop_height = resize_dimH - static_cast<std::uint32_t>(model_input_img_shape_chw[1]);
+  std::uint32_t crop_width = static_cast<std::uint32_t>(
+      std::max(0.0F, static_cast<float>(resize_dimW) - static_cast<float>(model_input_img_shape_chw[2])) / 2.0F);
+  float resize_ratio =
+      std::max(static_cast<float>(model_input_img_shape_chw[1]) / static_cast<float>(raw_img_shape_chw[1]),
+               static_cast<float>(model_input_img_shape_chw[2]) / static_cast<float>(raw_img_shape_chw[2]));
 
   /// @brief STEP3-3: Parse Node: `ModelExtractFeatTrtEngine` in YAML.
   YAML::Node model_extract_feat_trt_engine_node = common::getYamlSubNode(sparse_e2e_node, "ModelExtractFeatTrtEngine");
@@ -199,6 +212,15 @@ common::E2EParams parseParams(const std::string& params_dir, const std::string& 
   instance_bank_params.max_time_interval = max_time_interval;
   instance_bank_params.default_time_interval = default_time_interval;
   instance_bank_params.confidence_decay = confidence_decay;
+
+  /// STEP Parse Node: `PostProcess` in YAML.
+  YAML::Node post_process_node = common::getYamlSubNode(sparse_e2e_node, "PostProcess");
+
+  YAML::Node post_process_out_nums_node = common::getYamlSubNode(post_process_node, "PostProcessOutNums");
+  std::uint32_t post_process_out_nums = post_process_out_nums_node.as<std::uint32_t>();
+
+  YAML::Node post_process_threshold_node = common::getYamlSubNode(instance_bank_params_node, "PostProcessThreshold");
+  float post_process_threshold = post_process_threshold_node.as<float>();
 }
 
 }  // namespace processor

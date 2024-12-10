@@ -30,3 +30,6 @@ SparseE2E:
     - MaxTimeInterval: 2.0
     - DefaultTimeInterval: 0.5
     - ConfidenceDecay: 0.6
+  PostProcess:
+    - PostProcessOutNums: 300
+    - PostProcessThreshold: 0.2

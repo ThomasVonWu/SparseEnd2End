@@ -2,7 +2,7 @@
 #include "img_preprocess.h"
 
 namespace SparseEnd2End {
-namespace image {
+namespace preprocessor {
 
 Preprocess::Preprocess(const Params& params) : params_(params) {}
 
@@ -54,5 +54,5 @@ common::Status ImagePreprocessor::forward(const CudaWrapper<std::uint8_t>& raw_i
   return Ret_Code;
 }
 
-}  // namespace image
+}  // namespace preprocessor
 }  // namespace SparseEnd2End

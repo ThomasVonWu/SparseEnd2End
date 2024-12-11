@@ -1,4 +1,8 @@
+# Copyright (c) 2024 SparseEnd2End. All rights reserved @author: Thomas Von Wu.
 SparseE2E:
+  OfflineOnboardBinFilePath:
+    - KmeansAnchorsPath: "onboard/assets/bin_file/kmeans_anchors_900x11_float32.bin"
+    - Lidar2ImagePath: "onboard/assets/bin_file/lidar2img_5*6*4*4_float32.bin"
   TaskCameraFrameID:
     - CAM_FRONT
     - CAM_FRONT_RIGHT
@@ -9,6 +13,7 @@ SparseE2E:
   ImgPreprocessor:
     - RawImgShape_CHW: [3, 1080, 1920]
     - ModelInputImgShape_CHW: [3, 256, 704]
+  EmbedFeatDims: 256
   ModelExtractFeatTrtEngine:
     - EnginePath: "onboard/assets/trt_engine/sparse4dbackbone.engine"
     - EngineInputNames: ["img"]

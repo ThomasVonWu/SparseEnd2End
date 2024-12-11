@@ -6,13 +6,13 @@
 #include "../common/parameter.h"
 
 namespace sparse_end2end {
-namespace processor {
+namespace preprocessor {
 
-/// @brief parse parameters from local YAML config.
-/// @param model_root_dir: root directory of TensorRT files.
-common::E2EParams parseParams(const std::string& model_root_dir, const std::string& vehicle_name);
+/// @brief Parse parameters from local YAML config.
+/// @param model_cfg_path: Offline onboard assets: model config path.
+common::E2EParams parseParams(const std::string& model_cfg_path);
 
-}  // namespace processor
+}  // namespace preprocessor
 }  // namespace sparse_end2end
 
 #endif  // ONBOARD_PREPROCESSOR_PARAMETERS_PARSER_H

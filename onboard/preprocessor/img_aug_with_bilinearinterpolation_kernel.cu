@@ -2,7 +2,7 @@
 #include "common.h"
 #include "img_aug_with_bilinearinterpolation_kernel.h"
 namespace sparse_end2end {
-namespace image {
+namespace preprocessor {
 
 #define R_MEAN 0.485F
 #define G_MEAN 0.456F
@@ -224,5 +224,5 @@ common::Status ImgPreprocessLauncher(const std::uint8_t* raw_imgs_ptr,
   }
 }
 
-}  // namespace image
+}  // namespace preprocessor
 }  // namespace sparse_end2end

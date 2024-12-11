@@ -8,7 +8,7 @@
 
 #include "common.h"
 namespace sparse_end2end {
-namespace image {
+namespace preprocessor {
 
 /// @brief RGB format image prepocess CUDA launcher: resize(bilinear
 /// interpolation) -> crop -> normalization.
@@ -42,7 +42,7 @@ common::Status imgPreprocessLauncher(const std::uint8_t* raw_imgs_ptr,
                                      const cudaStream_t& stream,
                                      half* output_img_ptr);
 
-}  // namespace image
+}  // namespace preprocessor
 }  // namespace sparse_end2end
 
 #endif  // ONBOARD_PREPROCESSOR_IMG_AUG_WITH_BILINEARINTERPOLATION_KERNEL_H

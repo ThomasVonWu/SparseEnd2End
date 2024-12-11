@@ -8,7 +8,7 @@
 #include "../common/common.h"
 
 namespace sparse_end2end {
-namespace image {
+namespace preprocessor {
 
 class Preprocess {
  public:
@@ -28,7 +28,7 @@ class Preprocess {
   const Params params_;
 };
 
-}  // namespace image
+}  // namespace preprocessor
 }  // namespace sparse_end2end
 
 #endif  // ONBOARD_PREPROCESSOR_PREPROCESS_H

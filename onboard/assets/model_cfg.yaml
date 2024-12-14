@@ -14,17 +14,17 @@ SparseE2E:
     - RawImgShape_CHW: [3, 1080, 1920]
     - ModelInputImgShape_CHW: [3, 256, 704]
   EmbedFeatDims: 256
-  ModelExtractFeatTrtEngine:
+  Sparse4dExtractFeatTrtEngine:
     - EnginePath: "onboard/assets/trt_engine/sparse4dbackbone.engine"
     - EngineInputNames: ["img"]
     - EngineOutputNames: ["feature"]
-    - ModelExtractFeatShape_LC: [89760, 256]
-    - ModelExtractFeatSpatialShapes_LD: [64, 176, 32, 88, 16, 44, 8, 22]
-  ModelHeadFirstFrameEngine:
+    - Sparse4dExtractFeatShape_LC: [89760, 256]
+    - Sparse4dExtractFeatSpatialShapes_LD: [64, 176, 32, 88, 16, 44, 8, 22]
+  Sparse4dHeadFirstFrameEngine:
     - EnginePath: "onboard/assets/trt_engine/sparse4dhead1st.engine"
     - EngineInputNames: ["feature", "spatial_shapes", "level_start_index", "instance_feature", "anchor", "time_interval", "image_wh", "lidar2img"]
     - EngineOutputNames: ["pred_instance_feature", "pred_anchor", "pred_class_score", "pred_quality_score"]
-  ModelHeadSecondFrameEngine:
+  Sparse4dHeadSecondFrameEngine:
     - EnginePath: "onboard/assets/trt_engine/sparse4dhead2nd.engine"
     - EngineInputNames: ["feature", "spatial_shapes", "level_start_index", "instance_feature", "anchor", "time_interval", "temp_instance_feature", "temp_anchor", "mask", "track_id", "image_wh", "lidar2img"]
     - EngineOutputNames: ["tmp_outs0", "pred_track_id", "tmp_outs1", "tmp_outs2", "tmp_outs3", "tmp_outs4", "tmp_outs5", "pred_instance_feature", "pred_anchor", "pred_class_score", "pred_quality_score"]

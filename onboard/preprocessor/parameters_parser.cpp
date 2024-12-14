@@ -72,9 +72,6 @@ common::E2EParams parseParams(const std::string& model_cfg_path) {
 
   /// @attention Calculate image preprocess's parameters: `crop_height/crop_width/resize_ratio` based on the given
   /// configuration parameters in YAML.
-  float resize_ratio =
-      std::max(static_cast<float>(model_input_img_shape_chw[1]) / static_cast<float>(raw_img_shape_chw[1]),
-               static_cast<float>(model_input_img_shape_chw[2]) / static_cast<float>(raw_img_shape_chw[2]));
   std::uint32_t resize_dimH =
       static_cast<std::uint32_t>(std::floor(resize_ratio * static_cast<float>(raw_img_shape_chw[1])));
   std::uint32_t resize_dimW =
@@ -90,102 +87,104 @@ common::E2EParams parseParams(const std::string& model_cfg_path) {
   YAML::Node embedfeat_dims_node = common::getYamlSubNode(sparse_e2e_node, "EmbedFeatDims");
   std::uint32_t embedfeat_dims = embedfeat_dims_node.as<std::uint32_t>();
 
-  /// @brief STEP-7: Parse Node: `ModelExtractFeatTrtEngine` in YAML.
-  YAML::Node model_extract_feat_trt_engine_node = common::getYamlSubNode(sparse_e2e_node, "ModelExtractFeatTrtEngine");
+  /// @brief STEP-7: Parse Node: `Sparse4dExtractFeatTrtEngine` in YAML.
+  YAML::Node sparse4d_extract_feat_trt_engine_node =
+      common::getYamlSubNode(sparse_e2e_node, "Sparse4dExtractFeatTrtEngine");
 
-  /// STEP-7.1: Parse Node: `ModelExtractFeatTrtEngine/EnginePath` in YAML.
-  YAML::Node sparse4d_backbone_engine_path_node =
-      common::getYamlSubNode(model_extract_feat_trt_engine_node, "EnginePath");
-  std::string sparse4d_backbone_engine_path = sparse4d_backbone_engine_path_node.as<std::string>();
+  /// STEP-7.1: Parse Node: `Sparse4dExtractFeatTrtEngine/EnginePath` in YAML.
+  YAML::Node sparse4d_extract_feat_trt_engine_path_node =
+      common::getYamlSubNode(sparse4d_extract_feat_trt_engine_node, "EnginePath");
+  std::string sparse4d_extract_feat_trt_engine_path = sparse4d_extract_feat_trt_engine_path_node.as<std::string>();
 
-  /// STEP-7.2 : Parse Node: `ModelExtractFeatTrtEngine/EngineInputNames` in YAML.
-  YAML::Node sparse4d_backbone_engine_input_names_node =
-      common::getYamlSubNode(model_extract_feat_trt_engine_node, "EngineInputNames");
-  std::vector<std::string> sparse4d_backbone_engine_input_names =
-      sparse4d_backbone_engine_input_names_node.as<std::vector<std::string>>();
+  /// STEP-7.2 : Parse Node: `Sparse4dExtractFeatTrtEngine/EngineInputNames` in YAML.
+  YAML::Node sparse4d_extract_feat_trt_engine_input_names_node =
+      common::getYamlSubNode(sparse4d_extract_feat_trt_engine_node, "EngineInputNames");
+  std::vector<std::string> sparse4d_extract_feat_trt_engine_input_names =
+      sparse4d_extract_feat_trt_engine_input_names_node.as<std::vector<std::string>>();
 
-  /// STEP-7.3 : Parse Node: `ModelExtractFeatTrtEngine/EngineOutputNames` in YAML.
-  YAML::Node sparse4d_backbone_engine_output_names_node =
-      common::getYamlSubNode(model_extract_feat_trt_engine_node, "EngineOutputNames");
-  std::vector<std::string> sparse4d_backbone_engine_output_names =
-      sparse4d_backbone_engine_output_names_node.as<std::vector<std::string>>();
+  /// STEP-7.3 : Parse Node: `Sparse4dExtractFeatTrtEngine/EngineOutputNames` in YAML.
+  YAML::Node sparse4d_extract_feat_trt_engine_output_names_node =
+      common::getYamlSubNode(sparse4d_extract_feat_trt_engine_node, "EngineOutputNames");
+  std::vector<std::string> sparse4d_extract_feat_trt_engine_output_names =
+      sparse4d_extract_feat_trt_engine_output_names_node.as<std::vector<std::string>>();
 
-  /// STEP-7.4: Parse Node: `ModelExtractFeatTrtEngine/ModelExtractFeatShape_LC` in YAML.
-  YAML::Node model_extract_feat_shape_lc_node =
-      common::getYamlSubNode(img_preprocessor_node, "ModelExtractFeatShape_LC");
-  std::vector<std::uint32_t> model_extract_feat_shape_lc =
-      model_extract_feat_shape_lc_node.as<std::vector<std::uint32_t>>();
+  /// STEP-7.4: Parse Node: `Sparse4dExtractFeatTrtEngine/Sparse4dExtractFeatShape_LC` in YAML.
+  YAML::Node sparse4d_extract_feat_shape_lc_node =
+      common::getYamlSubNode(img_preprocessor_node, "Sparse4dExtractFeatShape_LC");
+  std::vector<std::uint32_t> sparse4d_extract_feat_shape_lc =
+      sparse4d_extract_feat_shape_lc_node.as<std::vector<std::uint32_t>>();
 
-  /// STEP-7.5 Parse Node: `ModelExtractFeatTrtEngine/ModelExtractFeatSpatialShapes_LD` in YAML.
-  YAML::Node model_extract_feat_spatial_shapes_ld_node =
-      common::getYamlSubNode(img_preprocessor_node, "ModelExtractFeatSpatialShapes_LD");
-  std::vector<std::int32_t> model_extract_feat_spatial_shapes_ld =
-      model_extract_feat_spatial_shapes_ld_node.as<std::vector<std::inst32_t>>();
+  /// STEP-7.5 Parse Node: `Sparse4dExtractFeatTrtEngine/Sparse4dExtractFeatSpatialShapes_LD` in YAML.
+  YAML::Node sparse4d_extract_feat_spatial_shapes_ld_node =
+      common::getYamlSubNode(img_preprocessor_node, "Sparse4dExtractFeatSpatialShapes_LD");
+  std::vector<std::int32_t> sparse4d_extract_feat_spatial_shapes_ld =
+      sparse4d_extract_feat_spatial_shapes_ld_node.as<std::vector<std::inst32_t>>();
 
-  /// Get model_extract_feat_level_start_index based on model_extract_feat_spatial_shapes_ld.
-  std::vector<std::int32_t> model_extract_feat_spatial_shapes_nld{};
+  /// Get sparse4d_extract_feat_level_start_index based on sparse4d_extract_feat_spatial_shapes_ld.
+  std::vector<std::int32_t> sparse4d_extract_feat_spatial_shapes_nld{};
   for (size_t i = 0; i < num_cams; ++i) {
-    model_extract_feat_spatial_shapes_nld.insert(
-        model_extract_feat_spatial_shapes_nld.end(),
-        {model_extract_feat_spatial_shapes_ld[0], model_extract_feat_spatial_shapes_ld[1],
-         model_extract_feat_spatial_shapes_ld[2], model_extract_feat_spatial_shapes_ld[3],
-         model_extract_feat_spatial_shapes_ld[4], model_extract_feat_spatial_shapes_ld[5],
-         model_extract_feat_spatial_shapes_ld[6], model_extract_feat_spatial_shapes_ld[7]});
+    sparse4d_extract_feat_spatial_shapes_nld.insert(
+        sparse4d_extract_feat_spatial_shapes_nld.end(),
+        {sparse4d_extract_feat_spatial_shapes_ld[0], sparse4d_extract_feat_spatial_shapes_ld[1],
+         sparse4d_extract_feat_spatial_shapes_ld[2], sparse4d_extract_feat_spatial_shapes_ld[3],
+         sparse4d_extract_feat_spatial_shapes_ld[4], sparse4d_extract_feat_spatial_shapes_ld[5],
+         sparse4d_extract_feat_spatial_shapes_ld[6], sparse4d_extract_feat_spatial_shapes_ld[7]});
   }
 
-  std::vector<std::int32_t> model_extract_feat_level_start_index_tmp{};
+  std::vector<std::int32_t> sparse4d_extract_feat_level_start_index_tmp{};
   for (size_t i = 0; i < num_cams; ++i) {
-    model_extract_feat_level_start_index_tmp.insert(
-        model_extract_feat_level_start_index_tmp.end(),
-        {model_extract_feat_spatial_shapes_nld[0] * model_extract_feat_spatial_shapes_nld[1],
-         model_extract_feat_spatial_shapes_nld[2] * model_extract_feat_spatial_shapes_nld[3],
-         model_extract_feat_spatial_shapes_nld[4] * model_extract_feat_spatial_shapes_nld[5],
-         model_extract_feat_spatial_shapes_nld[6] * model_extract_feat_spatial_shapes_nld[7]});
+    sparse4d_extract_feat_level_start_index_tmp.insert(
+        sparse4d_extract_feat_level_start_index_tmp.end(),
+        {sparse4d_extract_feat_spatial_shapes_nld[0] * sparse4d_extract_feat_spatial_shapes_nld[1],
+         sparse4d_extract_feat_spatial_shapes_nld[2] * sparse4d_extract_feat_spatial_shapes_nld[3],
+         sparse4d_extract_feat_spatial_shapes_nld[4] * sparse4d_extract_feat_spatial_shapes_nld[5],
+         sparse4d_extract_feat_spatial_shapes_nld[6] * sparse4d_extract_feat_spatial_shapes_nld[7]});
   }
-  std::vector<std::int32_t> model_extract_feat_level_start_index(model_extract_feat_level_start_index_tmp.size());
-  std::partial_sum(model_extract_feat_level_start_index_tmp.begin(), model_extract_feat_level_start_index_tmp.end(),
-                   model_extract_feat_level_start_index.begin());
-  model_extract_feat_level_start_index.pop_back();
-  model_extract_feat_level_start_index.insert(model_extract_feat_level_start_index.begin(), 0);
+  std::vector<std::int32_t> sparse4d_extract_feat_level_start_index(sparse4d_extract_feat_level_start_index_tmp.size());
+  std::partial_sum(sparse4d_extract_feat_level_start_index_tmp.begin(),
+                   sparse4d_extract_feat_level_start_index_tmp.end(), sparse4d_extract_feat_level_start_index.begin());
+  sparse4d_extract_feat_level_start_index.pop_back();
+  sparse4d_extract_feat_level_start_index.insert(sparse4d_extract_feat_level_start_index.begin(), 0);
 
-  /// @brief STEP-8 Parse Node: `ModelHeadFirstFrameEngine` in YAML.
-  YAML::Node model_head_first_frame_engine_node = common::getYamlSubNode(sparse_e2e_node, "ModelHeadFirstFrameEngine");
+  /// @brief STEP-8 Parse Node: `Sparse4dHeadFirstFrameEngine` in YAML.
+  YAML::Node sparse4d_head_first_frame_engine_node =
+      common::getYamlSubNode(sparse_e2e_node, "Sparse4dHeadFirstFrameEngine");
 
-  /// STEP-8.1 Parse Node:`ModelHeadFirstFrameEngine/EnginePath` in YAML.
+  /// STEP-8.1 Parse Node:`Sparse4dHeadFirstFrameEngine/EnginePath` in YAML.
   YAML::Node sparse4d_head1st_engine_path_node =
-      common::getYamlSubNode(model_head_first_frame_engine_node, "EnginePath");
+      common::getYamlSubNode(sparse4d_head_first_frame_engine_node, "EnginePath");
   std::string sparse4d_head1st_engine_path = sparse4d_head1st_engine_path_node.as<std::string>();
 
-  /// STEP-8.2 : Parse Node: `ModelHeadFirstFrameEngine/EngineInputNames` in YAML.
+  /// STEP-8.2 : Parse Node: `Sparse4dHeadFirstFrameEngine/EngineInputNames` in YAML.
   YAML::Node sparse4d_head1st_engine_input_names_node =
-      common::getYamlSubNode(model_head_first_frame_engine_node, "EngineInputNames");
+      common::getYamlSubNode(sparse4d_head_first_frame_engine_node, "EngineInputNames");
   std::vector<std::string> sparse4d_head1st_engine_input_names =
       sparse4d_head1st_engine_input_names_node.as<std::vector<std::string>>();
 
-  /// STEP-8.3 : Parse Node: `ModelHeadFirstFrameEngine/EngineOutputNames` in YAML.
+  /// STEP-8.3 : Parse Node: `Sparse4dHeadFirstFrameEngine/EngineOutputNames` in YAML.
   YAML::Node sparse4d_head1st_engine_output_names_node =
-      common::getYamlSubNode(model_head_first_frame_engine_node, "EngineOutputNames");
+      common::getYamlSubNode(sparse4d_head_first_frame_engine_node, "EngineOutputNames");
   std::vector<std::string> sparse4d_head1st_engine_output_names =
       sparse4d_head1st_engine_output_names_node.as<std::vector<std::string>>();
 
-  /// @brief STEP-9 Parse Node: `ModelHeadSecondFrameEngine` in YAML.
-  YAML::Node model_head_second_frame_engine_node =
-      common::getYamlSubNode(sparse_e2e_node, "ModelHeadSecondFrameEngine");
+  /// @brief STEP-9 Parse Node: `Sparse4dSecondFrameEngine` in YAML.
+  YAML::Node sparse4d_head_second_frame_engine_node =
+      common::getYamlSubNode(sparse_e2e_node, "Sparse4dSecondFrameEngine");
 
-  /// STEP-9.1 Parse Node:`ModelHeadSecondFrameEngine/EnginePath` in YAML.
+  /// STEP-9.1 Parse Node:`Sparse4dSecondFrameEngine/EnginePath` in YAML.
   YAML::Node sparse4d_head2nd_engine_path_node =
-      common::getYamlSubNode(model_head_second_frame_engine_node, "EnginePath");
+      common::getYamlSubNode(sparse4d_head_second_frame_engine_node, "EnginePath");
   std::string sparse4d_head2nd_engine_path = sparse4d_head2nd_engine_path_node.as<std::string>();
 
-  /// STEP-9.2 : Parse Node: `ModelHeadSecondFrameEngine/EngineInputNames` in YAML.
+  /// STEP-9.2 : Parse Node: `Sparse4dSecondFrameEngine/EngineInputNames` in YAML.
   YAML::Node sparse4d_head2nd_engine_input_names_node =
-      common::getYamlSubNode(model_head_second_frame_engine_node, "EngineInputNames");
+      common::getYamlSubNode(sparse4d_head_second_frame_engine_node, "EngineInputNames");
   std::vector<std::string> sparse4d_head2nd_engine_input_names =
       sparse4d_head2nd_engine_input_names_node.as<std::vector<std::string>>();
 
-  /// STEP-9.3 : Parse Node: `ModelHeadSecondFrameEngine/EngineOutputNames` in YAML.
+  /// STEP-9.3 : Parse Node: `Sparse4dSecondFrameEngine/EngineOutputNames` in YAML.
   YAML::Node sparse4d_head2nd_engine_output_names_node =
-      common::getYamlSubNode(model_head_second_frame_engine_node, "EngineOutputNames");
+      common::getYamlSubNode(sparse4d_head_second_frame_engine_node, "EngineOutputNames");
   std::vector<std::string> sparse4d_head2nd_engine_output_names =
       sparse4d_head2nd_engine_output_names_node.as<std::vector<std::string>>();
 
@@ -229,10 +228,16 @@ common::E2EParams parseParams(const std::string& model_cfg_path) {
   preprocessor_params.model_input_img_h = model_input_img_shape_chw_tmp[1];
   preprocessor_params.model_input_img_w = model_input_img_shape_chw_tmp[2];
 
-  common::E2ETrtEngine& sparse4d_backbone_engine;
-  sparse4d_backbone_engine.engine_path = sparse4d_backbone_engine_path;
-  sparse4d_backbone_engine.input_names = sparse4d_backbone_engine_input_names;
-  sparse4d_backbone_engine.output_names = sparse4d_backbone_engine_output_names;
+  common::ModelCfg model_cfg;
+  model_cfg.embedfeat_dims = embedfeat_dims;
+  model_cfg.sparse4d_extract_feat_shape_lc = sparse4d_extract_feat_shape_lc;
+  model_cfg.sparse4d_extract_feat_spatial_shapes_ld = sparse4d_extract_feat_spatial_shapes_ld;
+  model_cfg.sparse4d_extract_feat_level_start_index = sparse4d_extract_feat_level_start_index;
+
+  common::E2ETrtEngine& sparse4d_extract_feat_trt_engine;
+  sparse4d_extract_feat_trt_engine.engine_path = sparse4d_extract_feat_trt_engine_path;
+  sparse4d_extract_feat_trt_engine.input_names = sparse4d_extract_feat_trt_engine_input_names;
+  sparse4d_extract_feat_trt_engine.output_names = sparse4d_extract_feat_trt_engine_output_names;
 
   common::E2ETrtEngine& sparse4d_head1st_engine;
   sparse4d_head1st_engine.engine_path = sparse4d_head1st_engine_path;
@@ -257,8 +262,9 @@ common::E2EParams parseParams(const std::string& model_cfg_path) {
   postprocessor_params.post_process_out_nums = post_process_out_nums;
   post_process_out_nums.post_process_threshold = post_process_threshold;
 
-  const common::E2EParams params(preprocessor_params, sparse4d_backbone_engine, sparse4d_head1st_engine,
-                                 sparse4d_head2nd_engine, instance_bank_params, postprocessor_params);
+  const common::E2EParams params(preprocessor_params, model_cfg, sparse4d_extract_feat_trt_engine,
+                                 sparse4d_head1st_engine, sparse4d_head2nd_engine, instance_bank_params,
+                                 postprocessor_params);
 
   return params;
 }  // namespace preprocessor

@@ -1,5 +1,18 @@
+## 📫 Quick Start  SparseEnd2End LocalWorkStation | GPU Cluster
 
-# 📫 Quick Start LocalWorkStation | GPU Cluster
+### Git clone Repository
+```bash
+git clone --recursive https://github.com/ThomasVonWu/SparseEnd2End.git
+cd SparseEnd2End
+```
+f you forget to add `--recursive` in the Git command line or want to update submodules in SparseEnd2End, run the following command:
+```bash
+git clone https://github.com/ThomasVonWu/SparseEnd2End.git
+cd SparseEnd2End
+git submodule init
+git submodule update --recursive --remote
+```
+
 ### Set up a new virtual environment
 ```bash
 virtualenv sparsee2e --python=python3.8

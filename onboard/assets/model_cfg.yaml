@@ -1,8 +1,9 @@
 # Copyright (c) 2024 SparseEnd2End. All rights reserved @author: Thomas Von Wu.
+# Using vscode pluging : YAML:AML Language Support by Red Hat, with built-in Kubernetes syntax.
+OfflineOnboardBinFilePath:
+  - KmeansAnchorsPath: "/path/to/onboard/assets/bin_file/kmeans_anchors_900x11_float32.bin"
+  - Lidar2ImagePath: "/path/to/onboard/assets/bin_file/lidar2img_5*6*4*4_float32.bin"
 SparseE2E:
-  OfflineOnboardBinFilePath:
-    - KmeansAnchorsPath: "onboard/assets/bin_file/kmeans_anchors_900x11_float32.bin"
-    - Lidar2ImagePath: "onboard/assets/bin_file/lidar2img_5*6*4*4_float32.bin"
   TaskCameraFrameID:
     - CAM_FRONT
     - CAM_FRONT_RIGHT
@@ -22,12 +23,55 @@ SparseE2E:
     - Sparse4dExtractFeatSpatialShapes_LD: [64, 176, 32, 88, 16, 44, 8, 22]
   Sparse4dHeadFirstFrameEngine:
     - EnginePath: "onboard/assets/trt_engine/sparse4dhead1st.engine"
-    - EngineInputNames: ["feature", "spatial_shapes", "level_start_index", "instance_feature", "anchor", "time_interval", "image_wh", "lidar2img"]
-    - EngineOutputNames: ["pred_instance_feature", "pred_anchor", "pred_class_score", "pred_quality_score"]
+    - EngineInputNames:
+        [
+          "feature",
+          "spatial_shapes",
+          "level_start_index",
+          "instance_feature",
+          "anchor",
+          "time_interval",
+          "image_wh",
+          "lidar2img",
+        ]
+    - EngineOutputNames:
+        [
+          "pred_instance_feature",
+          "pred_anchor",
+          "pred_class_score",
+          "pred_quality_score",
+        ]
   Sparse4dHeadSecondFrameEngine:
     - EnginePath: "onboard/assets/trt_engine/sparse4dhead2nd.engine"
-    - EngineInputNames: ["feature", "spatial_shapes", "level_start_index", "instance_feature", "anchor", "time_interval", "temp_instance_feature", "temp_anchor", "mask", "track_id", "image_wh", "lidar2img"]
-    - EngineOutputNames: ["tmp_outs0", "pred_track_id", "tmp_outs1", "tmp_outs2", "tmp_outs3", "tmp_outs4", "tmp_outs5", "pred_instance_feature", "pred_anchor", "pred_class_score", "pred_quality_score"]
+    - EngineInputNames:
+        [
+          "feature",
+          "spatial_shapes",
+          "level_start_index",
+          "instance_feature",
+          "anchor",
+          "time_interval",
+          "temp_instance_feature",
+          "temp_anchor",
+          "mask",
+          "track_id",
+          "image_wh",
+          "lidar2img",
+        ]
+    - EngineOutputNames:
+        [
+          "tmp_outs0",
+          "pred_track_id",
+          "tmp_outs1",
+          "tmp_outs2",
+          "tmp_outs3",
+          "tmp_outs4",
+          "tmp_outs5",
+          "pred_instance_feature",
+          "pred_anchor",
+          "pred_class_score",
+          "pred_quality_score",
+        ]
   InstanceBankParams:
     - NumQuerys: 900
     - QueryDims: 11

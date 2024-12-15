@@ -14,10 +14,10 @@ namespace sparse_end2end {
 namespace common {
 
 template <typename T>
-std::vector<T> read_wrapper(const std::string& filename) {
+std::vector<T> readfile_wrapper(const std::string& filename) {
   std::ifstream file(filename, std::ios::in);
   if (!file) {
-    std::cout << "Read file failed : " << file_path;
+    std::cout << "Read file failed : " << filename << std::endl;
     throw "[ERROR] Read file failed";
     // LOG_ERROR(kLogContext, "Read file failed: " + file_path);
     return std::vector<T>{};
@@ -35,7 +35,7 @@ std::vector<T> read_wrapper(const std::string& filename) {
 }
 
 template <typename T>
-void write_wrapper(const std::vector<T>& data, const std::string& filename) {
+void writefile_wrapper(const std::vector<T>& data, const std::string& filename) {
   std::ofstream file;
   file.open(filename, std::ios::out);
   if (!file.is_open()) {
@@ -58,9 +58,10 @@ YAML::Node loadYamlFile(const std::string& file_path) {
     return node;
   } catch (const YAML::Exception& e) {
     std::string errorMessage = e.what();
-    std::cout << "Failed to load YAML file: " << file_path << std::endl;
+    std::cout << errorMessage << "| Failed to load YAML file: " << file_path << std::endl;
     // LOG_ERROR(kLogContext, "Failed to load YAML file: " + file_path + "->" + errorMessage);
-    exit(EXIT_FAILURE);
+    throw "[ERROR] Load YAML file failed! ";  // 抛出异常，推出函数，执行后续程序
+    // exit(EXIT_FAILURE);                       // 直接推出程序
     return YAML::Node();
   }
 }
@@ -89,7 +90,7 @@ template <typename T>
 inline void readYamlNode(const YAML::Node& yaml, const std::string& key, std::vector<T>& out_vals) {
   if (!yaml[key]) {
     std::cout << "Yaml file not set : " << key << std::endl;
-    // LOG_ERROR(kLogContext, "Yaml file not set " << key << " value, Aborting!!!");
+    // LOG_ERROR(kLogContext, "Yaml file not set " << key << " Aborting!!!");
     exit(EXIT_FAILURE);
   }
   if (yaml[key].IsSequence() && yaml[key].size() == out_vals.size()) {
@@ -99,7 +100,7 @@ inline void readYamlNode(const YAML::Node& yaml, const std::string& key, std::ve
   }
 
   for (size_t i = 0, len = yaml[key].size(); i < len; ++i) {
-    out_vals[i] = value.as<T>()
+    out_vals[i] = yaml[key].as<T>();
   }
 }
 

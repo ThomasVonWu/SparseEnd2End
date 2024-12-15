@@ -4,6 +4,7 @@
 #include <yaml-cpp/yaml.h>
 
 #include <map>
+#include <numeric>
 #include <string>
 
 #include "../common/common.h"
@@ -33,26 +34,28 @@ common::E2EParams parseParams(const std::string& model_cfg_path) {
       {"CAM_BACK_RIGHT", common::CameraFrameID::CAM_BACK_RIGHT},
   };
 
-  /// @brief STEP-1: Parse model config file from YAML file.
+  /// @brief STEP-1: Load model config file from YAML file.
   YAML::Node config_file_node = common::loadYamlFile(model_cfg_path);
 
   YAML::Node offline_onboard_bin_file_path_node = common::getYamlSubNode(config_file_node, "OfflineOnboardBinFilePath");
 
   /// @brief STEP-2: Parse kmeans anchor from offline bin file.
-  YAML::Node kmeans_anchors_path_node = common::getYamlSubNode(offline_onboard_bin_file_path_node, "KmeansAnchorsPath");
+  YAML::Node kmeans_anchors_path_node =
+      common::getYamlSubNode(offline_onboard_bin_file_path_node[0], "KmeansAnchorsPath");
   std::string kmeans_anchors_path = kmeans_anchors_path_node.as<std::string>();
-  std::vector<float> kmeans_anchors = common::read_wrapper<float>(kmeans_anchors_path);
+  std::vector<float> kmeans_anchors = common::readfile_wrapper<float>(kmeans_anchors_path);
 
-  /// @brief STEP-3: Parse calibration parameters:
-  YAML::Node lidar2image_path_node = common::getYamlSubNode(offline_onboard_bin_file_path_node, "Lidar2ImagePath");
+  /// @brief STEP-3: Parse calibration:lidar2image from offline bin file:
+  YAML::Node lidar2image_path_node = common::getYamlSubNode(offline_onboard_bin_file_path_node[1], "Lidar2ImagePath");
   std::string lidar2image_path = lidar2image_path_node.as<std::string>();
-  std::vector<float> lidar2img = common::read_wrapper(lidar2image_path);
+  std::cout << lidar2image_path << std::endl;
+  std::vector<float> lidar2img = common::readfile_wrapper<float>(lidar2image_path);
 
   YAML::Node sparse_e2e_node = common::getYamlSubNode(config_file_node, "SparseE2E");
 
   /// @brief STEP-4: Parse Node TaskCameraFrameID.
   std::vector<common::CameraFrameID> task_camera_frame_id;
-  YAML::Node task_camera_frame_id_node = getYamlSubNode(sparse_e2e_node, "TaskCameraFrameID");
+  YAML::Node task_camera_frame_id_node = common::getYamlSubNode(sparse_e2e_node, "TaskCameraFrameID");
   std::vector<std::string> task_camera_frame_id_strs = task_camera_frame_id_node.as<std::vector<std::string>>();
   size_t num_cams = task_camera_frame_id_strs.size();
 
@@ -60,7 +63,7 @@ common::E2EParams parseParams(const std::string& model_cfg_path) {
   YAML::Node img_preprocessor_node = common::getYamlSubNode(sparse_e2e_node, "ImgPreprocessor");
 
   /// STEP-5.1: Parse Node: `ImgPreprocessor/RawImgShape_CHW` in YAML.
-  YAML::Node raw_img_shape_chw_node = getYamlSubNode(img_preprocessor_node, "RawImgShape_CHW");
+  YAML::Node raw_img_shape_chw_node = common::getYamlSubNode(img_preprocessor_node, "RawImgShape_CHW");
   std::vector<std::uint32_t> raw_img_shape_chw = raw_img_shape_chw_node.as<std::vector<std::uint32_t>>();
 
   /// STEP-5.2: Parse Node: `ImgPreprocessor/ModelInputImgShape_CHW` in YAML.
@@ -70,8 +73,11 @@ common::E2EParams parseParams(const std::string& model_cfg_path) {
       model_input_img_shape_chw_node.as<std::vector<std::uint32_t>>();
   model_input_img_shape_chw_tmp.assign(model_input_img_shape_chw.begin(), model_input_img_shape_chw.end());
 
-  /// @attention Calculate image preprocess's parameters: `crop_height/crop_width/resize_ratio` based on the given
+  /// @attention Calculate image preprocess's parameters: `resize_ratio/crop_height/crop_width` based on the given
   /// configuration parameters in YAML.
+  float resize_ratio =
+      std::max(static_cast<float>(model_input_img_shape_chw[1]) / static_cast<float>(raw_img_shape_chw[1]),
+               static_cast<float>(model_input_img_shape_chw[2]) / static_cast<float>(raw_img_shape_chw[2]));
   std::uint32_t resize_dimH =
       static_cast<std::uint32_t>(std::floor(resize_ratio * static_cast<float>(raw_img_shape_chw[1])));
   std::uint32_t resize_dimW =
@@ -79,9 +85,6 @@ common::E2EParams parseParams(const std::string& model_cfg_path) {
   std::uint32_t crop_height = resize_dimH - static_cast<std::uint32_t>(model_input_img_shape_chw[1]);
   std::uint32_t crop_width = static_cast<std::uint32_t>(
       std::max(0.0F, static_cast<float>(resize_dimW) - static_cast<float>(model_input_img_shape_chw[2])) / 2.0F);
-  float resize_ratio =
-      std::max(static_cast<float>(model_input_img_shape_chw[1]) / static_cast<float>(raw_img_shape_chw[1]),
-               static_cast<float>(model_input_img_shape_chw[2]) / static_cast<float>(raw_img_shape_chw[2]));
 
   /// @brief STEP-6: Parse Node: `EmbedFeatDims` in YAML.
   YAML::Node embedfeat_dims_node = common::getYamlSubNode(sparse_e2e_node, "EmbedFeatDims");
@@ -117,11 +120,11 @@ common::E2EParams parseParams(const std::string& model_cfg_path) {
   /// STEP-7.5 Parse Node: `Sparse4dExtractFeatTrtEngine/Sparse4dExtractFeatSpatialShapes_LD` in YAML.
   YAML::Node sparse4d_extract_feat_spatial_shapes_ld_node =
       common::getYamlSubNode(img_preprocessor_node, "Sparse4dExtractFeatSpatialShapes_LD");
-  std::vector<std::int32_t> sparse4d_extract_feat_spatial_shapes_ld =
-      sparse4d_extract_feat_spatial_shapes_ld_node.as<std::vector<std::inst32_t>>();
+  std::vector<std::uint32_t> sparse4d_extract_feat_spatial_shapes_ld =
+      sparse4d_extract_feat_spatial_shapes_ld_node.as<std::vector<std::uint32_t>>();
 
   /// Get sparse4d_extract_feat_level_start_index based on sparse4d_extract_feat_spatial_shapes_ld.
-  std::vector<std::int32_t> sparse4d_extract_feat_spatial_shapes_nld{};
+  std::vector<std::uint32_t> sparse4d_extract_feat_spatial_shapes_nld{};
   for (size_t i = 0; i < num_cams; ++i) {
     sparse4d_extract_feat_spatial_shapes_nld.insert(
         sparse4d_extract_feat_spatial_shapes_nld.end(),
@@ -131,7 +134,7 @@ common::E2EParams parseParams(const std::string& model_cfg_path) {
          sparse4d_extract_feat_spatial_shapes_ld[6], sparse4d_extract_feat_spatial_shapes_ld[7]});
   }
 
-  std::vector<std::int32_t> sparse4d_extract_feat_level_start_index_tmp{};
+  std::vector<std::uint32_t> sparse4d_extract_feat_level_start_index_tmp{};
   for (size_t i = 0; i < num_cams; ++i) {
     sparse4d_extract_feat_level_start_index_tmp.insert(
         sparse4d_extract_feat_level_start_index_tmp.end(),
@@ -140,7 +143,8 @@ common::E2EParams parseParams(const std::string& model_cfg_path) {
          sparse4d_extract_feat_spatial_shapes_nld[4] * sparse4d_extract_feat_spatial_shapes_nld[5],
          sparse4d_extract_feat_spatial_shapes_nld[6] * sparse4d_extract_feat_spatial_shapes_nld[7]});
   }
-  std::vector<std::int32_t> sparse4d_extract_feat_level_start_index(sparse4d_extract_feat_level_start_index_tmp.size());
+  std::vector<std::uint32_t> sparse4d_extract_feat_level_start_index(
+      sparse4d_extract_feat_level_start_index_tmp.size());
   std::partial_sum(sparse4d_extract_feat_level_start_index_tmp.begin(),
                    sparse4d_extract_feat_level_start_index_tmp.end(), sparse4d_extract_feat_level_start_index.begin());
   sparse4d_extract_feat_level_start_index.pop_back();
@@ -227,24 +231,27 @@ common::E2EParams parseParams(const std::string& model_cfg_path) {
   preprocessor_params.model_input_img_c = model_input_img_shape_chw_tmp[0];
   preprocessor_params.model_input_img_h = model_input_img_shape_chw_tmp[1];
   preprocessor_params.model_input_img_w = model_input_img_shape_chw_tmp[2];
+  preprocessor_params.resize_ratio = resize_ratio;
+  preprocessor_params.crop_height = crop_height;
+  preprocessor_params.crop_width = crop_width;
 
-  common::ModelCfg model_cfg;
-  model_cfg.embedfeat_dims = embedfeat_dims;
-  model_cfg.sparse4d_extract_feat_shape_lc = sparse4d_extract_feat_shape_lc;
-  model_cfg.sparse4d_extract_feat_spatial_shapes_ld = sparse4d_extract_feat_spatial_shapes_ld;
-  model_cfg.sparse4d_extract_feat_level_start_index = sparse4d_extract_feat_level_start_index;
+  common::ModelCfgParams model_cfg_params;
+  model_cfg_params.embedfeat_dims = embedfeat_dims;
+  model_cfg_params.sparse4d_extract_feat_shape_lc = sparse4d_extract_feat_shape_lc;
+  model_cfg_params.sparse4d_extract_feat_spatial_shapes_ld = sparse4d_extract_feat_spatial_shapes_ld;
+  model_cfg_params.sparse4d_extract_feat_level_start_index = sparse4d_extract_feat_level_start_index;
 
-  common::E2ETrtEngine& sparse4d_extract_feat_trt_engine;
+  common::E2ETrtEngine sparse4d_extract_feat_trt_engine;
   sparse4d_extract_feat_trt_engine.engine_path = sparse4d_extract_feat_trt_engine_path;
   sparse4d_extract_feat_trt_engine.input_names = sparse4d_extract_feat_trt_engine_input_names;
   sparse4d_extract_feat_trt_engine.output_names = sparse4d_extract_feat_trt_engine_output_names;
 
-  common::E2ETrtEngine& sparse4d_head1st_engine;
+  common::E2ETrtEngine sparse4d_head1st_engine;
   sparse4d_head1st_engine.engine_path = sparse4d_head1st_engine_path;
   sparse4d_head1st_engine.input_names = sparse4d_head1st_engine_input_names;
   sparse4d_head1st_engine.output_names = sparse4d_head1st_engine_output_names;
 
-  common::E2ETrtEngine& sparse4d_head2nd_engine;
+  common::E2ETrtEngine sparse4d_head2nd_engine;
   sparse4d_head2nd_engine.engine_path = sparse4d_head2nd_engine_path;
   sparse4d_head2nd_engine.input_names = sparse4d_head2nd_engine_input_names;
   sparse4d_head2nd_engine.output_names = sparse4d_head2nd_engine_output_names;
@@ -260,9 +267,9 @@ common::E2EParams parseParams(const std::string& model_cfg_path) {
 
   common::PostprocessorParams postprocessor_params;
   postprocessor_params.post_process_out_nums = post_process_out_nums;
-  post_process_out_nums.post_process_threshold = post_process_threshold;
+  postprocessor_params.post_process_threshold = post_process_threshold;
 
-  const common::E2EParams params(preprocessor_params, model_cfg, sparse4d_extract_feat_trt_engine,
+  const common::E2EParams params(preprocessor_params, model_cfg_params, sparse4d_extract_feat_trt_engine,
                                  sparse4d_head1st_engine, sparse4d_head2nd_engine, instance_bank_params,
                                  postprocessor_params);
 

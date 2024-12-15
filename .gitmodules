@@ -4,3 +4,6 @@
 [submodule "onboard/third_party/glog"]
 	path = onboard/third_party/glog
 	url = https://github.com/google/glog.git
+[submodule "onboard/third_party/yaml-cpp"]
+	path = onboard/third_party/yaml-cpp
+	url = https://github.com/jbeder/yaml-cpp.git

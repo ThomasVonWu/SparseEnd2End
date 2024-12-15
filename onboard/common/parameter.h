@@ -21,15 +21,14 @@ struct PreprocessorParams {
   float resize_ratio = 1.0F;
   std::uint32_t crop_height = 0U;
   std::uint32_t crop_width = 0U;
-  float resize_ratio = 0.0F;
 };
 
-struct ModelCfg {
+struct ModelCfgParams {
   std::uint32_t embedfeat_dims = 256U;
   std::vector<std::uint32_t> sparse4d_extract_feat_shape_lc = {};
   std::vector<std::uint32_t> sparse4d_extract_feat_spatial_shapes_ld = {};
   std::vector<std::uint32_t> sparse4d_extract_feat_spatial_shapes_nld = {};
-  std::vector<std::int32_t> sparse4d_extract_feat_level_start_index = {};
+  std::vector<std::uint32_t> sparse4d_extract_feat_level_start_index = {};
 };
 
 /// @brief Parameters of InstanceBank.
@@ -56,7 +55,7 @@ struct PostprocessorParams {
 class E2EParams {
  public:
   E2EParams(const PreprocessorParams& preprocessor_params = {6U, 3U, 1080U, 1920U, 3U, 256U, 704U},
-            const ModelCfg& model_cfg = {256U, {}, {}, {}, {}},
+            const ModelCfgParams& model_cfg = {256U, {}, {}, {}, {}},
             const E2ETrtEngine& sparse4d_extract_feat_engine = {"", {}, {}},
             const E2ETrtEngine& sparse4d_head1st_engine = {"", {}, {}},
             const E2ETrtEngine& sparse4d_head2nd_engine = {"", {}, {}},
@@ -75,7 +74,7 @@ class E2EParams {
 
  public:
   const PreprocessorParams preprocessor_params;
-  const ModelCfg model_cfg;
+  const ModelCfgParams model_cfg;
   const E2ETrtEngine sparse4d_extract_feat_engine;
   const E2ETrtEngine sparse4d_head1st_engine;
   const E2ETrtEngine sparse4d_head2nd_engine;

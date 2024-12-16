@@ -63,15 +63,14 @@ common::E2EParams parseParams(const std::string& model_cfg_path) {
   YAML::Node img_preprocessor_node = common::getYamlSubNode(sparse_e2e_node, "ImgPreprocessor");
 
   /// STEP-5.1: Parse Node: `ImgPreprocessor/RawImgShape_CHW` in YAML.
-  YAML::Node raw_img_shape_chw_node = common::getYamlSubNode(img_preprocessor_node, "RawImgShape_CHW");
+  YAML::Node raw_img_shape_chw_node = common::getYamlSubNode(img_preprocessor_node[0], "RawImgShape_CHW");
   std::vector<std::uint32_t> raw_img_shape_chw = raw_img_shape_chw_node.as<std::vector<std::uint32_t>>();
 
   /// STEP-5.2: Parse Node: `ImgPreprocessor/ModelInputImgShape_CHW` in YAML.
-  std::vector<std::uint32_t> model_input_img_shape_chw_tmp;
-  YAML::Node model_input_img_shape_chw_node = common::getYamlSubNode(img_preprocessor_node, "ModelInputImgShape_CHW");
+  YAML::Node model_input_img_shape_chw_node =
+      common::getYamlSubNode(img_preprocessor_node[1], "ModelInputImgShape_CHW");
   std::vector<std::uint32_t> model_input_img_shape_chw =
       model_input_img_shape_chw_node.as<std::vector<std::uint32_t>>();
-  model_input_img_shape_chw_tmp.assign(model_input_img_shape_chw.begin(), model_input_img_shape_chw.end());
 
   /// @attention Calculate image preprocess's parameters: `resize_ratio/crop_height/crop_width` based on the given
   /// configuration parameters in YAML.
@@ -96,30 +95,30 @@ common::E2EParams parseParams(const std::string& model_cfg_path) {
 
   /// STEP-7.1: Parse Node: `Sparse4dExtractFeatTrtEngine/EnginePath` in YAML.
   YAML::Node sparse4d_extract_feat_trt_engine_path_node =
-      common::getYamlSubNode(sparse4d_extract_feat_trt_engine_node, "EnginePath");
+      common::getYamlSubNode(sparse4d_extract_feat_trt_engine_node[0], "EnginePath");
   std::string sparse4d_extract_feat_trt_engine_path = sparse4d_extract_feat_trt_engine_path_node.as<std::string>();
 
   /// STEP-7.2 : Parse Node: `Sparse4dExtractFeatTrtEngine/EngineInputNames` in YAML.
   YAML::Node sparse4d_extract_feat_trt_engine_input_names_node =
-      common::getYamlSubNode(sparse4d_extract_feat_trt_engine_node, "EngineInputNames");
+      common::getYamlSubNode(sparse4d_extract_feat_trt_engine_node[1], "EngineInputNames");
   std::vector<std::string> sparse4d_extract_feat_trt_engine_input_names =
       sparse4d_extract_feat_trt_engine_input_names_node.as<std::vector<std::string>>();
 
   /// STEP-7.3 : Parse Node: `Sparse4dExtractFeatTrtEngine/EngineOutputNames` in YAML.
   YAML::Node sparse4d_extract_feat_trt_engine_output_names_node =
-      common::getYamlSubNode(sparse4d_extract_feat_trt_engine_node, "EngineOutputNames");
+      common::getYamlSubNode(sparse4d_extract_feat_trt_engine_node[2], "EngineOutputNames");
   std::vector<std::string> sparse4d_extract_feat_trt_engine_output_names =
       sparse4d_extract_feat_trt_engine_output_names_node.as<std::vector<std::string>>();
 
   /// STEP-7.4: Parse Node: `Sparse4dExtractFeatTrtEngine/Sparse4dExtractFeatShape_LC` in YAML.
   YAML::Node sparse4d_extract_feat_shape_lc_node =
-      common::getYamlSubNode(img_preprocessor_node, "Sparse4dExtractFeatShape_LC");
+      common::getYamlSubNode(sparse4d_extract_feat_trt_engine_node[3], "Sparse4dExtractFeatShape_LC");
   std::vector<std::uint32_t> sparse4d_extract_feat_shape_lc =
       sparse4d_extract_feat_shape_lc_node.as<std::vector<std::uint32_t>>();
 
   /// STEP-7.5 Parse Node: `Sparse4dExtractFeatTrtEngine/Sparse4dExtractFeatSpatialShapes_LD` in YAML.
   YAML::Node sparse4d_extract_feat_spatial_shapes_ld_node =
-      common::getYamlSubNode(img_preprocessor_node, "Sparse4dExtractFeatSpatialShapes_LD");
+      common::getYamlSubNode(sparse4d_extract_feat_trt_engine_node[4], "Sparse4dExtractFeatSpatialShapes_LD");
   std::vector<std::uint32_t> sparse4d_extract_feat_spatial_shapes_ld =
       sparse4d_extract_feat_spatial_shapes_ld_node.as<std::vector<std::uint32_t>>();
 
@@ -156,70 +155,70 @@ common::E2EParams parseParams(const std::string& model_cfg_path) {
 
   /// STEP-8.1 Parse Node:`Sparse4dHeadFirstFrameEngine/EnginePath` in YAML.
   YAML::Node sparse4d_head1st_engine_path_node =
-      common::getYamlSubNode(sparse4d_head_first_frame_engine_node, "EnginePath");
+      common::getYamlSubNode(sparse4d_head_first_frame_engine_node[0], "EnginePath");
   std::string sparse4d_head1st_engine_path = sparse4d_head1st_engine_path_node.as<std::string>();
 
   /// STEP-8.2 : Parse Node: `Sparse4dHeadFirstFrameEngine/EngineInputNames` in YAML.
   YAML::Node sparse4d_head1st_engine_input_names_node =
-      common::getYamlSubNode(sparse4d_head_first_frame_engine_node, "EngineInputNames");
+      common::getYamlSubNode(sparse4d_head_first_frame_engine_node[1], "EngineInputNames");
   std::vector<std::string> sparse4d_head1st_engine_input_names =
       sparse4d_head1st_engine_input_names_node.as<std::vector<std::string>>();
 
   /// STEP-8.3 : Parse Node: `Sparse4dHeadFirstFrameEngine/EngineOutputNames` in YAML.
   YAML::Node sparse4d_head1st_engine_output_names_node =
-      common::getYamlSubNode(sparse4d_head_first_frame_engine_node, "EngineOutputNames");
+      common::getYamlSubNode(sparse4d_head_first_frame_engine_node[2], "EngineOutputNames");
   std::vector<std::string> sparse4d_head1st_engine_output_names =
       sparse4d_head1st_engine_output_names_node.as<std::vector<std::string>>();
 
-  /// @brief STEP-9 Parse Node: `Sparse4dSecondFrameEngine` in YAML.
+  /// @brief STEP-9 Parse Node: `Sparse4dHeadSecondFrameEngine` in YAML.
   YAML::Node sparse4d_head_second_frame_engine_node =
-      common::getYamlSubNode(sparse_e2e_node, "Sparse4dSecondFrameEngine");
+      common::getYamlSubNode(sparse_e2e_node, "Sparse4dHeadSecondFrameEngine");
 
-  /// STEP-9.1 Parse Node:`Sparse4dSecondFrameEngine/EnginePath` in YAML.
+  /// STEP-9.1 Parse Node:`Sparse4dHeadSecondFrameEngine/EnginePath` in YAML.
   YAML::Node sparse4d_head2nd_engine_path_node =
-      common::getYamlSubNode(sparse4d_head_second_frame_engine_node, "EnginePath");
+      common::getYamlSubNode(sparse4d_head_second_frame_engine_node[0], "EnginePath");
   std::string sparse4d_head2nd_engine_path = sparse4d_head2nd_engine_path_node.as<std::string>();
 
-  /// STEP-9.2 : Parse Node: `Sparse4dSecondFrameEngine/EngineInputNames` in YAML.
+  /// STEP-9.2 : Parse Node: `Sparse4dHeadSecondFrameEngine/EngineInputNames` in YAML.
   YAML::Node sparse4d_head2nd_engine_input_names_node =
-      common::getYamlSubNode(sparse4d_head_second_frame_engine_node, "EngineInputNames");
+      common::getYamlSubNode(sparse4d_head_second_frame_engine_node[1], "EngineInputNames");
   std::vector<std::string> sparse4d_head2nd_engine_input_names =
       sparse4d_head2nd_engine_input_names_node.as<std::vector<std::string>>();
 
-  /// STEP-9.3 : Parse Node: `Sparse4dSecondFrameEngine/EngineOutputNames` in YAML.
+  /// STEP-9.3 : Parse Node: `Sparse4dHeadSecondFrameEngine/EngineOutputNames` in YAML.
   YAML::Node sparse4d_head2nd_engine_output_names_node =
-      common::getYamlSubNode(sparse4d_head_second_frame_engine_node, "EngineOutputNames");
+      common::getYamlSubNode(sparse4d_head_second_frame_engine_node[2], "EngineOutputNames");
   std::vector<std::string> sparse4d_head2nd_engine_output_names =
       sparse4d_head2nd_engine_output_names_node.as<std::vector<std::string>>();
 
   ///@brief STEP-10 Parse Node: `InstanceBankParams` in YAML.
   YAML::Node instance_bank_params_node = common::getYamlSubNode(sparse_e2e_node, "InstanceBankParams");
 
-  YAML::Node num_querys_node = common::getYamlSubNode(instance_bank_params_node, "NumQuerys");
+  YAML::Node num_querys_node = common::getYamlSubNode(instance_bank_params_node[0], "NumQuerys");
   std::uint32_t num_querys = num_querys_node.as<std::uint32_t>();
 
-  YAML::Node query_dims_node = common::getYamlSubNode(instance_bank_params_node, "QueryDims");
+  YAML::Node query_dims_node = common::getYamlSubNode(instance_bank_params_node[1], "QueryDims");
   std::uint32_t query_dims = query_dims_node.as<std::uint32_t>();
 
-  YAML::Node topk_querys_node = common::getYamlSubNode(instance_bank_params_node, "TopKQuerys");
+  YAML::Node topk_querys_node = common::getYamlSubNode(instance_bank_params_node[2], "TopKQuerys");
   std::uint32_t topk_querys = topk_querys_node.as<std::uint32_t>();
 
-  YAML::Node max_time_interval_node = common::getYamlSubNode(instance_bank_params_node, "MaxTimeInterval");
+  YAML::Node max_time_interval_node = common::getYamlSubNode(instance_bank_params_node[3], "MaxTimeInterval");
   float max_time_interval = max_time_interval_node.as<float>();
 
-  YAML::Node default_time_interval_node = common::getYamlSubNode(instance_bank_params_node, "DefaultTimeInterval");
+  YAML::Node default_time_interval_node = common::getYamlSubNode(instance_bank_params_node[4], "DefaultTimeInterval");
   float default_time_interval = default_time_interval_node.as<float>();
 
-  YAML::Node confidence_decay_node = common::getYamlSubNode(instance_bank_params_node, "ConfidenceDecay");
+  YAML::Node confidence_decay_node = common::getYamlSubNode(instance_bank_params_node[5], "ConfidenceDecay");
   float confidence_decay = confidence_decay_node.as<float>();
 
   ///@brief STEP-11 Parse Node: `PostProcess` in YAML.
   YAML::Node post_process_node = common::getYamlSubNode(sparse_e2e_node, "PostProcess");
 
-  YAML::Node post_process_out_nums_node = common::getYamlSubNode(post_process_node, "PostProcessOutNums");
+  YAML::Node post_process_out_nums_node = common::getYamlSubNode(post_process_node[0], "PostProcessOutNums");
   std::uint32_t post_process_out_nums = post_process_out_nums_node.as<std::uint32_t>();
 
-  YAML::Node post_process_threshold_node = common::getYamlSubNode(instance_bank_params_node, "PostProcessThreshold");
+  YAML::Node post_process_threshold_node = common::getYamlSubNode(post_process_node[1], "PostProcessThreshold");
   float post_process_threshold = post_process_threshold_node.as<float>();
 
   ///@brief STEP-12 Construct E2EParams::params based on the the parsed parameters.
@@ -228,9 +227,9 @@ common::E2EParams parseParams(const std::string& model_cfg_path) {
   preprocessor_params.raw_img_c = raw_img_shape_chw[0];
   preprocessor_params.raw_img_h = raw_img_shape_chw[1];
   preprocessor_params.raw_img_w = raw_img_shape_chw[2];
-  preprocessor_params.model_input_img_c = model_input_img_shape_chw_tmp[0];
-  preprocessor_params.model_input_img_h = model_input_img_shape_chw_tmp[1];
-  preprocessor_params.model_input_img_w = model_input_img_shape_chw_tmp[2];
+  preprocessor_params.model_input_img_c = model_input_img_shape_chw[0];
+  preprocessor_params.model_input_img_h = model_input_img_shape_chw[1];
+  preprocessor_params.model_input_img_w = model_input_img_shape_chw[2];
   preprocessor_params.resize_ratio = resize_ratio;
   preprocessor_params.crop_height = crop_height;
   preprocessor_params.crop_width = crop_width;

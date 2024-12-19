@@ -14,6 +14,25 @@
 namespace sparse_end2end {
 namespace preprocessor {
 
+template <typename T>
+void print_infos(const std::vector<T>& vec) {
+  if (vec.size() > 20) {
+    std::cout << "First 5 elements: ";
+    for (size_t i = 0; i < 5; ++i) {
+      std::cout << vec[i] << " | ";
+    }
+    std::cout << "\nLast 5 elements: ";
+    for (size_t j = vec.size() - 5; j < vec.size(); ++j) {
+      std::cout << vec[j] << " | ";
+    }
+  } else {
+    for (const auto& x : vec) {
+      std::cout << x << " | ";
+    }
+  }
+  std::cout << std::endl;
+}
+
 TEST(ParseParamsUnitTest, ParseParamsFunctionCall) {
   std::filesystem::path current_dir = std::filesystem::current_path();
   const common::E2EParams params = parseParams(current_dir / "../../assets/model_cfg.yaml");
@@ -29,33 +48,41 @@ TEST(ParseParamsUnitTest, ParseParamsFunctionCall) {
 
   printf("[ModelCfg Parameters Infos]:\n");
   printf("embedfeat_dims = %u\n", params.model_cfg.embedfeat_dims);
-  // printf("sparse4d_extract_feat_shape_lc = %u\n", params.model_cfg.sparse4d_extract_feat_shape_lc);
-  // printf("sparse4d_extract_feat_spatial_shapes_ld = %u\n", params.model_cfg.sparse4d_extract_feat_spatial_shapes_ld);
-  // printf("sparse4d_extract_feat_spatial_shapes_nld = %u\n",
-  // params.model_cfg.sparse4d_extract_feat_spatial_shapes_nld); printf("sparse4d_extract_feat_level_start_index =
-  // %u\n", params.model_cfg.sparse4d_extract_feat_level_start_index);
+  printf("sparse4d_extract_feat_shape_lc : \n");
+  print_infos(params.model_cfg.sparse4d_extract_feat_shape_lc);
+  printf("sparse4d_extract_feat_spatial_shapes_ld : \n");
+  print_infos(params.model_cfg.sparse4d_extract_feat_spatial_shapes_ld);
+  printf("sparse4d_extract_feat_spatial_shapes_nld : \n");
+  print_infos(params.model_cfg.sparse4d_extract_feat_spatial_shapes_nld);
+  printf("sparse4d_extract_feat_level_start_index : \n");
+  print_infos(params.model_cfg.sparse4d_extract_feat_level_start_index);
 
   printf("[Sparse4dExtractFeatEngine Parameters Infos]:\n");
-  // printf("sparse4d_extract_feat_engine.engine_path = %u\n", params.sparse4d_extract_feat_engine.engine_path.c_str());
-  // printf("sparse4d_extract_feat_engine. input_names= %u\n",
-  // params.sparse4d_extract_feat_engine.input_names[0].c_str()); printf("sparse4d_extract_feat_engine. output_names=
-  // %u\n",
-  //        params.sparse4d_extract_feat_engine.output_names[0].c_str());
+  printf("sparse4d_extract_feat_engine.engine_path = %s\n", params.sparse4d_extract_feat_engine.engine_path.c_str());
+  printf("sparse4d_extract_feat_engine. input_names: \n");
+  print_infos(params.sparse4d_extract_feat_engine.input_names);
+  printf("sparse4d_extract_feat_engine. output_names=\n");
+  print_infos(params.sparse4d_extract_feat_engine.output_names);
 
   printf("[Sparse4dHead1stEngine Parameters Infos]:\n");
-  // printf("sparse4d_head1st_engine.engine_path = %u\n", params.sparse4d_head1st_engine.engine_path.c_str());
-  // printf("sparse4d_head1st_engine. input_names= %u\n", params.sparse4d_head1st_engine.input_names[0].c_str());
-  // printf("sparse4d_head1st_engine. output_names= %u\n", params.sparse4d_head1st_engine.output_names[0].c_str());
+  printf("sparse4d_head1st_engine.engine_path = %s\n", params.sparse4d_head1st_engine.engine_path.c_str());
+  printf("sparse4d_head1st_engine. input_names: \n");
+  print_infos(params.sparse4d_head1st_engine.input_names);
+  printf("sparse4d_head1st_engine. output_names=\n");
+  print_infos(params.sparse4d_head1st_engine.output_names);
 
   printf("[Sparse4dHead2ndEngine Parameters Infos]:\n");
-  // printf("sparse4d_head2nd_engine.engine_path = %u\n", params.sparse4d_head2nd_engine.engine_path.c_str());
-  // printf("sparse4d_head2nd_engine. input_names= %u\n", params.sparse4d_head2nd_engine.input_names[0].c_str());
-  // printf("sparse4d_head2nd_engine. output_names= %u\n", params.sparse4d_head2nd_engine.output_names[0].c_str());
+  printf("sparse4d_head2nd_engine.engine_path = %s\n", params.sparse4d_head2nd_engine.engine_path.c_str());
+  printf("sparse4d_head2nd_engine. input_names: \n");
+  print_infos(params.sparse4d_head2nd_engine.input_names);
+  printf("sparse4d_head2nd_engine. output_names=\n");
+  print_infos(params.sparse4d_head1st_engine.output_names);
 
   printf("\n[InstanceBank Parameters Infos]:\n");
   printf("num_querys = %u\n", params.instance_bank_params.num_querys);
   printf("query_dims = %u\n", params.instance_bank_params.query_dims);
-  // printf("kmeans_anchors = %u\n", params.instance_bank_params.kmeans_anchors);
+  printf("kmeans_anchors : \n");
+  print_infos(params.instance_bank_params.kmeans_anchors);
   printf("topk_querys = %u\n", params.instance_bank_params.topk_querys);
   printf("max_time_interval = %f\n", params.instance_bank_params.max_time_interval);
   printf("default_time_interval = %f\n", params.instance_bank_params.default_time_interval);
@@ -64,16 +91,6 @@ TEST(ParseParamsUnitTest, ParseParamsFunctionCall) {
   printf("\n[Postprocessor Parameters Infos]:\n");
   printf("post_process_out_nums = %u\n", params.postprocessor_params.post_process_out_nums);
   printf("post_process_threshold = %f\n", params.postprocessor_params.post_process_threshold);
-
-  // printf("\nsparse4dhead2nd_trtio.engine_path = %s\n", params.sparse4dhead2nd_trtio.engine_path.c_str());
-  // printf("sparse4dhead2nd_trtio.input_names:\n");
-  // for (size_t i = 0; i < params.sparse4dhead2nd_trtio.input_names.size(); ++i) {
-  //   printf("%s ", params.sparse4dhead2nd_trtio.input_names[i].c_str());
-  // }
-  // printf("\nsparse4dhead2nd_trtio.output_names:\n");
-  // for (size_t i = 0; i < params.sparse4dhead2nd_trtio.output_names.size(); ++i) {
-  //   printf("%s ", params.sparse4dhead2nd_trtio.output_names[i].c_str());
-  // }
 }
 }  // namespace preprocessor
 }  // namespace sparse_end2end

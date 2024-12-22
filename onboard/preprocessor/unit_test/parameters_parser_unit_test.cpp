@@ -46,32 +46,30 @@ TEST(ParseParamsUnitTest, ParseParamsFunctionCall) {
   printf("model_input_img_h = %u\n", params.preprocessor_params.model_input_img_h);
   printf("model_input_img_w = %u\n", params.preprocessor_params.model_input_img_w);
 
-  printf("[ModelCfg Parameters Infos]:\n");
+  printf("\n[ModelCfg Parameters Infos]:\n");
   printf("embedfeat_dims = %u\n", params.model_cfg.embedfeat_dims);
   printf("sparse4d_extract_feat_shape_lc : \n");
   print_infos(params.model_cfg.sparse4d_extract_feat_shape_lc);
   printf("sparse4d_extract_feat_spatial_shapes_ld : \n");
   print_infos(params.model_cfg.sparse4d_extract_feat_spatial_shapes_ld);
-  printf("sparse4d_extract_feat_spatial_shapes_nld : \n");
-  print_infos(params.model_cfg.sparse4d_extract_feat_spatial_shapes_nld);
   printf("sparse4d_extract_feat_level_start_index : \n");
   print_infos(params.model_cfg.sparse4d_extract_feat_level_start_index);
 
-  printf("[Sparse4dExtractFeatEngine Parameters Infos]:\n");
+  printf("\n[Sparse4dExtractFeatEngine Parameters Infos]:\n");
   printf("sparse4d_extract_feat_engine.engine_path = %s\n", params.sparse4d_extract_feat_engine.engine_path.c_str());
   printf("sparse4d_extract_feat_engine. input_names: \n");
   print_infos(params.sparse4d_extract_feat_engine.input_names);
   printf("sparse4d_extract_feat_engine. output_names=\n");
   print_infos(params.sparse4d_extract_feat_engine.output_names);
 
-  printf("[Sparse4dHead1stEngine Parameters Infos]:\n");
+  printf("\n[Sparse4dHead1stEngine Parameters Infos]:\n");
   printf("sparse4d_head1st_engine.engine_path = %s\n", params.sparse4d_head1st_engine.engine_path.c_str());
   printf("sparse4d_head1st_engine. input_names: \n");
   print_infos(params.sparse4d_head1st_engine.input_names);
   printf("sparse4d_head1st_engine. output_names=\n");
   print_infos(params.sparse4d_head1st_engine.output_names);
 
-  printf("[Sparse4dHead2ndEngine Parameters Infos]:\n");
+  printf("\n[Sparse4dHead2ndEngine Parameters Infos]:\n");
   printf("sparse4d_head2nd_engine.engine_path = %s\n", params.sparse4d_head2nd_engine.engine_path.c_str());
   printf("sparse4d_head2nd_engine. input_names: \n");
   print_infos(params.sparse4d_head2nd_engine.input_names);

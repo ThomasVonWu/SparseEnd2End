@@ -27,7 +27,6 @@ struct ModelCfgParams {
   std::uint32_t embedfeat_dims = 256U;
   std::vector<std::uint32_t> sparse4d_extract_feat_shape_lc = {};
   std::vector<std::uint32_t> sparse4d_extract_feat_spatial_shapes_ld = {};
-  std::vector<std::uint32_t> sparse4d_extract_feat_spatial_shapes_nld = {};
   std::vector<std::uint32_t> sparse4d_extract_feat_level_start_index = {};
 };
 
@@ -55,7 +54,7 @@ struct PostprocessorParams {
 class E2EParams {
  public:
   E2EParams(const PreprocessorParams& preprocessor_params = {6U, 3U, 1080U, 1920U, 3U, 256U, 704U},
-            const ModelCfgParams& model_cfg = {256U, {}, {}, {}, {}},
+            const ModelCfgParams& model_cfg = {256U, {}, {}, {}},
             const E2ETrtEngine& sparse4d_extract_feat_engine = {"", {}, {}},
             const E2ETrtEngine& sparse4d_head1st_engine = {"", {}, {}},
             const E2ETrtEngine& sparse4d_head2nd_engine = {"", {}, {}},

@@ -48,7 +48,6 @@ common::E2EParams parseParams(const std::string& model_cfg_path) {
   /// @brief STEP-3: Parse calibration:lidar2image from offline bin file:
   YAML::Node lidar2image_path_node = common::getYamlSubNode(offline_onboard_bin_file_path_node[1], "Lidar2ImagePath");
   std::string lidar2image_path = lidar2image_path_node.as<std::string>();
-  std::cout << lidar2image_path << std::endl;
   std::vector<float> lidar2img = common::readfile_wrapper<float>(lidar2image_path);
 
   YAML::Node sparse_e2e_node = common::getYamlSubNode(config_file_node, "SparseE2E");

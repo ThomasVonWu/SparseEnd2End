@@ -108,7 +108,7 @@ python script/tutorial_task_nusc/001_nusc_dataset_visualization.py
 ```
 
 
-### Train&Val Pipeline in DP Mode
+### Train&Test Pipeline in DP Mode
 Set PythonEnvironment
 ```bash
 export PYTHONPATH=$PYTHONPATH:./
@@ -131,8 +131,7 @@ export  config_path=dataset/config/sparse4d_temporal_r50_1x1_bs1_256x704_mini.py
 clear && python script/test.py  ${config_path} --checkpoint /path/to/checkpoint
 ```
 
-
-Train in ddp mode.
+### Train in DDP Mode.
 ```bash
 export  config_path=dataset/config/sparse4d_temporal_r50_1x4_bs22_256x704.py  # defaule training in nuscenes v1.0-trainval with 4GPUs.
 export python_version=python3.10 # your environment python version(or 3.8)
@@ -147,9 +146,9 @@ python3 -m torch.distributed.launch --nproc_per_node=${gpu_nums} --master_port=$
 clear && bash script/dist_train.sh ${config_path}
 ```
 
-Evaluation Offline
+###  Evaluation Offline
 ```bash
-# If you use -- ,you can evaluation offline
+# If you use  `--no-validate` args while launching train script, you can evaluation checkpoints offline.
 export iter_per_epoch=79 # if your config is the same with `sparse4d_temporal_r50_1x4_bs22_256x704.py`,  iter_per_epoch=int(28130 // (4 * 88))
 python3 script/offline_eval.py ---cfg /path/to/train/cfg -dir_path /path/to/train/cached/ckpt/dir/path --iter_per_epoch ${iter_per_epoch}
 ```

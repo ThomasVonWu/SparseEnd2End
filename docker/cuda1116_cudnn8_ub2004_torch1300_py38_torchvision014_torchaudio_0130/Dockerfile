@@ -22,10 +22,11 @@ RUN sed -i s:/archive.ubuntu.com:/mirrors.tuna.tsinghua.edu.cn/ubuntu:g /etc/apt
 RUN cat /etc/apt/sources.list
 RUN chmod 777 /tmp
 RUN apt-get clean && apt-get update &&\
-    apt-get install -y vim git wget curl libglib2.0-0 bash-completion zip htop --no-install-recommends &&\
+    apt-get install -y vim git wget curl libglib2.0-0 libgl1 bash-completion zip htop --no-install-recommends &&\
     rm -rf /var/lib/apt/lists/*
 
 ### STEP3: Install Miniconda.
+RUN rm -rf /opt/conda
 RUN curl -fsSL -v -o ~/miniconda.sh -O  https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh  && \
     chmod +x ~/miniconda.sh && \
     ~/miniconda.sh -b -p /opt/conda && \
@@ -37,7 +38,7 @@ ENV PATH /opt/conda/bin:$PATH
 ### STEP4: Install all libs which should be the same with requirements.txt in your repository.
 RUN pip3 install --upgrade pip && \
     pip3 config set global.index-url https://pypi.tuna.tsinghua.edu.cn/simple
-RUN pip3 install torch==${TORCH_VERSION} torchvision==${TORCHVISION_VERSION} torchaudio==${TROCHAUDIO_VERSION} --extra-index-url==${EXTRA_URL}
+RUN pip3 install torch==${TORCH_VERSION} torchvision==${TORCHVISION_VERSION} torchaudio==${TROCHAUDIO_VERSION} --extra-index-url ${EXTRA_URL}
 RUN pip3 install numpy==1.23.5 \
     urllib3==1.26.16 \
     pyquaternion==0.9.9 \

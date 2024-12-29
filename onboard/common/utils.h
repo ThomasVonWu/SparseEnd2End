@@ -13,8 +13,10 @@
 namespace sparse_end2end {
 namespace common {
 
+/// @brief  Using `inline` aim to prevent the occurrence of  multiple definition error and reduce the overhead of
+/// function calls.
 template <typename T>
-std::vector<T> readfile_wrapper(const std::string& filename) {
+inline std::vector<T> readfile_wrapper(const std::string& filename) {
   std::ifstream file(filename, std::ios::in);
   if (!file) {
     std::cout << "Read file failed : " << filename << std::endl;
@@ -35,7 +37,7 @@ std::vector<T> readfile_wrapper(const std::string& filename) {
 }
 
 template <typename T>
-void writefile_wrapper(const std::vector<T>& data, const std::string& filename) {
+inline void writefile_wrapper(const std::vector<T>& data, const std::string& filename) {
   std::ofstream file;
   file.open(filename, std::ios::out);
   if (!file.is_open()) {
@@ -46,7 +48,7 @@ void writefile_wrapper(const std::vector<T>& data, const std::string& filename) 
   file.close();
 }
 
-YAML::Node loadYamlFile(const std::string& file_path) {
+inline YAML::Node loadYamlFile(const std::string& file_path) {
   try {
     YAML::Node node = YAML::LoadFile(file_path);
     if (!node) {
@@ -104,7 +106,7 @@ inline void readYamlNode(const YAML::Node& yaml, const std::string& key, std::ve
   }
 }
 
-YAML::Node getYamlSubNode(const YAML::Node& yaml, const std::string& node) {
+inline YAML::Node getYamlSubNode(const YAML::Node& yaml, const std::string& node) {
   YAML::Node ret = yaml[node.c_str()];
   if (ret && ret.Type() != YAML::NodeType::Null) {
     return ret;
@@ -115,13 +117,35 @@ YAML::Node getYamlSubNode(const YAML::Node& yaml, const std::string& node) {
   }
 }
 
-void fileExists(const std::string& filename) {
+// void fileExists(const std::string& filename) {
+//   std::ifstream file(filename);
+//   if (!file) {
+//     std::cout << "Failed to Open file : " << filename << std::endl;
+//     // LOG_ERROR(kLogContext, "Failed to Open file: " + filename);
+//     exit(EXIT_FAILURE);
+//   }
+// }
+
+inline void fileExistsHelper(const std::string& filename) {
   std::ifstream file(filename);
-  if (!file.good()) {
-    std::cout << "Failed to Open file : " << filename << std::endl;
-    // LOG_ERROR(kLogContext, "Failed to Open file: " + filename);
+  if (!file) {
+    std::cout << "Failed to Open file: " << filename << std::endl;
     exit(EXIT_FAILURE);
   }
+}
+
+template <std::size_t I = 0, typename... Ts>
+inline void fileExistsHelper(const std::tuple<Ts...>& tup) {
+  if constexpr (I < sizeof...(Ts)) {
+    const auto& filename = std::get<I>(tup);
+    fileExistsHelper(filename);
+    fileExistsHelper<I + 1>(tup);
+  }
+}
+
+template <typename... Args>
+inline void fileExists(Args&&... args) {
+  (fileExistsHelper(std::forward<Args>(args)), ...);
 }
 
 }  // namespace common

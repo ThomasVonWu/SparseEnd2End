@@ -2,9 +2,10 @@
 
 ```bash
 # 1st Step
-cd onboard/preprocessor/unit_test
+cd onboard/preprocessor/unit_test/parameters_parser_unit_test/
 cmake -B build -S .
 ```
+
 You will get log like this:
 ```bash
 -- The CXX compiler identification is GNU 9.4.0
@@ -30,7 +31,7 @@ You will get log like this:
 -- Found Threads: TRUE  
 -- Configuring done
 -- Generating done
--- Build files have been written to: /home/thomasvowu/PublishRepos/SparseEnd2End/onboard/preprocessor/unit_test/build
+-- Build files have been written to: /home/thomasvowu/PublishRepos/SparseEnd2End/onboard/preprocessor/unit_test/parameters_parser_unit_test/build
 ```
 
 ```bash
@@ -116,8 +117,8 @@ Running main() from /home/thomasvonwu/PublishRepos/SparseEnd2End/onboard/third_p
 [Preprocessor Parameters Infos]:
 num_cams = 6
 raw_img_c = 3
-raw_img_h = 1080
-raw_img_w = 1920
+raw_img_h = 900
+raw_img_w = 1600
 model_input_img_c = 3
 model_input_img_h = 256
 model_input_img_w = 704
@@ -172,5 +173,146 @@ post_process_threshold = 0.200000
 
 [----------] Global test environment tear-down
 [==========] 1 test from 1 test suite ran. (2 ms total)
+[  PASSED  ] 1 test.
+```
+
+## Unit Test for `img_preprocessor_unit_test`
+
+```bash
+# 1st Step
+cd onboard/preprocessor/unit_test/img_preprocessor_unit_test/
+cmake -B build -S .
+```
+
+You will get log like this:
+```bash
+-- The CXX compiler identification is GNU 9.4.0
+-- The CUDA compiler identification is NVIDIA 11.6.55
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /usr/bin/c++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Detecting CUDA compiler ABI info
+-- Detecting CUDA compiler ABI info - done
+-- Check for working CUDA compiler: /usr/local/cuda/bin/nvcc - skipped
+-- Detecting CUDA compile features
+-- Detecting CUDA compile features - done
+-- Looking for C++ include pthread.h
+-- Looking for C++ include pthread.h - found
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD - Failed
+-- Looking for pthread_create in pthreads
+-- Looking for pthread_create in pthreads - not found
+-- Looking for pthread_create in pthread
+-- Looking for pthread_create in pthread - found
+-- Found Threads: TRUE  
+-- Found CUDA: /usr/local/cuda (found suitable version "11.6", minimum required is "11") 
+-- The C compiler identification is GNU 9.4.0
+-- Detecting C compiler ABI info
+-- Detecting C compiler ABI info - done
+-- Check for working C compiler: /usr/bin/cc - skipped
+-- Detecting C compile features
+-- Detecting C compile features - done
+-- Configuring done
+-- Generating done
+-- Build files have been written to: /home/thomasvonwu/PublishRepos/SparseEnd2End/onboard/preprocessor/unit_test/img_preprocessor_unit_test/build
+```
+
+```bash
+# 2nd Step
+cmake --build build -j8
+```
+
+You will get log like this:
+```bash
+[  1%] Building CXX object CMakeFiles/img_preprocessor_cuda.dir/home/thomasvonwu/PublishRepos/SparseEnd2End/onboard/preprocessor/img_preprocessor.cpp.o
+[  5%] Building CUDA object CMakeFiles/img_preprocessor_cuda.dir/home/thomasvonwu/PublishRepos/SparseEnd2End/onboard/preprocessor/img_aug_with_bilinearinterpolation_kernel.cu.o
+[  5%] Building CXX object third_party/googletest/googletest/CMakeFiles/gtest.dir/src/gtest-all.cc.o
+[  7%] Building CXX object third_party/yaml-cpp/CMakeFiles/yaml-cpp.dir/src/contrib/graphbuilder.cpp.o
+[  9%] Building CXX object third_party/yaml-cpp/CMakeFiles/yaml-cpp.dir/src/contrib/graphbuilderadapter.cpp.o
+[ 11%] Building CXX object third_party/yaml-cpp/CMakeFiles/yaml-cpp.dir/src/binary.cpp.o
+[ 13%] Building CXX object third_party/yaml-cpp/CMakeFiles/yaml-cpp.dir/src/convert.cpp.o
+[ 15%] Building CXX object third_party/yaml-cpp/CMakeFiles/yaml-cpp.dir/src/depthguard.cpp.o
+[ 16%] Building CXX object third_party/yaml-cpp/CMakeFiles/yaml-cpp.dir/src/directives.cpp.o
+[ 18%] Building CXX object third_party/yaml-cpp/CMakeFiles/yaml-cpp.dir/src/emit.cpp.o
+[ 20%] Building CXX object third_party/yaml-cpp/CMakeFiles/yaml-cpp.dir/src/emitfromevents.cpp.o
+[ 22%] Building CXX object third_party/yaml-cpp/CMakeFiles/yaml-cpp.dir/src/emitter.cpp.o
+[ 24%] Building CXX object third_party/yaml-cpp/CMakeFiles/yaml-cpp.dir/src/emitterstate.cpp.o
+[ 26%] Building CXX object third_party/yaml-cpp/CMakeFiles/yaml-cpp.dir/src/emitterutils.cpp.o
+[ 28%] Building CXX object third_party/yaml-cpp/CMakeFiles/yaml-cpp.dir/src/exceptions.cpp.o
+[ 30%] Building CXX object third_party/yaml-cpp/CMakeFiles/yaml-cpp.dir/src/exp.cpp.o
+[ 32%] Building CXX object third_party/yaml-cpp/CMakeFiles/yaml-cpp.dir/src/fptostring.cpp.o
+[ 33%] Building CXX object third_party/yaml-cpp/CMakeFiles/yaml-cpp.dir/src/memory.cpp.o
+[ 35%] Building CXX object third_party/yaml-cpp/CMakeFiles/yaml-cpp.dir/src/node.cpp.o
+[ 37%] Building CXX object third_party/yaml-cpp/CMakeFiles/yaml-cpp.dir/src/node_data.cpp.o
+[ 39%] Building CXX object third_party/yaml-cpp/CMakeFiles/yaml-cpp.dir/src/nodebuilder.cpp.o
+[ 41%] Building CXX object third_party/yaml-cpp/CMakeFiles/yaml-cpp.dir/src/nodeevents.cpp.o
+[ 43%] Building CXX object third_party/yaml-cpp/CMakeFiles/yaml-cpp.dir/src/null.cpp.o
+[ 45%] Building CXX object third_party/yaml-cpp/CMakeFiles/yaml-cpp.dir/src/ostream_wrapper.cpp.o
+[ 47%] Linking CXX static library libimg_preprocessor_cuda.a
+[ 47%] Built target img_preprocessor_cuda
+[ 49%] Building CXX object third_party/yaml-cpp/CMakeFiles/yaml-cpp.dir/src/parse.cpp.o
+[ 50%] Building CXX object third_party/yaml-cpp/CMakeFiles/yaml-cpp.dir/src/parser.cpp.o
+[ 52%] Building CXX object third_party/yaml-cpp/CMakeFiles/yaml-cpp.dir/src/regex_yaml.cpp.o
+[ 54%] Building CXX object third_party/yaml-cpp/CMakeFiles/yaml-cpp.dir/src/scanner.cpp.o
+[ 56%] Building CXX object third_party/yaml-cpp/CMakeFiles/yaml-cpp.dir/src/scanscalar.cpp.o
+[ 58%] Building CXX object third_party/yaml-cpp/CMakeFiles/yaml-cpp.dir/src/scantag.cpp.o
+[ 60%] Building CXX object third_party/yaml-cpp/CMakeFiles/yaml-cpp.dir/src/scantoken.cpp.o
+[ 62%] Building CXX object third_party/yaml-cpp/CMakeFiles/yaml-cpp.dir/src/simplekey.cpp.o
+[ 64%] Building CXX object third_party/yaml-cpp/CMakeFiles/yaml-cpp.dir/src/singledocparser.cpp.o
+[ 66%] Building CXX object third_party/yaml-cpp/CMakeFiles/yaml-cpp.dir/src/stream.cpp.o
+[ 67%] Building CXX object third_party/yaml-cpp/CMakeFiles/yaml-cpp.dir/src/tag.cpp.o
+[ 69%] Linking CXX static library libyaml-cpp.a
+[ 69%] Built target yaml-cpp
+[ 71%] Building CXX object third_party/yaml-cpp/util/CMakeFiles/yaml-cpp-sandbox.dir/sandbox.cpp.o
+[ 75%] Building CXX object third_party/yaml-cpp/util/CMakeFiles/yaml-cpp-read.dir/read.cpp.o
+[ 75%] Building CXX object third_party/yaml-cpp/util/CMakeFiles/yaml-cpp-parse.dir/parse.cpp.o
+[ 77%] Linking CXX executable bin/parse
+[ 79%] Linking CXX executable bin/read
+[ 81%] Linking CXX executable bin/sandbox
+[ 81%] Built target yaml-cpp-parse
+[ 81%] Built target yaml-cpp-read
+[ 81%] Built target yaml-cpp-sandbox
+[ 83%] Linking CXX static library ../../../lib/libgtest.a
+[ 83%] Built target gtest
+[ 84%] Building CXX object third_party/googletest/googletest/CMakeFiles/gtest_main.dir/src/gtest_main.cc.o
+[ 86%] Building CXX object third_party/googletest/googlemock/CMakeFiles/gmock.dir/src/gmock-all.cc.o
+[ 88%] Linking CXX static library ../../../lib/libgtest_main.a
+[ 88%] Built target gtest_main
+[ 90%] Linking CXX static library ../../../lib/libgmock.a
+[ 90%] Built target gmock
+[ 92%] Building CXX object third_party/googletest/googlemock/CMakeFiles/gmock_main.dir/src/gmock_main.cc.o
+[ 94%] Linking CXX static library ../../../lib/libgmock_main.a
+[ 94%] Built target gmock_main
+[ 96%] Building CXX object CMakeFiles/img_preprocessor_unit_test.bin.dir/img_preprocessor_unit_test.cpp.o
+[ 98%] Building CXX object CMakeFiles/img_preprocessor_unit_test.bin.dir/home/thomasvonwu/PublishRepos/SparseEnd2End/onboard/preprocessor/parameters_parser.cpp.o
+[100%] Linking CXX executable bin/img_preprocessor_unit_test.bin
+[100%] Built target img_preprocessor_unit_test.bin
+```
+
+```bash
+# 3rd Step
+./build/bin/img_preprocessor_unit_test.bin
+```
+
+You will get log like this:
+```bash
+Running main() from /home/thomasvonwu/PublishRepos/SparseEnd2End/onboard/third_party/googletest/googletest/src/gtest_main.cc
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from ImgPreprocessorUnitTest
+[ RUN      ] ImgPreprocessorUnitTest.ImgPreprocessorFP32
+[Time Cost] : Image Preprocessor (CUDA float32) time = 0.163744[ms].
+[MaxError] = 0.0131711
+[Time Cost] : Image Preprocessor (CUDA float32) time = 0.161792[ms].
+[MaxError] = 0.0133002
+[Time Cost] : Image Preprocessor (CUDA float32) time = 0.161792[ms].
+[MaxError] = 0.0131727
+[       OK ] ImgPreprocessorUnitTest.ImgPreprocessorFP32 (340 ms)
+[----------] 1 test from ImgPreprocessorUnitTest (340 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (340 ms total)
 [  PASSED  ] 1 test.
 ```

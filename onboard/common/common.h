@@ -63,6 +63,7 @@ enum class Status : std::uint8_t {
   kSuccess = 0U,
 
   kImgPreprocesSizeErr = 1U,
+  kImgPreprocessLaunchErr = 2U,
 
   kBackboneInferErr = 20U,
 

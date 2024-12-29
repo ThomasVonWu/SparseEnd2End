@@ -12,7 +12,7 @@ SparseE2E:
     - CAM_BACK_LEFT
     - CAM_BACK_RIGHT
   ImgPreprocessor:
-    - RawImgShape_CHW: [3, 1080, 1920]
+    - RawImgShape_CHW: [3, 900, 1600]
     - ModelInputImgShape_CHW: [3, 256, 704]
   EmbedFeatDims: 256
   Sparse4dExtractFeatTrtEngine:

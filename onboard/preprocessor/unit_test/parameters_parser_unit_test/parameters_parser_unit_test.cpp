@@ -8,8 +8,8 @@
 #include <string>
 #include <vector>
 
-#include "../../common/parameter.h"
-#include "../parameters_parser.h"
+#include "../../../common/parameter.h"
+#include "../../parameters_parser.h"
 
 namespace sparse_end2end {
 namespace preprocessor {
@@ -35,7 +35,7 @@ void print_infos(const std::vector<T>& vec) {
 
 TEST(ParseParamsUnitTest, ParseParamsFunctionCall) {
   std::filesystem::path current_dir = std::filesystem::current_path();
-  const common::E2EParams params = parseParams(current_dir / "../../assets/model_cfg.yaml");
+  const common::E2EParams params = parseParams(current_dir / "../../../assets/model_cfg.yaml");
 
   printf("[Preprocessor Parameters Infos]:\n");
   printf("num_cams = %u\n", params.preprocessor_params.num_cams);

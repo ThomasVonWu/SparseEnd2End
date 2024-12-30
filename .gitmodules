@@ -7,3 +7,6 @@
 [submodule "onboard/third_party/yaml-cpp"]
 	path = onboard/third_party/yaml-cpp
 	url = https://github.com/jbeder/yaml-cpp.git
+[submodule "onboard/third_party/eigen"]
+	path = onboard/third_party/eigen
+	url = https://gitlab.com/libeigen/eigen.git

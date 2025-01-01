@@ -229,9 +229,9 @@ class Sparse4DHead(BaseModule):
             num_free_instance = num_instance - num_dn_anchor  # 320+900-320=900
             attn_mask = anchor.new_ones((num_instance, num_instance), dtype=torch.bool)
             attn_mask[:num_free_instance, :num_free_instance] = False
-            attn_mask[
-                num_free_instance:, num_free_instance:
-            ] = dn_attn_mask  # (1120, 1120)
+            attn_mask[num_free_instance:, num_free_instance:] = (
+                dn_attn_mask  # (1120, 1120)
+            )
 
         anchor_embed = self.anchor_encoder(anchor)  # (bs, 320+900, 256)
         if temp_anchor is not None:
@@ -396,9 +396,10 @@ class Sparse4DHead(BaseModule):
         # input: [1, 900, 256], [1, 900, 11], [1, 900, 10],  metas, feature_maps
         self.instance_bank.cache(instance_feature, anchor, cls, metas, feature_maps)
         if not self.training:
-            track_id = self.instance_bank.get_track_id(
-                cls, anchor, self.decoder.score_threshold
-            )
+            # track_id = self.instance_bank.get_track_id(
+            #     cls, anchor, self.decoder.score_threshold
+            # )
+            track_id = self.instance_bank.get_track_id(cls)
             output["track_id"] = track_id  # [1, 900], int64
         return output
 

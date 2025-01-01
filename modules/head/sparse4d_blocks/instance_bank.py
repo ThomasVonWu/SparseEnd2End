@@ -26,7 +26,7 @@ def topk(confidence, k, *inputs):
     # (bs, num_querys, c) => (bs, k, 256)
     for input in inputs:
         outputs.append(input.flatten(end_dim=1)[indices].reshape(bs, k, -1))
-    return confidence, outputs
+    return confidence, outputs, indices
 
 
 class InstanceBank(nn.Module):
@@ -87,8 +87,9 @@ class InstanceBank(nn.Module):
         self.cached_anchor = None
         self.metas = None
         self.mask = None
-        self.confidence = None
-        self.temp_confidence = None
+        self.confidence = None  # fusioned and unordered
+        self.temp_confidence = None  # fusioned. unordered and topk
+        self.temp_topk_indice = None
         self.track_id = None
         self.prev_id = 0
 
@@ -181,7 +182,7 @@ class InstanceBank(nn.Module):
 
         N = self.num_anchor - self.num_temp_instances
         confidence = confidence.max(dim=-1).values
-        _, (selected_feature, selected_anchor) = topk(
+        _, (selected_feature, selected_anchor), _ = topk(
             confidence, N, instance_feature, anchor
         )
         selected_feature = torch.cat([self.cached_feature, selected_feature], dim=1)
@@ -228,35 +229,42 @@ class InstanceBank(nn.Module):
         (
             self.confidence,
             (self.cached_feature, self.cached_anchor),
+            self.temp_topk_indice,
         ) = topk(confidence, self.num_temp_instances, instance_feature, anchor)
 
-    def get_track_id(self, confidence, anchor=None, threshold=None):
-        confidence = confidence.max(dim=-1).values.sigmoid()  # (bs, num_querys)
-        track_id = confidence.new_full(confidence.shape, -1).long()
+    def get_track_id(self, confidence):
+        # def get_track_id(self, confidence, anchor=None, threshold=None):
+        # confidence = confidence.max(dim=-1).values.sigmoid()  # (bs, num_querys)
+        track_id = confidence.new_full(confidence.shape[:2], -1).long()
 
         if self.track_id is not None and self.track_id.shape[0] == track_id.shape[0]:
             track_id[:, : self.track_id.shape[1]] = self.track_id
 
         mask = track_id < 0
-        if threshold is not None:
-            mask = mask & (confidence >= threshold)
+        # if threshold is not None:
+        #     mask = mask & (confidence >= threshold)
         num_new_instance = mask.sum()
         new_ids = torch.arange(num_new_instance).to(track_id) + self.prev_id
         track_id[torch.where(mask)] = new_ids
         self.prev_id += num_new_instance
-        self.update_track_id(track_id, confidence)
+        # self.update_track_id(track_id, confidence)
+        self.update_track_id(track_id)
         return track_id
 
-    def update_track_id(self, track_id=None, confidence=None):
-        if self.temp_confidence is None:
-            if confidence.dim() == 3:  # bs, num_anchor, num_cls
-                temp_conf = confidence.max(dim=-1).values
-            else:  # bs, num_anchor
-                temp_conf = confidence
-        else:
-            temp_conf = self.temp_confidence
-        track_id = topk(temp_conf, self.num_temp_instances, track_id)[1][0]
-        track_id = track_id.squeeze(dim=-1)  # (bs, k)
+    def update_track_id(self, track_id=None):
+        # def update_track_id(self, track_id=None, confidence=None):
+        # if self.temp_confidence is None:
+        #     if confidence.dim() == 3:  # bs, num_anchor, num_cls
+        #         temp_conf = confidence.max(dim=-1).values
+        #     else:  # bs, num_anchor
+        #         temp_conf = confidence
+        # else:
+        #     temp_conf = self.temp_confidence
+        # track_id = topk(temp_conf, self.num_temp_instances, track_id)[1][0]
+        # track_id = track_id.squeeze(dim=-1)  # (bs, k)
+
+        bs = track_id.shape[0]
+        track_id = track_id.flatten(end_dim=1)[self.temp_topk_indice].reshape(bs, -1)
         self.track_id = F.pad(
             track_id,
             (0, self.num_anchor - self.num_temp_instances),

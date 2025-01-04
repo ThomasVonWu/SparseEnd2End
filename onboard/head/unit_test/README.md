@@ -395,7 +395,7 @@ ibank_updated_temp_trackid [MaxError] = 0
 [==========] 1 test from 1 test suite ran. (32 ms total)
 [  PASSED  ] 1 test.
 ```
-***Attention: It's import to use double in replace of float32 as function parameter precesion. The error decreased by 1,000x, lowering from \$10^{-4}$ to \$10^{-7}$ for `ibank_got_cached_anchor`. The following functions need use double:***
+***Attention: It's import to use double in replace of float32 as function parameter precesion. The error decreased by 1,000x, lowering from $10^{-4}$ to $10^{-7}$ for `ibank_got_cached_anchor`. The following functions need use double:***
 ```c++
 InstanceBank::get(const double& timestamp, const Eigen::Matrix<double, 4, 4>& global_to_lidar_mat)
 ```

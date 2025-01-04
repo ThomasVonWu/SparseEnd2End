@@ -399,7 +399,7 @@ class Sparse4DHead(BaseModule):
             # track_id = self.instance_bank.get_track_id(
             #     cls, anchor, self.decoder.score_threshold
             # )
-            track_id = self.instance_bank.get_track_id(cls)
+            track_id = self.instance_bank.get_track_id(cls, self.decoder.score_threshold)
             output["track_id"] = track_id  # [1, 900], int64
         return output
 

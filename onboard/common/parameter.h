@@ -31,7 +31,7 @@ struct ModelCfgParams {
 };
 
 /// @brief Parameters of InstanceBank.
-/// @param query_dims: 11 indicates X, Y, Z, W, L,H, SIN_YAW, COS_YAW, VX, VY,VZ.
+/// @param query_dims: 11 indicates X, Y, Z, W, L, H, SIN_YAW, COS_YAW, VX, VY, VZ.
 /// @param kmeans_anchors: anchors' values by kmeans, size  = num_querys * query_dims.
 /// @param  max_time_interval: Unit s
 /// @param  default_time_interval: Unit s

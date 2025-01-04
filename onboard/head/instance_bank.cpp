@@ -23,7 +23,7 @@ InstanceBank::InstanceBank(const common::E2EParams& params)
   mask_ = 0;
   history_time_ = 0.0F;
   time_interval_ = 0.0F;
-  temp_lidar_to_global_mat_ = Eigen::Matrix<float, 4, 4>::Zero();
+  temp_lidar_to_global_mat_ = Eigen::Matrix<double, 4, 4>::Zero();
   track_size_ = static_cast<std::uint32_t>(common::ObstacleType::OBSTACLETYPE_Max) * num_querys_;
   instance_feature_.resize(num_querys_ * embedfeat_dims_);
   temp_topk_instance_feature_.reserve(num_topk_querys_ * embedfeat_dims_);
@@ -86,15 +86,16 @@ std::tuple<const std::vector<float>&,
            const std::vector<float>&,
            const float&,
            const std::int32_t&,
-           const std::vector<int>&>
-InstanceBank::get(const float& timestamp, const Eigen::Matrix<float, 4, 4>& global_to_lidar_mat) {
+           const std::vector<std::int32_t>&>
+InstanceBank::get(const double& timestamp, const Eigen::Matrix<double, 4, 4>& global_to_lidar_mat) {
   if (!temp_topk_anchors_.empty()) {
-    time_interval_ = std::fabs(timestamp - history_time_);
+    time_interval_ = static_cast<float>(std::fabs(timestamp - history_time_));
     float epsilon = std::numeric_limits<float>::epsilon();
     mask_ = (time_interval_ < max_time_interval_ || std::fabs(time_interval_ - max_time_interval_) < epsilon) ? 1 : 0;
     time_interval_ = (static_cast<bool>(mask_) && time_interval_ > epsilon) ? time_interval_ : default_time_interval_;
 
-    Eigen::Matrix<float, 4, 4> temp2cur_mat = global_to_lidar_mat * temp_lidar_to_global_mat_;
+    Eigen::Matrix<double, 4, 4> temp2cur_mat_double = global_to_lidar_mat * temp_lidar_to_global_mat_;
+    Eigen::Matrix<float, 4, 4> temp2cur_mat = temp2cur_mat_double.cast<float>();
     anchorProjection(temp_topk_anchors_, temp2cur_mat, time_interval_);
   } else {
     reset();
@@ -133,45 +134,41 @@ common::Status InstanceBank::cache(const std::vector<float>& instance_feature,
   return common::Status::kSuccess;
 }
 
-std::vector<int> InstanceBank::getTrackId(const std::vector<int>& refined_track_ids) {
-  std::vector<int> track_ids;
-  track_ids.resize(num_querys_);
-  std::fill(track_ids.begin(), track_ids.end(), -1);
+std::vector<std::int32_t> InstanceBank::getTrackId(const std::vector<std::int32_t>& refined_track_ids) {
+  std::vector<std::int32_t> track_ids(num_querys_, -1);
   if (!refined_track_ids.empty()) {
+    if (refined_track_ids.size() != num_querys_) {
+      throw "[ERROR] refined_track_ids size is mismatch !";
+    }
     std::copy(refined_track_ids.begin(), refined_track_ids.end(), track_ids.begin());
   }
 
-  auto nums_new_anchor = std::count_if(track_ids.begin(), track_ids.end(), [](int track_id) { return track_id < 0; });
-
-  std::vector<int> new_track_ids(nums_new_anchor);
+  auto nums_new_anchor = static_cast<size_t>(
+      std::count_if(track_ids.begin(), track_ids.end(), [](std::int32_t track_id) { return track_id < 0; }));
+  std::vector<std::int32_t> new_track_ids(nums_new_anchor);
   for (size_t k = 0; k < nums_new_anchor; ++k) {
     new_track_ids[k] = k + prev_id_;
   }
 
-  std::uint32_t j = 0;
-  for (std::uint32_t i = 0; i < track_size_; ++i) {
-    if (track_ids[i] == -1) {
-      track_ids[i] = new_track_ids[j];
-      ++j;
-    }
+  for (size_t i = num_querys_ - nums_new_anchor, j = 0; i < num_querys_ && j < nums_new_anchor; ++i, ++j) {
+    track_ids[i] = new_track_ids[j];
   }
 
-  // prev_id_ += static_cast<int>(nums_new_anchor);
   prev_id_ += nums_new_anchor;
   updateTrackId(track_ids);
   return track_ids;
 }
 
-void InstanceBank::updateTrackId(const std::vector<int>& track_ids) {
-  std::vector<int> topk_trackids;
-  topk_trackids.reserve(num_topk_querys_);
+void InstanceBank::updateTrackId(const std::vector<std::int32_t>& track_ids) {
+  std::vector<std::int32_t> topk_track_ids;
+  topk_track_ids.reserve(num_topk_querys_);
   for (const auto& i : temp_topk_index_) {
-    topk_trackids.emplace_back(track_ids[i]);
+    topk_track_ids.emplace_back(track_ids[i]);
   }
 
   temp_track_ids_.clear();
+  temp_track_ids_.insert(temp_track_ids_.end(), topk_track_ids.begin(), topk_track_ids.end());
   temp_track_ids_.resize(num_querys_, -1);
-  std::copy(topk_trackids.begin(), topk_trackids.end(), temp_track_ids_.begin());
 }
 
 std::vector<float> InstanceBank::getTempConfidence() const { return temp_confidence_; }
@@ -182,18 +179,18 @@ std::vector<float> InstanceBank::getCachedFeature() const { return temp_topk_ins
 
 std::vector<float> InstanceBank::getCachedAnchor() const { return temp_topk_anchors_; }
 
-int InstanceBank::getPrevId() const { return prev_id_; }
+std::int32_t InstanceBank::getPrevId() const { return prev_id_; }
 
-std::vector<int> InstanceBank::getCachedTrackIds() const { return temp_track_ids_; }
+std::vector<std::int32_t> InstanceBank::getCachedTrackIds() const { return temp_track_ids_; }
 
 template <typename T>
 std::vector<T> InstanceBank::getMaxConfidenceScores(const std::vector<T>& confidence_logits,
                                                     const std::uint32_t& num_querys) {
   std::vector<T> max_confidence_scores;
   for (std::uint32_t i = 0; i < num_querys; ++i) {
-    T max_confidence_logit = confidence_logits[i * static_cast<std::uint32_t>(common::ObstacleType::ObstacleType_Max)];
-    for (std::uint32_t j = 0; j < static_cast<std::uint32_t>(common::ObstacleType::ObstacleType_Max); ++j) {
-      std::uint32_t index = i * static_cast<std::uint32_t>(common::ObstacleType::ObstacleType_Max) + j;
+    T max_confidence_logit = confidence_logits[i * static_cast<std::uint32_t>(common::ObstacleType::OBSTACLETYPE_Max)];
+    for (std::uint32_t j = 0; j < static_cast<std::uint32_t>(common::ObstacleType::OBSTACLETYPE_Max); ++j) {
+      std::uint32_t index = i * static_cast<std::uint32_t>(common::ObstacleType::OBSTACLETYPE_Max) + j;
       if (confidence_logits[index] > max_confidence_logit) {
         max_confidence_logit = confidence_logits[index];
       }

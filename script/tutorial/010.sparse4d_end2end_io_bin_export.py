@@ -230,9 +230,11 @@ class Sparse4D_head(nn.Module):
     def instance_bank_io_hook(self):
         """InstanceBank::get() input tensor names."""
         ibank_timestamp = self._ibank_timestamp.detach().cpu().numpy()
-        ibank_global2lidar = self._ibank_global2lidar.astype(
-            np.float32
-        )  # float64 -> float32
+        # ibank_global2lidar = self._ibank_global2lidar.astype(
+        #     np.float32
+        # )  # float64 -> float32
+
+        ibank_global2lidar = self._ibank_global2lidar
 
         """InstanceBank::get() output tensor names. """
         # self._instance_feature

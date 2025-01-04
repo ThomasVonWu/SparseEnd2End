@@ -232,7 +232,7 @@ class InstanceBank(nn.Module):
             self.temp_topk_indice,
         ) = topk(confidence, self.num_temp_instances, instance_feature, anchor)
 
-    def get_track_id(self, confidence):
+    def get_track_id(self, confidence, threshold):
         # def get_track_id(self, confidence, anchor=None, threshold=None):
         # confidence = confidence.max(dim=-1).values.sigmoid()  # (bs, num_querys)
         track_id = confidence.new_full(confidence.shape[:2], -1).long()
@@ -241,8 +241,8 @@ class InstanceBank(nn.Module):
             track_id[:, : self.track_id.shape[1]] = self.track_id
 
         mask = track_id < 0
-        # if threshold is not None:
-        #     mask = mask & (confidence >= threshold)
+        if threshold is not None:
+            mask = mask & (confidence >= threshold)
         num_new_instance = mask.sum()
         new_ids = torch.arange(num_new_instance).to(track_id) + self.prev_id
         track_id[torch.where(mask)] = new_ids

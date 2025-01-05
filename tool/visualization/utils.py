@@ -573,7 +573,7 @@ def draw_lidar_bbox3d_metas(
 
 def video(imgs, dst_path, size):
     print("ori image size = ", size)
-    size = (int(size[0] / 2), int(size[1] / 2))
+    size = (int(size[0] / 1), int(size[1] / 1))
     print("resized image size = ", size)
     resized_imgs = []
     for img in imgs:
@@ -587,4 +587,4 @@ def video(imgs, dst_path, size):
     for i in tqdm(range(len(resized_imgs))):
         videowrite.write(resized_imgs[i])
     videowrite.release()
-    print("Save video {dst_name} !")
+    print(f"Save video {dst_name} !")

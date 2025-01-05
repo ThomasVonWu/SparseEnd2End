@@ -1,4 +1,7 @@
 # SparseEnd2End: Obstacle 3D Detection and Tracking Architecture Based VisionTransformer
+
+![demo](resources/sparse_end2end.gif)
+
 <div align="center">
 
 [![license](https://img.shields.io/github/license/ThomasVonWu/SparseEnd2End

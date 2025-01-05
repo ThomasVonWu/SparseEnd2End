@@ -5,6 +5,7 @@ import cv2
 import numpy as np
 import torch
 
+from tqdm import tqdm
 from dataset.config.nusc_std_bbox3d import *
 from typing import Dict, Tuple, List, Union
 
@@ -168,8 +169,9 @@ def draw_class_label(
     cv2.rectangle(
         img=img,
         pt1=(x1, start_y),
-        pt2=(x1 + labelSize[0], end_y),
+        pt2=(x1 + labelSize[0] - 10, end_y),
         color=color,
+        lineType=cv2.LINE_AA,
         thickness=-1,
     )
     if with_yaw_label:
@@ -177,7 +179,7 @@ def draw_class_label(
     cv2.putText(
         img=img,
         text=label,
-        org=(x1, end_y),
+        org=(x1, end_y - 1),
         fontFace=cv2.FONT_HERSHEY_SIMPLEX,
         fontScale=fontScale,
         color=(0, 0, 0),
@@ -187,7 +189,7 @@ def draw_class_label(
 
 
 def plot_rect3d_on_img(
-    img, num_rects, rect_corners, label, img_metas, color, thickness=1
+    img, num_rects, rect_corners, label, img_metas, color, thickness, cam_index
 ):
     """Plot the boundary lines of 3D rectangular on 2D images.
 
@@ -265,12 +267,42 @@ def plot_rect3d_on_img(
                 draw_meatas(
                     img, (x0, y0), track_id[i], colormap[id_class_map[label[i]]]
                 )
+                draw_legend(img, cam_index)
 
     return img.astype(np.uint8)
 
 
+def draw_legend(img, cam_index):
+    camera_types = [
+        "CAM_FRONT",
+        "CAM_FRONT_RIGHT",
+        "CAM_FRONT_LEFT",
+        "CAM_BACK",
+        "CAM_BACK_LEFT",
+        "CAM_BACK_RIGHT",
+    ]
+    cam_name = camera_types[cam_index]
+    cv2.putText(
+        img=img,
+        text=f"{cam_name}",
+        org=(8, 16),
+        fontFace=cv2.FONT_HERSHEY_SIMPLEX,
+        fontScale=0.5,
+        color=(80, 127, 255),
+        thickness=1,
+    )
+    pass
+
+
 def draw_lidar_bbox3d_on_img(
-    bboxes3d, label, raw_img, lidar2img_rt, img_metas=None, color=None, thickness=1
+    bboxes3d,
+    label,
+    raw_img,
+    lidar2img_rt,
+    img_metas=None,
+    color=None,
+    thickness=1,
+    cam_index=0,
 ):
     """Project the 3D bbox on 2D plane and draw on input image.
 
@@ -310,6 +342,7 @@ def draw_lidar_bbox3d_on_img(
         img_metas,
         color,
         thickness,
+        cam_index,
     )
 
 
@@ -369,7 +402,7 @@ def draw_points_on_img(points, img, lidar2img_rt, color=(0, 255, 0), circle=4):
 
 
 def draw_lidar_bbox3d_on_bev(
-    bboxes_3d, label, bev_size, bev_range=115, color=None, thickness=3
+    bboxes_3d, label, bev_size, bev_range=115, color=None, thickness=4
 ):
     color_flag = color is None
     id_class_map = get_id_class_map()
@@ -396,6 +429,7 @@ def draw_lidar_bbox3d_on_bev(
         (bev_w, int(bev_h / 2)),
         marking_color,
         lineType=cv2.LINE_AA,
+        thickness=thickness,
     )
     cv2.line(
         bev,
@@ -403,6 +437,7 @@ def draw_lidar_bbox3d_on_bev(
         (int(bev_w / 2), bev_h),
         marking_color,
         lineType=cv2.LINE_AA,
+        thickness=thickness,
     )
     if len(bboxes_3d) != 0:
         bev_corners = box3d_to_corners(bboxes_3d)[:, [0, 3, 4, 7]][..., [0, 1]]
@@ -508,10 +543,18 @@ def draw_lidar_bbox3d_metas(
     else:
         for i, (img, lidar2img) in enumerate(zip(imgs, lidar2imgs)):
             img_show = draw_lidar_bbox3d_on_img(
-                bboxes_3d, label, img, lidar2img, imgs_meat, thickness=1
+                bboxes_3d, label, img, lidar2img, imgs_meat, cam_index=i
             )
             vis_imgs.append(img_show)
 
+        vis_imgs = [
+            vis_imgs[2],
+            vis_imgs[0],
+            vis_imgs[1],
+            vis_imgs[5],
+            vis_imgs[3],
+            vis_imgs[4],
+        ]
         num_imgs = len(vis_imgs)
         vis_imgs = np.concatenate(
             [
@@ -526,3 +569,22 @@ def draw_lidar_bbox3d_metas(
 
     vis_imgs = np.concatenate([bev, vis_imgs], axis=1) if bev is not None else vis_imgs
     return vis_imgs
+
+
+def video(imgs, dst_path, size):
+    print("ori image size = ", size)
+    size = (int(size[0] / 2), int(size[1] / 2))
+    print("resized image size = ", size)
+    resized_imgs = []
+    for img in imgs:
+        img = cv2.resize(img, dsize=size)
+        resized_imgs.append(img)
+
+    fourcc = cv2.VideoWriter_fourcc('m', 'p', '4', 'v')
+    dst_name = dst_path +"sparse_end2end.mp4"
+    videowrite = cv2.VideoWriter(dst_name, fourcc, 10, size)
+
+    for i in tqdm(range(len(resized_imgs))):
+        videowrite.write(resized_imgs[i])
+    videowrite.release()
+    print("Save video {dst_name} !")

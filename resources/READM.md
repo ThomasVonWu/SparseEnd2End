@@ -1,11 +1,7 @@
 # Add/Update sparse_end2end GIF 
 
 **1st Step**
-```python
-cd /path/to/SparseEnd2End
-python script/tutorial/001.nusc_dataset_visualization.py
-```
-**2nd Step**
+
 ```bash
 sudo apt install ffmpeg
 

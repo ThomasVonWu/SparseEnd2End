@@ -9,6 +9,7 @@
 #include "NvInferPlugin.h"
 
 namespace SparseEnd2End {
+namespace engine {
 
 class TensorRT {
  public:
@@ -18,13 +19,11 @@ class TensorRT {
   TensorRT() = delete;
   ~TensorRT();
 
-  bool init();
-  bool setInputDimensions(
-      const std::vector<std::vector<std::int32_t>>& input_dims);
+  void init();
+  bool setInputDimensions(const std::vector<std::vector<std::int32_t>>& input_dims);
   bool infer(void* const* buffers, const cudaStream_t& stream);
   std::map<std::string, std::tuple<std::int32_t, std::int32_t>> getInputIndex();
-  std::map<std::string, std::tuple<std::int32_t, std::int32_t>>
-  getOutputIndex();
+  std::map<std::string, std::tuple<std::int32_t, std::int32_t>> getOutputIndex();
   void getEngineInfo();
 
  private:
@@ -37,6 +36,7 @@ class TensorRT {
   nvinfer1::IExecutionContext* context_;
 };
 
+}  // namespace engine
 }  // namespace SparseEnd2End
 
 #endif  // ONBOARD_TENSORRT_TENSORRT_H

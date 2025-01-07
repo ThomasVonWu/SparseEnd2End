@@ -3,115 +3,106 @@
 
 #include <dlfcn.h>
 
-namespace SparseEnd2End {
+#include <iostream>
+
+#include "../common/utils.h"
+
+namespace sparse_end2end {
+namespace engine {
 
 TensorRT::TensorRT(const std::string& engine_path,
                    const std::vector<std::string>& input_names,
                    const std::vector<std::string>& output_names)
-    : engine_path_(engine_path),
-      input_names_(input_names),
-      output_names_(output_names) {}
+    : engine_path_(engine_path), input_names_(input_names), output_names_(output_names) {}
+
 TensorRT::~TensorRT() {
   context_->destroy();
   engine_->destroy();
   runtime_->destroy();
 }
 
-bool TensorRT::Init() {
-  auto [status, engine_data] = deserializate<char>(engine_path_);
-  if (!ok) {
-    LOG_ERROR(kLogContext,
-              "Failed to find TensorRT engine file." << engine_path_);
-    return false;
-  }
+void TensorRT::Init() {
+  std::vector<char> engine_data = common::readfile_wrapper<char>(engine_path_);
 
   void* pluginLibraryHandle = dlopen(plugin_path_, RTLD_LAZY);
   if (!pluginLibraryHandle) {
-    LOG_ERROR(kLogContext, "Failed to load plugin: " << plugin_path_);
-    return false;
+    // LOG_ERROR(kLogContext, "Failed to load plugin: " << plugin_path_);
+    std::cout << "[ERROR] Failed to load TensorRT plugin : " << plugin_path_ << std::endl;
   }
 
   initLibNvInferPlugins(&gLogger, "");
   runtime_ = nvinfer1::createInferRuntime(gLogger);
-  engine_ = runtime_->deserializeCudaEngine(engine_data.data(),
-                                            engine_data.size(), nullptr);
+  engine_ = runtime_->deserializeCudaEngine(engine_data.data(), engine_data.size(), nullptr);
   context_ = engine_->createExecutionContext();
 
   if (!runtime_ || !engine_ || !context_) {
-    LOG_ERROR(kLogContext, "TensorRT engine initialized failed!");
-    return false;
+    // LOG_ERROR(kLogContext, "TensorRT engine initialized failed!");
+    std::cout << "[ERROR] TensorRT engine initialized failed !" std::endl;
   }
-  return true;
 }
 
 bool TensorRT::Infer(void* const* buffers, const cudaStream_t& stream) {
   return context_->enqueueV2(buffers, stream, nullptr);
 }
 
-bool TensorRT::SetInputDimensions(
-    const std::vector<std::vector<std::int32_t>>& input_dims) {
+bool TensorRT::SetInputDimensions(const std::vector<std::vector<std::int32_t>>& input_dims) {
   if (input_dims.size() != input_names_.size()) {
-    LOG_ERROR(kLogContext, "Mismatched number of input dimensions!");
+    // LOG_ERROR(kLogContext, "Mismatched number of input dimensions!");
+    std::cout << "[ERROR] Mismatched number of input dimensions ! " << std::endl;
     return false;
   }
 
   for (size_t i = 0; i < input_names_.size(); ++i) {
     const std::string& input_name = input_names_[i];
-    const std::int32_t binding_index =
-        engine_->getBindingIndex(input_name.c_str());
+    const std::int32_t binding_index = engine_->getBindingIndex(input_name.c_str());
     nvinfer1::Dims dims = engine_->getBindingDimensions(binding_index);
     if (static_cast<size_t>(dims.nbDims) != input_dims[i].size()) {
-      LOG_ERROR(
-          kLogContext,
-          "Mismatched number of dimensions for input tensor: " << input_name);
+      // LOG_ERROR(kLogContext, "Mismatched number of dimensions for input tensor: " << input_name);
+      std::cout << "Mismatched number of dimensions for input tensor :  " << input_name << " "
+                << static_cast<size_t>(dims.nbDims) << " v.s. " << input_dims[i].size() << std::endl;
       return false;
     }
 
     for (size_t j = 0; j < static_cast<size_t>(dims.nbDims); ++j) {
       dims.d[j] = input_dims[i][j];
     }
+
     if (!context_->setBindingDimensions(binding_index, dims)) {
-      LOG_ERROR(kLogContext, "Error binding input_name of " << input_name);
+      // LOG_ERROR(kLogContext, "Error binding input_name of " << input_name);
+      std::cout << "[ERROR]  Failed to set binding dimensions for index  " << binding_index
+                << "for input tensor : " << input_name << std::endl;
       return false;
     }
   }
   return true;
 }
 
-std::map<std::string, std::tuple<std::int32_t, std::int32_t>>
-TensorRT::GetInputIndex() {
-  std::map<std::string, std::tuple<std::int32_t, std::int32_t>>
-      inputs_index_map;
+std::map<std::string, std::tuple<std::int32_t, std::int32_t>> TensorRT::GetInputIndex() {
+  std::map<std::string, std::tuple<std::int32_t, std::int32_t>> inputs_index_map;
   for (size_t i = 0; i < input_names_.size(); ++i) {
     const std::string input_name = input_names_[i];
-    const std::int32_t binding_index =
-        engine_->getBindingIndex(input_name.c_str());
+    const std::int32_t binding_index = engine_->getBindingIndex(input_name.c_str());
     const nvinfer1::Dims dims = engine_->getBindingDimensions(binding_index);
     std::int32_t tensor_length = 1;
     for (int j = 0; j < dims.nbDims; ++j) {
       tensor_length *= dims.d[j];
     }
-    inputs_index_map[input_name] =
-        std::make_tuple(tensor_length, binding_index);
+    inputs_index_map[input_name] = std::make_tuple(tensor_length, binding_index);
   }
   return inputs_index_map;
 }
 
-std::map<std::string, std::tuple<std::int32_t, std::int32_t>>
-TensorRT::GetOutputIndex() {
-  std::map<std::string, std::tuple<std::int32_t, std::int32_t>>
-      outputs_index_map;
+std::map<std::string, std::tuple<std::int32_t, std::int32_t>> TensorRT::GetOutputIndex() {
+  std::map<std::string, std::tuple<std::int32_t, std::int32_t>> outputs_index_map;
   for (size_t i = 0; i < output_names_.size(); ++i) {
     const std::string output_name = output_names_[i];
-    const std::int32_t binding_index =
-        engine_->getBindingIndex(output_name.c_str());
+    const std::int32_t binding_index = engine_->getBindingIndex(output_name.c_str());
     const nvinfer1::Dims dims = engine_->getBindingDimensions(binding_index);
     std::int32_t tensor_length = 1;
     for (int j = 0; j < dims.nbDims; ++j) {
       tensor_length *= dims.d[j];
     }
-    outputs_index_map[output_name] =
-        std::make_tuple(tensor_length, binding_index);
+    outputs_index_map[output_name] = std::make_tuple(tensor_length, binding_index);
   }
   return outputs_index_map;
 }
@@ -121,35 +112,36 @@ void getEngineInfo() {
   for (int i = 0; i < numBindings; ++i) {
     bool isInput = engine_->bindingIsInput(i);
     std::string type = isInput ? "Input" : "Output";
-    LOG_INFO << type << " binding " << i << ": " << std::endl;
-    LOG_INFO << "  Name: " << engine_->getBindingName(i) << std::endl;
+    std::cout << type << " binding " << i << ": " << std::endl;
+    std::cout << "  Name: " << engine_->getBindingName(i) << std::endl;
     nvinfer1::Dims dims = engine_->getBindingDimensions(i);
-    LOG_INFO << "  Dimensions: ";
+    std::cout << "  Dimensions: ";
     for (int j = 0; j < dims.nbDims; ++j) {
-      LOG_INFO << dims.d[j] << (j < dims.nbDims - 1 ? "x" : "");
+      std::cout << dims.d[j] << (j < dims.nbDims - 1 ? "x" : "");
     }
-    LOG_INFO << std::endl;
+    std::cout << std::endl;
     nvinfer1::DataType dtype = engine_->getBindingDataType(i);
-    LOG_INFO << "  Data type: ";
+    std::cout << "  Data type: ";
     switch (dtype) {
       case nvinfer1::DataType::kFLOAT:
-        LOG_INFO << "FLOAT";
+        std::cout << "FLOAT";
         break;
       case nvinfer1::DataType::kHALF:
-        LOG_INFO << "HALF";
+        std::cout << "HALF";
         break;
       case nvinfer1::DataType::kINT8:
-        LOG_INFO << "INT8";
+        std::cout << "INT8";
         break;
       case nvinfer1::DataType::kINT32:
-        LOG_INFO << "INT32";
+        std::cout << "INT32";
         break;
       default:
-        LOG_INFO << "UNKNOWN";
+        std::cout << "UNKNOWN";
         break;
     }
-    LOG_INFO << std::endl;
+    std::cout << std::endl;
   }
 }
 
-}  // namespace SparseEnd2End
+}  // namespace engine
+}  // namespace sparse_end2end

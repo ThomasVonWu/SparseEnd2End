@@ -19,7 +19,6 @@ class TensorRT {
   TensorRT() = delete;
   ~TensorRT();
 
-  void init();
   bool setInputDimensions(const std::vector<std::vector<std::int32_t>>& input_dims);
   bool infer(void* const* buffers, const cudaStream_t& stream);
   std::map<std::string, std::tuple<std::int32_t, std::int32_t>> getInputIndex();
@@ -27,6 +26,7 @@ class TensorRT {
   void getEngineInfo();
 
  private:
+  void init();
   const std::string engine_path_;
   const std::string plugin_path_;
   const std::vector<std::string> input_names_;

@@ -132,23 +132,24 @@ sparse4d_extract_feat_spatial_shapes_ld :
 sparse4d_extract_feat_level_start_index : 
 First 5 elements: 0 | 11264 | 14080 | 14784 | 14960 | 
 Last 5 elements: 74624 | 74800 | 86064 | 88880 | 89584 | 
+multiview_multiscale_deformable_attention_aggregation_path = /path/to/onboard/assets/trt_engine/deformableAttentionAggr.so
 
 [Sparse4dExtractFeatEngine Parameters Infos]:
-sparse4d_extract_feat_engine.engine_path = onboard/assets/trt_engine/sparse4dbackbone.engine
+sparse4d_extract_feat_engine.engine_path = /path/to/onboard/assets/trt_engine/sparse4dbackbone.engine
 sparse4d_extract_feat_engine. input_names: 
 img | 
 sparse4d_extract_feat_engine. output_names=
 feature | 
 
 [Sparse4dHead1stEngine Parameters Infos]:
-sparse4d_head1st_engine.engine_path = onboard/assets/trt_engine/sparse4dhead1st.engine
+sparse4d_head1st_engine.engine_path = /path/to/onboard/assets/trt_engine/sparse4dhead1st.engine
 sparse4d_head1st_engine. input_names: 
 feature | spatial_shapes | level_start_index | instance_feature | anchor | time_interval | image_wh | lidar2img | 
 sparse4d_head1st_engine. output_names=
 pred_instance_feature | pred_anchor | pred_class_score | pred_quality_score | 
 
 [Sparse4dHead2ndEngine Parameters Infos]:
-sparse4d_head2nd_engine.engine_path = onboard/assets/trt_engine/sparse4dhead2nd.engine
+sparse4d_head2nd_engine.engine_path = /path/to/onboard/assets/trt_engine/sparse4dhead2nd.engine
 sparse4d_head2nd_engine. input_names: 
 feature | spatial_shapes | level_start_index | instance_feature | anchor | time_interval | temp_instance_feature | temp_anchor | mask | track_id | image_wh | lidar2img | 
 sparse4d_head2nd_engine. output_names=

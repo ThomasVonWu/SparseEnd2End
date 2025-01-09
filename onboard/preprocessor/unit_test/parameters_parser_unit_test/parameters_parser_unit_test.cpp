@@ -54,6 +54,8 @@ TEST(ParseParamsUnitTest, ParseParamsFunctionCall) {
   print_infos(params.model_cfg.sparse4d_extract_feat_spatial_shapes_ld);
   printf("sparse4d_extract_feat_level_start_index : \n");
   print_infos(params.model_cfg.sparse4d_extract_feat_level_start_index);
+  printf("multiview_multiscale_deformable_attention_aggregation_path = %s\n",
+         params.model_cfg.multiview_multiscale_deformable_attention_aggregation_path.c_str());
 
   printf("\n[Sparse4dExtractFeatEngine Parameters Infos]:\n");
   printf("sparse4d_extract_feat_engine.engine_path = %s\n", params.sparse4d_extract_feat_engine.engine_path.c_str());

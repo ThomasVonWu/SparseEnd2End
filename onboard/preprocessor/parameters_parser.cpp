@@ -148,49 +148,55 @@ common::E2EParams parseParams(const std::string& model_cfg_path) {
   sparse4d_extract_feat_level_start_index.pop_back();
   sparse4d_extract_feat_level_start_index.insert(sparse4d_extract_feat_level_start_index.begin(), 0);
 
-  /// @brief STEP-8 Parse Node: `Sparse4dHeadFirstFrameEngine` in YAML.
+  /// @brief STEP-8 Parse Node: `MultiViewMultiScaleDeformableAttentionAggregationPath` in YAML.
+  YAML::Node multiview_multiscale_deformable_attention_aggregation_path_node =
+      common::getYamlSubNode(sparse_e2e_node, "MultiViewMultiScaleDeformableAttentionAggregationPath");
+  std::string multiview_multiscale_deformable_attention_aggregation_path =
+      multiview_multiscale_deformable_attention_aggregation_path_node.as<std::string>();
+
+  /// @brief STEP-9 Parse Node: `Sparse4dHeadFirstFrameEngine` in YAML.
   YAML::Node sparse4d_head_first_frame_engine_node =
       common::getYamlSubNode(sparse_e2e_node, "Sparse4dHeadFirstFrameEngine");
 
-  /// STEP-8.1 Parse Node:`Sparse4dHeadFirstFrameEngine/EnginePath` in YAML.
+  /// STEP-9.1 Parse Node:`Sparse4dHeadFirstFrameEngine/EnginePath` in YAML.
   YAML::Node sparse4d_head1st_engine_path_node =
       common::getYamlSubNode(sparse4d_head_first_frame_engine_node[0], "EnginePath");
   std::string sparse4d_head1st_engine_path = sparse4d_head1st_engine_path_node.as<std::string>();
 
-  /// STEP-8.2 : Parse Node: `Sparse4dHeadFirstFrameEngine/EngineInputNames` in YAML.
+  /// STEP-9.2 : Parse Node: `Sparse4dHeadFirstFrameEngine/EngineInputNames` in YAML.
   YAML::Node sparse4d_head1st_engine_input_names_node =
       common::getYamlSubNode(sparse4d_head_first_frame_engine_node[1], "EngineInputNames");
   std::vector<std::string> sparse4d_head1st_engine_input_names =
       sparse4d_head1st_engine_input_names_node.as<std::vector<std::string>>();
 
-  /// STEP-8.3 : Parse Node: `Sparse4dHeadFirstFrameEngine/EngineOutputNames` in YAML.
+  /// STEP-9.3 : Parse Node: `Sparse4dHeadFirstFrameEngine/EngineOutputNames` in YAML.
   YAML::Node sparse4d_head1st_engine_output_names_node =
       common::getYamlSubNode(sparse4d_head_first_frame_engine_node[2], "EngineOutputNames");
   std::vector<std::string> sparse4d_head1st_engine_output_names =
       sparse4d_head1st_engine_output_names_node.as<std::vector<std::string>>();
 
-  /// @brief STEP-9 Parse Node: `Sparse4dHeadSecondFrameEngine` in YAML.
+  /// @brief STEP-10 Parse Node: `Sparse4dHeadSecondFrameEngine` in YAML.
   YAML::Node sparse4d_head_second_frame_engine_node =
       common::getYamlSubNode(sparse_e2e_node, "Sparse4dHeadSecondFrameEngine");
 
-  /// STEP-9.1 Parse Node:`Sparse4dHeadSecondFrameEngine/EnginePath` in YAML.
+  /// STEP-10.1 Parse Node:`Sparse4dHeadSecondFrameEngine/EnginePath` in YAML.
   YAML::Node sparse4d_head2nd_engine_path_node =
       common::getYamlSubNode(sparse4d_head_second_frame_engine_node[0], "EnginePath");
   std::string sparse4d_head2nd_engine_path = sparse4d_head2nd_engine_path_node.as<std::string>();
 
-  /// STEP-9.2 : Parse Node: `Sparse4dHeadSecondFrameEngine/EngineInputNames` in YAML.
+  /// STEP-10.2 : Parse Node: `Sparse4dHeadSecondFrameEngine/EngineInputNames` in YAML.
   YAML::Node sparse4d_head2nd_engine_input_names_node =
       common::getYamlSubNode(sparse4d_head_second_frame_engine_node[1], "EngineInputNames");
   std::vector<std::string> sparse4d_head2nd_engine_input_names =
       sparse4d_head2nd_engine_input_names_node.as<std::vector<std::string>>();
 
-  /// STEP-9.3 : Parse Node: `Sparse4dHeadSecondFrameEngine/EngineOutputNames` in YAML.
+  /// STEP-10.3 : Parse Node: `Sparse4dHeadSecondFrameEngine/EngineOutputNames` in YAML.
   YAML::Node sparse4d_head2nd_engine_output_names_node =
       common::getYamlSubNode(sparse4d_head_second_frame_engine_node[2], "EngineOutputNames");
   std::vector<std::string> sparse4d_head2nd_engine_output_names =
       sparse4d_head2nd_engine_output_names_node.as<std::vector<std::string>>();
 
-  ///@brief STEP-10 Parse Node: `InstanceBankParams` in YAML.
+  ///@brief STEP-11 Parse Node: `InstanceBankParams` in YAML.
   YAML::Node instance_bank_params_node = common::getYamlSubNode(sparse_e2e_node, "InstanceBankParams");
 
   YAML::Node num_querys_node = common::getYamlSubNode(instance_bank_params_node[0], "NumQuerys");
@@ -211,7 +217,7 @@ common::E2EParams parseParams(const std::string& model_cfg_path) {
   YAML::Node confidence_decay_node = common::getYamlSubNode(instance_bank_params_node[5], "ConfidenceDecay");
   float confidence_decay = confidence_decay_node.as<float>();
 
-  ///@brief STEP-11 Parse Node: `PostProcess` in YAML.
+  ///@brief STEP-12 Parse Node: `PostProcess` in YAML.
   YAML::Node post_process_node = common::getYamlSubNode(sparse_e2e_node, "PostProcess");
 
   YAML::Node post_process_out_nums_node = common::getYamlSubNode(post_process_node[0], "PostProcessOutNums");
@@ -220,7 +226,7 @@ common::E2EParams parseParams(const std::string& model_cfg_path) {
   YAML::Node post_process_threshold_node = common::getYamlSubNode(post_process_node[1], "PostProcessThreshold");
   float post_process_threshold = post_process_threshold_node.as<float>();
 
-  ///@brief STEP-12 Construct E2EParams::params based on the the parsed parameters.
+  ///@brief STEP-13 Construct E2EParams::params based on the the parsed parameters.
   common::PreprocessorParams preprocessor_params;
   preprocessor_params.num_cams = num_cams;
   preprocessor_params.raw_img_c = raw_img_shape_chw[0];
@@ -238,6 +244,8 @@ common::E2EParams parseParams(const std::string& model_cfg_path) {
   model_cfg_params.sparse4d_extract_feat_shape_lc = sparse4d_extract_feat_shape_lc;
   model_cfg_params.sparse4d_extract_feat_spatial_shapes_ld = sparse4d_extract_feat_spatial_shapes_ld;
   model_cfg_params.sparse4d_extract_feat_level_start_index = sparse4d_extract_feat_level_start_index;
+  model_cfg_params.multiview_multiscale_deformable_attention_aggregation_path =
+      multiview_multiscale_deformable_attention_aggregation_path;
 
   common::E2ETrtEngine sparse4d_extract_feat_trt_engine;
   sparse4d_extract_feat_trt_engine.engine_path = sparse4d_extract_feat_trt_engine_path;

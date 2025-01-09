@@ -4,6 +4,7 @@
 #include <dlfcn.h>
 
 #include <iostream>
+// #include <vector>
 
 #include "../common/utils.h"
 
@@ -13,7 +14,9 @@ namespace engine {
 TensorRT::TensorRT(const std::string& engine_path,
                    const std::vector<std::string>& input_names,
                    const std::vector<std::string>& output_names)
-    : engine_path_(engine_path), input_names_(input_names), output_names_(output_names) {}
+    : engine_path_(engine_path), input_names_(input_names), output_names_(output_names) {
+  init();
+}
 
 TensorRT::~TensorRT() {
   context_->destroy();
@@ -21,7 +24,7 @@ TensorRT::~TensorRT() {
   runtime_->destroy();
 }
 
-void TensorRT::Init() {
+void TensorRT::init() {
   std::vector<char> engine_data = common::readfile_wrapper<char>(engine_path_);
 
   void* pluginLibraryHandle = dlopen(plugin_path_, RTLD_LAZY);
@@ -37,15 +40,15 @@ void TensorRT::Init() {
 
   if (!runtime_ || !engine_ || !context_) {
     // LOG_ERROR(kLogContext, "TensorRT engine initialized failed!");
-    std::cout << "[ERROR] TensorRT engine initialized failed !" std::endl;
+    std::cout << "[ERROR] TensorRT engine initialized failed !" << std::endl;
   }
 }
 
-bool TensorRT::Infer(void* const* buffers, const cudaStream_t& stream) {
+bool TensorRT::infer(void* const* buffers, const cudaStream_t& stream) {
   return context_->enqueueV2(buffers, stream, nullptr);
 }
 
-bool TensorRT::SetInputDimensions(const std::vector<std::vector<std::int32_t>>& input_dims) {
+bool TensorRT::setInputDimensions(const std::vector<std::vector<std::int32_t>>& input_dims) {
   if (input_dims.size() != input_names_.size()) {
     // LOG_ERROR(kLogContext, "Mismatched number of input dimensions!");
     std::cout << "[ERROR] Mismatched number of input dimensions ! " << std::endl;
@@ -77,7 +80,7 @@ bool TensorRT::SetInputDimensions(const std::vector<std::vector<std::int32_t>>& 
   return true;
 }
 
-std::map<std::string, std::tuple<std::int32_t, std::int32_t>> TensorRT::GetInputIndex() {
+std::map<std::string, std::tuple<std::int32_t, std::int32_t>> TensorRT::getInputIndex() {
   std::map<std::string, std::tuple<std::int32_t, std::int32_t>> inputs_index_map;
   for (size_t i = 0; i < input_names_.size(); ++i) {
     const std::string input_name = input_names_[i];
@@ -92,7 +95,7 @@ std::map<std::string, std::tuple<std::int32_t, std::int32_t>> TensorRT::GetInput
   return inputs_index_map;
 }
 
-std::map<std::string, std::tuple<std::int32_t, std::int32_t>> TensorRT::GetOutputIndex() {
+std::map<std::string, std::tuple<std::int32_t, std::int32_t>> TensorRT::getOutputIndex() {
   std::map<std::string, std::tuple<std::int32_t, std::int32_t>> outputs_index_map;
   for (size_t i = 0; i < output_names_.size(); ++i) {
     const std::string output_name = output_names_[i];
@@ -107,7 +110,7 @@ std::map<std::string, std::tuple<std::int32_t, std::int32_t>> TensorRT::GetOutpu
   return outputs_index_map;
 }
 
-void getEngineInfo() {
+void TensorRT::getEngineInfo() {
   int numBindings = engine_->getNbBindings();
   for (int i = 0; i < numBindings; ++i) {
     bool isInput = engine_->bindingIsInput(i);

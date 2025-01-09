@@ -16,11 +16,12 @@ SparseE2E:
     - ModelInputImgShape_CHW: [3, 256, 704]
   EmbedFeatDims: 256
   Sparse4dExtractFeatTrtEngine:
-    - EnginePath: "onboard/assets/trt_engine/sparse4dbackbone.engine"
+    - EnginePath: "/path/to/onboard/assets/trt_engine/sparse4dbackbone.engine"
     - EngineInputNames: ["img"]
     - EngineOutputNames: ["feature"]
     - Sparse4dExtractFeatShape_LC: [89760, 256]
     - Sparse4dExtractFeatSpatialShapes_LD: [64, 176, 32, 88, 16, 44, 8, 22]
+  MultiViewMultiScaleDeformableAttentionAggregationPath: "/path/to/onboard/assets/trt_engine/deformableAttentionAggr.so"
   Sparse4dHeadFirstFrameEngine:
     - EnginePath: "onboard/assets/trt_engine/sparse4dhead1st.engine"
     - EngineInputNames:

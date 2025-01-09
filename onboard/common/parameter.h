@@ -28,6 +28,7 @@ struct ModelCfgParams {
   std::vector<std::uint32_t> sparse4d_extract_feat_shape_lc = {};
   std::vector<std::uint32_t> sparse4d_extract_feat_spatial_shapes_ld = {};
   std::vector<std::uint32_t> sparse4d_extract_feat_level_start_index = {};
+  std::string multiview_multiscale_deformable_attention_aggregation_path;
 };
 
 /// @brief Parameters of InstanceBank.

@@ -8,14 +8,15 @@
 #include "NvInfer.h"
 #include "NvInferPlugin.h"
 
-namespace SparseEnd2End {
+namespace sparse_end2end {
 namespace engine {
 
 class TensorRT {
  public:
-  TensorRT(const std::string& engine_path,
-           const std::vector<std::string>& input_names,
-           const std::vector<std::string>& output_names);
+  TensorRT(const std::string& engine_path = "",
+           const std::string& plugin_path = "",
+           const std::vector<std::string>& input_names = {},
+           const std::vector<std::string>& output_names = {});
   TensorRT() = delete;
   ~TensorRT();
 
@@ -37,6 +38,6 @@ class TensorRT {
 };
 
 }  // namespace engine
-}  // namespace SparseEnd2End
+}  // namespace sparse_end2end
 
 #endif  // ONBOARD_TENSORRT_TENSORRT_H

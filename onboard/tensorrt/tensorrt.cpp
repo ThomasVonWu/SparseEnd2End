@@ -4,17 +4,18 @@
 #include <dlfcn.h>
 
 #include <iostream>
-// #include <vector>
 
 #include "../common/utils.h"
+#include "logging.h"
 
 namespace sparse_end2end {
 namespace engine {
 
 TensorRT::TensorRT(const std::string& engine_path,
+                   const std::string& plugin_path,
                    const std::vector<std::string>& input_names,
                    const std::vector<std::string>& output_names)
-    : engine_path_(engine_path), input_names_(input_names), output_names_(output_names) {
+    : engine_path_(engine_path), plugin_path_(plugin_path), input_names_(input_names), output_names_(output_names) {
   init();
 }
 
@@ -27,10 +28,12 @@ TensorRT::~TensorRT() {
 void TensorRT::init() {
   std::vector<char> engine_data = common::readfile_wrapper<char>(engine_path_);
 
-  void* pluginLibraryHandle = dlopen(plugin_path_, RTLD_LAZY);
-  if (!pluginLibraryHandle) {
-    // LOG_ERROR(kLogContext, "Failed to load plugin: " << plugin_path_);
-    std::cout << "[ERROR] Failed to load TensorRT plugin : " << plugin_path_ << std::endl;
+  if (!plugin_path_.empty()) {
+    void* pluginLibraryHandle = dlopen(plugin_path_.c_str(), RTLD_LAZY);
+    if (!pluginLibraryHandle) {
+      // LOG_ERROR(kLogContext, "Failed to load plugin: " << plugin_path_);
+      std::cout << "[ERROR] Failed to load TensorRT plugin : " << plugin_path_ << std::endl;
+    }
   }
 
   initLibNvInferPlugins(&gLogger, "");

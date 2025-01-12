@@ -24,7 +24,7 @@ class TensorRT {
   bool infer(void* const* buffers, const cudaStream_t& stream);
   std::map<std::string, std::tuple<std::int32_t, std::int32_t>> getInputIndex();
   std::map<std::string, std::tuple<std::int32_t, std::int32_t>> getOutputIndex();
-  void getEngineInfo();
+  void getEngineInfo() const;
 
  private:
   void init();

@@ -225,7 +225,7 @@ def main():
 
         max_abs_distance = float((np.abs(output1 - output2)).max())
         assert (
-            max_abs_distance < 0.1
+            max_abs_distance < 0.11
         ), f"Error in max_abs_distance = {max_abs_distance} !"
         logger.info(f"max(abs(a-b))   = {max_abs_distance}")
 

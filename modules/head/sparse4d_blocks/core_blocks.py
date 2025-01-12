@@ -108,9 +108,9 @@ class DeformableAttentionAggr(BaseModule):
             out: (bs, 900+x, 512)
         """
         bs, num_anchor = instance_feature.shape[:2]
-        # [bs, 1220, 7+6, 3]
+        # [bs, num_anchors, 7+6, 3]
         key_points = self.kps_generator(anchor, instance_feature)
-        # [bs, 1220, 6, 4, 13, 8]
+        # [bs, num_anchors, 6, 4, 13, 8]
         weights = self._get_weights(instance_feature, anchor_embed, metas)
 
         if self.use_deformable_func:

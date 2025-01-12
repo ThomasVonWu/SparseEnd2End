@@ -113,21 +113,25 @@ std::map<std::string, std::tuple<std::int32_t, std::int32_t>> TensorRT::getOutpu
   return outputs_index_map;
 }
 
-void TensorRT::getEngineInfo() {
+void TensorRT::getEngineInfo()  const{
   int numBindings = engine_->getNbBindings();
+  std::cout << "[INFO] Get TensorRT Engine Name/Dim/Type:" <<std::endl;
+  
   for (int i = 0; i < numBindings; ++i) {
     bool isInput = engine_->bindingIsInput(i);
     std::string type = isInput ? "Input" : "Output";
     std::cout << type << " binding " << i << ": " << std::endl;
     std::cout << "  Name: " << engine_->getBindingName(i) << std::endl;
+    
     nvinfer1::Dims dims = engine_->getBindingDimensions(i);
-    std::cout << "  Dimensions: ";
+    std::cout << "  Dim: ";
     for (int j = 0; j < dims.nbDims; ++j) {
       std::cout << dims.d[j] << (j < dims.nbDims - 1 ? "x" : "");
     }
     std::cout << std::endl;
+
     nvinfer1::DataType dtype = engine_->getBindingDataType(i);
-    std::cout << "  Data type: ";
+    std::cout << " Type: ";
     switch (dtype) {
       case nvinfer1::DataType::kFLOAT:
         std::cout << "FLOAT";
